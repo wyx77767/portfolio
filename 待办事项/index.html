@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>待办事项 · 任务管理</title>
+<style>
+:root{--bg:#f5f5f0;--panel:#ffffff;--text:#2d3436;--muted:#b2bec3;--accent:#6c5ce7;--accent-light:#a29bfe;--green:#00b894;--orange:#fdcb6e;--red:#d63031;--blue:#0984e3;--shadow:0 2px 8px rgba(0,0,0,.06)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
+.container{max-width:800px;margin:0 auto}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:16px}
+.header h1{font-size:28px;display:flex;align-items:center;gap:10px}
+.header h1 span{color:var(--accent)}
+.date-badge{background:var(--panel);padding:8px 16px;border-radius:20px;font-size:14px;color:var(--muted);box-shadow:var(--shadow)}
+/* 统计卡片 */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--panel);border-radius:16px;padding:20px;text-align:center;box-shadow:var(--shadow);transition:transform .2s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-icon{font-size:32px;margin-bottom:8px}
+.stat-num{font-size:32px;font-weight:700}
+.stat-label{font-size:13px;color:var(--muted);margin-top:4px}
+/* 添加任务 */
+.add-task{background:var(--panel);border-radius:16px;padding:20px;box-shadow:var(--shadow);margin-bottom:24px}
+.add-form{display:flex;gap:12px;flex-wrap:wrap}
+.add-input{flex:1;min-width:200px;padding:14px 18px;border:2px solid #dfe6e9;border-radius:12px;font-size:15px;outline:none;transition:border-color .2s;font-family:inherit}
+.add-input:focus{border-color:var(--accent)}
+.add-select{padding:14px 18px;border:2px solid #dfe6e9;border-radius:12px;font-size:15px;outline:none;background:#fff;cursor:pointer;font-family:inherit}
+.add-btn{padding:14px 28px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s;font-family:inherit;display:flex;align-items:center;gap:6px}
+.add-btn:hover{background:var(--accent-light);transform:translateY(-1px)}
+/* 筛选标签 */
+.filter-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.filter-tab{padding:8px 20px;border-radius:20px;border:2px solid #dfe6e9;background:#fff;font-size:14px;cursor:pointer;transition:.2s;font-family:inherit}
+.filter-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.filter-tab:hover:not(.active){border-color:var(--accent)}
+/* 任务列表 */
+.task-list{display:flex;flex-direction:column;gap:12px}
+.task-item{background:var(--panel);border-radius:16px;padding:18px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:16px;transition:.2s;animation:slideIn .3s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.task-item:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.task-item.done{opacity:.6}
+.task-item.done .task-title{text-decoration:line-through;color:var(--muted)}
+.task-checkbox{width:24px;height:24px;border:2px solid #dfe6e9;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;font-size:14px}
+.task-checkbox:hover{border-color:var(--green)}
+.task-item.done .task-checkbox{background:var(--green);border-color:var(--green);color:#fff}
+.task-content{flex:1;min-width:0}
+.task-title{font-size:16px;font-weight:500;margin-bottom:4px;word-break:break-word}
+.task-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.task-tag{padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600}
+.tag-work{background:#e17055;color:#fff}.tag-study{background:var(--blue);color:#fff}.tag-life{background:var(--green);color:#fff}.tag-urgent{background:var(--red);color:#fff}
+.task-date{display:flex;align-items:center;gap:4px}
+.task-actions{display:flex;gap:8px;opacity:0;transition:.2s}
+.task-item:hover .task-actions{opacity:1}
+.action-btn{width:36px;height:36px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:.2s}
+.action-btn.edit{background:#dfe6e9}.action-btn.edit:hover{background:var(--orange)}
+.action-btn.delete{background:#fab1a0}.action-btn.delete:hover{background:var(--red);color:#fff}
+/* 空状态 */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .icon{font-size:64px;margin-bottom:16px}
+/* 优先级指示 */
+.priority-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.priority-high{background:var(--red)}.priority-medium{background:var(--orange)}.priority-low{background:var(--green)}
+/* 编辑模态框 */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-bg.show{opacity:1;pointer-events:auto}
+.modal{background:#fff;border-radius:20px;padding:28px;width:90%;max-width:440px;transform:scale(.95);transition:transform .3s}
+.modal-bg.show .modal{transform:scale(1)}
+.modal h2{font-size:20px;margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 16px;border:2px solid #dfe6e9;border-radius:12px;font-size:15px;outline:none;font-family:inherit}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:80px}
+.modal-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:24px}
+.btn-cancel{padding:12px 24px;border-radius:12px;border:2px solid #dfe6e9;background:#fff;font-size:14px;cursor:pointer;font-family:inherit}
+.btn-save{padding:12px 24px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-save:hover{background:var(--accent-light)}
+/* 进度条 */
+.progress-section{background:var(--panel);border-radius:16px;padding:20px;box-shadow:var(--shadow);margin-bottom:24px}
+.progress-header{display:flex;justify-content:space-between;margin-bottom:12px}
+.progress-header span{font-size:14px;color:var(--muted)}
+.progress-bar{height:8px;background:#dfe6e9;border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-light));border-radius:4px;transition:width .5s ease}
+@media(max-width:600px){.add-form{flex-direction:column}.add-input{min-width:100%}.task-actions{opacity:1}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>✅ <span>待办</span>事项</h1>
+    <div class="date-badge" id="dateBadge"></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-num" id="totalTasks">0</div><div class="stat-label">全部任务</div></div>
+    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-num" id="doneTasks" style="color:var(--green)">0</div><div class="stat-label">已完成</div></div>
+    <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-num" id="pendingTasks" style="color:var(--orange)">0</div><div class="stat-label">进行中</div></div>
+    <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-num" id="urgentTasks" style="color:var(--red)">0</div><div class="stat-label">紧急</div></div>
+  </div>
+
+  <div class="progress-section">
+    <div class="progress-header"><span>今日完成进度</span><span id="progressText">0%</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="add-task">
+    <div class="add-form">
+      <input type="text" class="add-input" id="newTaskInput" placeholder="输入新任务..." onkeydown="if(event.key==='Enter')addTask()">
+      <select class="add-select" id="newTaskTag"><option value="life">🏠 生活</option><option value="work">💼 工作</option><option value="study">📚 学习</option><option value="urgent">🔥 紧急</option></select>
+      <select class="add-select" id="newTaskPriority"><option value="low">低优先级</option><option value="medium" selected>中优先级</option><option value="high">高优先级</option></select>
+      <button class="add-btn" onclick="addTask()">+ 添加任务</button>
+    </div>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="filter-tab active" data-filter="all" onclick="setFilter('all')">全部</button>
+    <button class="filter-tab" data-filter="pending" onclick="setFilter('pending')">进行中</button>
+    <button class="filter-tab" data-filter="done" onclick="setFilter('done')">已完成</button>
+    <button class="filter-tab" data-filter="work" onclick="setFilter('work')">💼 工作</button>
+    <button class="filter-tab" data-filter="study" onclick="setFilter('study')">📚 学习</button>
+    <button class="filter-tab" data-filter="life" onclick="setFilter('life')">🏠 生活</button>
+    <button class="filter-tab" data-filter="urgent" onclick="setFilter('urgent')">🔥 紧急</button>
+  </div>
+
+  <div class="task-list" id="taskList"></div>
+</div>
+
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <h2>编辑任务</h2>
+    <div class="form-group"><label>任务内容</label><textarea id="editContent" rows="3"></textarea></div>
+    <div class="form-group"><label>标签</label><select id="editTag"><option value="life">🏠 生活</option><option value="work">💼 工作</option><option value="study">📚 学习</option><option value="urgent">🔥 紧急</option></select></div>
+    <div class="form-group"><label>优先级</label><select id="editPriority"><option value="low">低优先级</option><option value="medium">中优先级</option><option value="high">高优先级</option></select></div>
+    <div class="modal-actions"><button class="btn-cancel" onclick="closeEditModal()">取消</button><button class="btn-save" onclick="saveEdit()">保存</button></div>
+  </div>
+</div>
+
+<script>
+let tasks=[],filter='all',editingId=null;
+const tagNames={work:'💼 工作',study:'📚 学习',life:'🏠 生活',urgent:'🔥 紧急'};
+const priorityNames={high:'高',medium:'中',low:'低'};
+function init(){loadTasks();render();updateDate();}
+function loadTasks(){const s=localStorage.getItem('todoTasks');if(s)tasks=JSON.parse(s);}
+function saveTasks(){localStorage.setItem('todoTasks',JSON.stringify(tasks));}
+function updateDate(){const d=new Date();document.getElementById('dateBadge').textContent=d.toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});}
+function addTask(){const input=document.getElementById('newTaskInput'),content=input.value.trim();if(!content)return;tasks.unshift({id:Date.now(),content,done:false,tag:document.getElementById('newTaskTag').value,priority:document.getElementById('newTaskPriority').value,created:new Date().toISOString()});input.value='';saveTasks();render();}
+function toggleTask(id){const t=tasks.find(t=>t.id===id);if(t){t.done=!t.done;saveTasks();render();}}
+function deleteTask(id){tasks=tasks.filter(t=>t.id!==id);saveTasks();render();}
+function openEditModal(id){editingId=id;const t=tasks.find(t=>t.id===id);if(!t)return;document.getElementById('editContent').value=t.content;document.getElementById('editTag').value=t.tag;document.getElementById('editPriority').value=t.priority;document.getElementById('editModal').classList.add('show');}
+function closeEditModal(){document.getElementById('editModal').classList.remove('show');editingId=null;}
+function saveEdit(){const t=tasks.find(t=>t.id===editingId);if(t){t.content=document.getElementById('editContent').value;t.tag=document.getElementById('editTag').value;t.priority=document.getElementById('editPriority').value;saveTasks();render();}closeEditModal();}
+function setFilter(f){filter=f;document.querySelectorAll('.filter-tab').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));render();}
+function getFilteredTasks(){if(filter==='all')return tasks;if(filter==='pending')return tasks.filter(t=>!t.done);if(filter==='done')return tasks.filter(t=>t.done);return tasks.filter(t=>t.tag===filter);}
+function render(){const filtered=getFilteredTasks();const list=document.getElementById('taskList');
+if(filtered.length===0){list.innerHTML=`<div class="empty-state"><div class="icon">📭</div><p>暂无${filter==='all'?'':filter==='pending'?'进行中':filter==='done'?'已完成':tagNames[filter]}任务</p></div>`;}
+else{list.innerHTML=filtered.map(t=>`<div class="task-item ${t.done?'done':''}"><div class="task-checkbox" onclick="toggleTask(${t.id})">${t.done?'✓':''}</div><div class="task-content"><div class="task-title">${escapeHtml(t.content)}</div><div class="task-meta"><span class="task-tag tag-${t.tag}">${tagNames[t.tag]}</span><span class="task-date"><span class="priority-dot priority-${t.priority}"></span>${priorityNames[t.priority]}优先级</span></div></div><div class="task-actions"><button class="action-btn edit" onclick="openEditModal(${t.id})">✏️</button><button class="action-btn delete" onclick="deleteTask(${t.id})">🗑</button></div></div>`).join('');}
+const total=tasks.length,done=tasks.filter(t=>t.done).length,pending=total-done,urgent=tasks.filter(t=>t.tag==='urgent'&&!t.done).length;
+document.getElementById('totalTasks').textContent=total;document.getElementById('doneTasks').textContent=done;document.getElementById('pendingTasks').textContent=pending;document.getElementById('urgentTasks').textContent=urgent;
+const pct=total?Math.round(done/total*100):0;document.getElementById('progressText').textContent=pct+'%';document.getElementById('progressFill').style.width=pct+'%';}
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+init();
+</script>
+</body>
+</html>

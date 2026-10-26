@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>wyx · 数智编程作品集</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🦋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Anonymous+Pro:ital,wght@0,400;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  /* ===== 复古拼贴艺术主题（参考素材：黑底颗粒+撕纸+图钉+打字机+老照片拼贴） ===== */
+  :root {
+    --bg: #080706;                    /* 黑板近黑暖底 */
+    --paper: #efe5cd;                 /* 做旧奶油纸 */
+    --paper-2: #e3d4b0;               /* 深一档牛皮纸 */
+    --paper-3: #f7f0db;               /* 最浅纸（卡片高光） */
+    --ink: #241b10;                   /* 油墨黑（纸上深字） */
+    --ink-soft: #53442d;              /* 纸上次要字 */
+    --cream: #ece1c6;                 /* 黑板上的做旧白字 */
+    --cream-dim: rgba(236,225,198,.68);
+    --pin: #cf202c;                   /* 图钉红 / 红唇红 */
+    --pin-deep: #9e1722;
+    --navy: #26426e;                  /* 藏蓝（编号） */
+    --teal: #4f9a8d;                  /* 复古青 */
+    --gold: #c08f24;                  /* 芥末金 */
+    --magenta: #c73479;               /* 玫红 */
+    --lime: #a8b23f;
+    --rose: #de8fa9;
+    --sage: #8ba888;
+    --shadow-paper: 0 14px 30px rgba(0,0,0,.5);
+    --f-type: "Special Elite", "Noto Serif SC", "Songti SC", "SimSun", serif;
+    --f-cn: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif;
+    --f-mono: "Anonymous Pro", "Special Elite", "Noto Serif SC", monospace;
+    /* 兼容旧变量名（避免遗留行内样式失色） */
+    --text: var(--ink);
+    --muted: var(--ink-soft);
+    --body-text: var(--cream);
+    --primary: var(--pin);
+    --accent: var(--pin);
+    --card-bg: var(--paper);
+    --card-border: transparent;
+  }
+  html[data-theme="light"] {
+    /* 日光模式 = 牛皮纸本 */
+    --bg: #e4d8ba;
+    --paper: #f8f1dd;
+    --paper-2: #e7dabb;
+    --paper-3: #fffaf0;
+    --ink: #241b10;
+    --ink-soft: #5c4d33;
+    --cream: #241b10;
+    --cream-dim: rgba(36,27,16,.68);
+    --shadow-paper: 0 12px 26px rgba(70,50,20,.28);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body {
+    font-family: var(--f-cn);
+    background: var(--bg);
+    color: var(--cream);
+    line-height: 1.85;
+    max-width: 100%;
+    overflow-x: hidden;
+    font-size: 15px;
+    transition: background .4s, color .4s;
+  }
+  body::before {
+    /* 黑色颗粒照片纹理（PPT 每一页的黑板底） */
+    content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background: #070605 url("collage/bg-grain.png") center/cover no-repeat;
+    opacity: .92;
+    mix-blend-mode: screen;
+  }
+  body::after {
+    /* 暗角 + 老照片泛旧光晕 */
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(ellipse 120% 90% at 50% 42%, transparent 55%, rgba(0,0,0,.55) 100%),
+      radial-gradient(ellipse 50% 38% at 78% 8%, rgba(79,154,141,.07), transparent 70%),
+      radial-gradient(ellipse 45% 35% at 12% 90%, rgba(192,143,36,.06), transparent 70%);
+  }
+  html[data-theme="light"] body::before {
+    background: #e4d8ba url("collage/bg-grain.png") center/cover no-repeat;
+    mix-blend-mode: multiply; opacity: .2;
+  }
+  html[data-theme="light"] body::after {
+    background: radial-gradient(ellipse 120% 90% at 50% 42%, transparent 60%, rgba(90,66,28,.28) 100%);
+  }
+  section { scroll-margin-top: 76px; position: relative; z-index: 1; }
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  header, footer { position: relative; z-index: 1; }
+
+  /* ===== 导航（黑色颗粒板 + 打字机小纸片链接） ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,8,6,.86);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px dashed rgba(236,225,198,.28);
+  }
+  body { padding-top: 65px; }  /* 给 fixed nav 让位，防止内容被遮 */
+  html[data-theme="light"] nav {
+    background: rgba(232,220,190,.92);
+    border-bottom: 1px dashed rgba(36,27,16,.35);
+  }
+  .nav-inner {
+    max-width: 1080px; margin: 0 auto; padding: 12px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .logo {
+    font-family: var(--f-type); font-weight: 400; font-size: 19px;
+    color: var(--cream); letter-spacing: 2.5px; white-space: nowrap;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo::before {
+    content: ""; width: 14px; height: 14px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ff6b73, var(--pin) 55%, #7d1019);
+    box-shadow: 0 2px 4px rgba(0,0,0,.6); flex: 0 0 auto;
+  }
+  .logo span { color: var(--pin); }
+  html[data-theme="light"] .logo span { color: var(--pin-deep); }
+  .nav-links { display: flex; gap: 6px 16px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .nav-links a {
+    color: var(--cream); text-decoration: none; opacity: .82;
+    font-family: var(--f-type);
+    font-size: 14px; font-weight: 400; transition: .2s; white-space: nowrap; letter-spacing: 1px;
+    position: relative; padding: 2px 2px;
+  }
+  .nav-links a:hover { opacity: 1; color: var(--pin); }
+  html[data-theme="light"] .nav-links a:hover { color: var(--pin-deep); }
+  #themeBtn {
+    border: 1.5px solid var(--cream); background: transparent;
+    cursor: pointer; width: 32px; height: 32px; border-radius: 50%; font-size: 14px;
+    color: var(--cream); transition: .2s; line-height: 1; padding: 0;
+  }
+  #themeBtn:hover { background: var(--pin); border-color: var(--pin); color: var(--paper); transform: rotate(20deg); }
+
+  /* ===== Hero（PPT 封面式拼贴：旧书/月亮/雕像/热气球/拍立得/打字机标题） ===== */
+  .hero { position: relative; padding: 64px 0 72px; overflow: clip; min-height: 88vh; display: flex; align-items: center; }
+  .hero-inner {
+    position: relative; z-index: 3;
+    display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; width: 100%;
+  }
+  .hero-text { flex: 1 1 420px; }
+  .hello {
+    font-family: var(--f-type); font-size: 14px; color: var(--cream);
+    letter-spacing: 2px; opacity: .9; margin-bottom: 18px;
+  }
+  .hello::before { content: "📌 "; }
+  .hero h1 { font-weight: 400; line-height: 1.25; margin: 0 0 16px; }
+  .bar {
+    display: table; background: #100d09;
+    padding: 9px 30px 12px; margin: 0 0 14px;
+    box-shadow: 0 12px 28px rgba(0,0,0,.65);
+    transform: rotate(-1.1deg);
+  }
+  .bar.alt { transform: rotate(.9deg); padding: 7px 26px 9px; }
+  .bar .l1 {
+    font-family: var(--f-type); color: #ece1c6;
+    font-size: clamp(30px, 4.6vw, 50px); letter-spacing: 5px; white-space: nowrap;
+  }
+  .bar .l1 .name { color: #f3ead3; text-shadow: 1px 1px 0 rgba(207,32,44,.55); }
+  .bar .l2 {
+    font-family: var(--f-type); color: #e6dabc;
+    font-size: clamp(15px, 2vw, 21px); letter-spacing: 6px; white-space: nowrap;
+  }
+  .type-line { font-family: var(--f-mono); font-size: 15px; color: #d9c9a3; min-height: 22px; letter-spacing: 1px; opacity: .95; margin-top: 6px; }
+  .type-line .cursor { display: inline-block; width: 8px; height: 1.1em; background: var(--pin); vertical-align: -3px; margin-left: 3px; animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .btns { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 30px; }
+  .btn {
+    display: inline-block; padding: 10px 26px; text-decoration: none;
+    font-family: var(--f-type); font-weight: 400; font-size: 16px;
+    transition: .22s; letter-spacing: 3px; border-radius: 2px;
+  }
+  .btn-main {
+    background: #100d09; color: #ece1c6; border: 1px solid #000;
+    box-shadow: 0 8px 20px rgba(0,0,0,.55); transform: rotate(-.8deg);
+  }
+  .btn-main:hover { background: var(--pin); transform: rotate(.6deg) translateY(-2px); color: #f7efd9; }
+  .btn-ghost {
+    background: var(--paper); color: var(--ink); border: 1px solid #000;
+    box-shadow: 0 8px 20px rgba(0,0,0,.45); transform: rotate(.7deg);
+  }
+  .btn-ghost:hover { background: var(--paper-2); transform: rotate(-.6deg) translateY(-2px); }
+
+  /* 头像：拍立得纸片 + 胶带 */
+  .avatar-wrap { position: relative; flex: 0 0 auto; display: flex; justify-content: center; padding: 18px 0 6px; }
+  .avatar-ring {
+    position: relative; background: #f2ead8; padding: 14px 14px 44px;
+    box-shadow: 0 18px 42px rgba(0,0,0,.6);
+    transform: rotate(3.2deg); cursor: pointer; transition: transform .3s;
+  }
+  .avatar-ring::before {
+    content: ""; position: absolute; top: -15px; left: 50%; transform: translateX(-50%) rotate(-6deg);
+    width: 120px; height: 32px;
+    background: url("collage/tape-green.png") center/100% 100% no-repeat;
+  }
+  .avatar-ring::after {
+    content: "wyx · 2026"; position: absolute; bottom: 12px; left: 0; right: 0; text-align: center;
+    font-family: var(--f-mono); font-style: italic; font-size: 14px; color: #4a3d28;
+  }
+  .avatar-ring:hover { transform: rotate(1deg) scale(1.03); }
+  .avatar-ring img {
+    display: block; width: 248px; height: 248px; object-fit: cover;
+    filter: grayscale(.1) sepia(.32) contrast(.94);
+  }
+  .avatar-ring.wobble { animation: wobble .6s ease; }
+  @keyframes wobble { 0%,100%{transform:rotate(3.2deg)} 25%{transform:rotate(-4deg)} 75%{transform:rotate(8deg)} }
+  #quoteBubble {
+    position: absolute; top: -30px; left: 50%; transform: translate(-50%, -100%) rotate(-2deg) scale(.85);
+    background: var(--paper); color: var(--ink); border: 1px solid #000;
+    font-family: var(--f-cn);
+    padding: 9px 18px; border-radius: 2px; font-size: 13.5px; white-space: nowrap;
+    box-shadow: 0 8px 20px rgba(0,0,0,.5); opacity: 0; pointer-events: none; transition: .3s;
+  }
+  #quoteBubble::before {
+    content: ""; position: absolute; top: -11px; left: 18px; width: 12px; height: 12px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ff6b73, var(--pin) 55%, #7d1019);
+  }
+  #quoteBubble.show { opacity: 1; transform: translate(-50%, -100%) rotate(-2deg) scale(1); }
+
+  /* ===== Hero 拼贴层（素材全部来自 PPT） ===== */
+  .hero-collage { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .hc { position: absolute; will-change: transform; filter: drop-shadow(0 10px 16px rgba(0,0,0,.45)); }
+  .hc-book   { left: 50%; top: 47%; width: min(60vw, 720px); transform: translate(-50%,-50%) rotate(-9deg); opacity: .9; animation: sway 11s ease-in-out infinite alternate; }
+  .hc-moon   { right: 4%; top: 2%;  width: 300px; opacity: .92; animation: sway 13s ease-in-out infinite alternate-reverse; }
+  .hc-statue { left: -3%; top: 4%;  width: 236px; animation: sway 9.5s ease-in-out infinite alternate; }
+  .hc-balloon{ left: 40%; top: -5%; width: 128px; animation: floaty 8s ease-in-out infinite alternate; }
+  .hc-zeppelin{ right: 2%; top: 32%; width: 180px; transform: rotate(9deg); animation: floaty 10s ease-in-out infinite alternate-reverse; }
+  .hc-mirror { left: 57%; top: 3%;  width: 104px; transform: rotate(-7deg); animation: sway 12s ease-in-out infinite alternate; }
+  .hc-lips   { right: 21%; top: 10%; width: 84px; transform: rotate(-10deg); }
+  .hc-typewriter{ right: 15%; bottom: -2%; width: 172px; transform: rotate(-7deg); animation: sway 10.5s ease-in-out infinite alternate-reverse; }
+  .hc-letter { right: 30%; bottom: 1%; width: 150px; transform: rotate(9deg); }
+  .hc-writer { right: -1%; bottom: 6%; width: 190px; }
+  .hc-fwhite { left: 19%; top: -2%; width: 126px; transform: rotate(-16deg); animation: sway 12s ease-in-out infinite alternate-reverse; }
+  .hc-fyellow{ left: 3%; top: 40%; width: 108px; transform: rotate(10deg); }
+  .hc-polar  { border: 7px solid #f2ead8; border-bottom-width: 26px; background: #f2ead8;
+               box-shadow: 0 12px 24px rgba(0,0,0,.55); width: 92px; }
+  .hc-polar img { width: 100%; height: 92px; object-fit: cover; display: block; filter: sepia(.35) saturate(.8); }
+  .hc-p1 { left: 13%; bottom: 4%; transform: rotate(-12deg); animation: floaty 9s ease-in-out infinite alternate; }
+  .hc-p2 { left: 21%; bottom: 7%; transform: rotate(7deg); animation: floaty 10.5s ease-in-out infinite alternate-reverse; }
+  .hc-p3 { left: 8%;  bottom: 11%; transform: rotate(-3deg); animation: floaty 8.2s ease-in-out infinite alternate; }
+  @keyframes sway { from { margin-top: -6px; } to { margin-top: 8px; } }
+  @keyframes floaty { from { translate: 0 -4px; } to { translate: 0 10px; } }
+  @media (prefers-reduced-motion: reduce) {
+    .hc { animation: none !important; }
+  }
+
+  /* ===== 通用板块（撕纸标题 + 编号拼贴 + 图钉） ===== */
+  .section { padding: 78px 0; }
+  .sec-head { text-align: center; margin-bottom: 52px; }
+  .num-badge { display: inline-flex; gap: 5px; margin-bottom: 20px; }
+  .num-badge img { height: 60px; width: auto; filter: drop-shadow(0 7px 9px rgba(0,0,0,.55)); }
+  .num-badge img:first-child { transform: rotate(-3.5deg); }
+  .num-badge img:last-child  { transform: rotate(2.8deg) translateY(4px); }
+  .sec-title {
+    position: relative; display: inline-block;
+    min-width: 280px;
+    background: url("collage/strip-a.png") center/100% 100% no-repeat;
+    padding: 17px 64px 21px;
+    font-family: var(--f-type); font-weight: 400;
+    font-size: clamp(25px, 3.4vw, 37px); letter-spacing: 5px;
+    color: #181007; line-height: 1.25;
+    transform: rotate(-.7deg);
+  }
+  .sec-title::before {
+    content: ""; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+    width: 30px; height: 44px;
+    background: url("collage/pin.png") center/contain no-repeat;
+    filter: drop-shadow(0 3px 3px rgba(0,0,0,.5));
+  }
+  .sec-title span { color: var(--pin-deep); }
+  section:nth-of-type(2n)   .sec-title { background-image: url("collage/strip-b.png"); transform: rotate(.8deg); }
+  section:nth-of-type(3n)   .sec-title { background-image: url("collage/strip-c.png"); }
+  section:nth-of-type(4n)   .sec-title { background-image: url("collage/strip-d.png"); }
+  section:nth-of-type(5n)   .sec-title { background-image: url("collage/strip-e.png"); }
+  .sec-sub {
+    text-align: center; color: var(--cream-dim);
+    font-family: var(--f-mono); font-size: 14px; letter-spacing: 2px;
+    margin-top: 20px;
+  }
+  html[data-theme="light"] .sec-title { filter: drop-shadow(0 4px 6px rgba(90,66,28,.25)); }
+
+  /* 纸质卡片通用 */
+  .card, .ev, .work, .review-card, .board, .declare {
+    position: relative;
+    background:
+      radial-gradient(ellipse at 18% 0%, rgba(255,255,255,.5), transparent 55%),
+      var(--paper);
+    color: var(--ink);
+    border-radius: 2px;
+    box-shadow: var(--shadow-paper);
+  }
+  .card::after, .ev::after, .work::after, .review-card::after, .board::after, .declare::after {
+    /* 纸张颗粒脏点 */
+    content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+    background: url("collage/bg-grain.png") center/cover;
+    opacity: .07; mix-blend-mode: multiply;
+  }
+  .card {
+    padding: 36px 30px 28px;
+    transform: rotate(-.28deg);
+  }
+  .card::before, .ev::before {
+    content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(-4deg);
+    width: 118px; height: 32px;
+    background: url("collage/tape-green.png") center/100% 100% no-repeat; opacity: .92;
+  }
+  .grid-2 > .card:nth-child(2)::before { background-image: url("collage/tape-floral.png"); }
+  .card h3, .card .muted, .card .small, .card p, .card li { color: var(--ink); }
+  .card .muted, .muted { color: var(--ink-soft); }
+  .card h3.block-h, h3.block-h {
+    font-family: var(--f-type); font-weight: 400; font-size: 20.5px; color: var(--ink);
+    letter-spacing: 2px; border-bottom: 2px solid var(--ink); padding-bottom: 8px;
+    margin: 6px 0 14px;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: start; }
+  .small { font-size: 14px; color: var(--ink-soft); }
+
+  .info-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info-item {
+    background: rgba(36,27,16,.045); border: 1px dashed #b39d72; border-radius: 2px;
+    padding: 11px 15px; font-size: 14px; color: var(--ink);
+  }
+  .info-item .k { color: var(--ink-soft); margin-right: 8px; }
+  .info-item .v { font-weight: 700; color: var(--ink); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    font-family: var(--f-mono); font-size: 12px; font-weight: 700;
+    padding: 3px 11px; border-radius: 2px;
+    background: transparent; border: 1.5px solid var(--pin-deep); color: var(--pin-deep);
+    transform: rotate(-.6deg); letter-spacing: .5px;
+  }
+  .chip:nth-child(2n) { transform: rotate(.8deg); border-color: var(--navy); color: var(--navy); }
+  .skill { margin-top: 19px; }
+  .skill .label {
+    display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 400;
+    margin-bottom: 6px; gap: 8px; color: var(--ink);
+  }
+  .skill .track {
+    height: 12px; border-radius: 0; background: #d8c8a4;
+    border: 1px solid #b39d72; box-shadow: inset 0 2px 3px rgba(0,0,0,.18); overflow: hidden;
+  }
+  .skill .fill {
+    height: 100%; width: 0;
+    background: repeating-linear-gradient(-45deg, var(--pin-deep) 0 7px, #83121c 7px 13px);
+    transition: width 1.2s cubic-bezier(.22,.9,.35,1);
+  }
+
+  /* ===== 阶段作业表（旧档案纸 + 打字机表头） ===== */
+  .tbl-wrap {
+    overflow-x: auto; border-radius: 2px;
+    box-shadow: var(--shadow-paper);
+    background: var(--paper-3);
+    border: 1px solid #000;
+  }
+  table { width: 100%; border-collapse: collapse; min-width: 640px; }
+  th, td {
+    padding: 13px 16px; text-align: left; font-size: 14px;
+    border-bottom: 1px dashed #c3b189; vertical-align: top; color: var(--ink);
+  }
+  th {
+    background: #211a10; color: var(--paper);
+    font-family: var(--f-type); font-weight: 400; white-space: nowrap;
+    font-size: 13.5px; letter-spacing: 2px;
+  }
+  tbody tr:nth-child(even) td { background: rgba(36,27,16,.035); }
+  tbody tr:hover td { background: rgba(207,32,44,.06); }
+  tr:last-child td { border-bottom: none; }
+  td a { color: var(--pin-deep); font-weight: 700; text-decoration: none; }
+  td a:hover { text-decoration: underline; text-decoration-style: wavy; }
+  .todo-box {
+    border: 1px solid #b39d72;
+    background:
+      repeating-linear-gradient(transparent 0 27px, rgba(38,66,110,.28) 27px 28px),
+      #f4ead0;
+    color: #3a2d18; border-radius: 2px;
+    padding: 16px 22px 18px; font-size: 14px; line-height: 28px;
+    margin-top: 22px; box-shadow: 0 8px 20px rgba(0,0,0,.35);
+    transform: rotate(-.4deg);
+  }
+
+  /* ===== 项目成果（拍立得封面 + 档案卡纸） ===== */
+  .works-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+  .work {
+    scroll-margin-top: 76px;
+    overflow: hidden;
+    transition: .25s ease; display: flex; flex-direction: column;
+    border: 1px solid #000;
+  }
+  .works-grid .work:nth-child(2n) { transform: rotate(.55deg); }
+  .works-grid .work:nth-child(3n) { transform: rotate(-.45deg); }
+  .work:hover { transform: translateY(-5px) rotate(0deg) !important; box-shadow: 0 22px 40px rgba(0,0,0,.6); }
+  /* 漂流墙点击跳转后，目标卡片红框闪一下 */
+  .work:target { animation: cardFlash 1.6s ease; }
+  @keyframes cardFlash {
+    0% { box-shadow: 0 0 0 3px var(--pin), 0 0 34px rgba(207,32,44,.65); }
+    60% { box-shadow: 0 0 0 1px var(--pin), 0 0 18px rgba(207,32,44,.35); }
+    100% { box-shadow: var(--shadow-paper); }
+  }
+  .work .pic {
+    overflow: hidden; height: 196px; position: relative;
+    margin: 14px 14px 0; padding: 0; background: #fff;
+    border: 1px solid rgba(0,0,0,.25);
+  }
+  .work .pic img {
+    width: 100%; height: 100%; object-fit: cover; transition: .5s;
+    filter: sepia(.32) saturate(.82) contrast(.93);
+  }
+  .work .pic img.no-vintage { filter: none; }
+  .work:hover .pic img { transform: scale(1.04); filter: none; }
+  .work:hover .pic img.no-vintage { filter: none; }
+  .work .body { padding: 18px 22px 22px; flex: 1; display: flex; flex-direction: column; color: var(--ink); }
+  .work h3 {
+    font-family: var(--f-type); font-weight: 400; font-size: 20px; letter-spacing: 1.5px;
+    color: var(--ink); border-bottom: 2px solid var(--ink); padding-bottom: 7px; margin-bottom: 10px;
+  }
+  .feat-list { list-style: none; margin: 6px 0 12px; }
+  .feat-list li { font-size: 13.5px; color: var(--ink-soft); padding-left: 16px; position: relative; margin: 3px 0; line-height: 1.75; }
+  .feat-list li::before { content: "*"; position: absolute; left: 2px; top: -1px; color: var(--pin-deep); font-weight: 700; font-size: 16px; }
+  .kv { font-size: 13px; margin: 3px 0; color: var(--ink-soft); line-height: 1.75; }
+  .kv b { color: var(--ink); font-weight: 700; }
+  .kv a { color: var(--pin-deep); text-decoration: none; font-weight: 700; }
+  .kv a:hover { text-decoration: underline; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .tag {
+    font-family: var(--f-mono); font-size: 11px; font-weight: 700;
+    padding: 2px 9px; background: var(--paper-2); color: var(--navy);
+    border: 1px solid #b39d72; border-radius: 2px;
+  }
+  .work .link {
+    margin-top: auto; align-self: flex-start;
+    background: #100d09; color: var(--paper); text-decoration: none;
+    font-family: var(--f-type); font-size: 14px; letter-spacing: 2px;
+    padding: 8px 18px; transform: rotate(-.8deg); transition: .2s;
+  }
+  .work .link:hover { background: var(--pin); transform: rotate(.6deg); }
+
+  /* 漂流墙：装在纸相框里的老照片墙 */
+  #driftWall {
+    background: #0c0906 !important;
+    border: 12px solid var(--paper);
+    outline: 1px solid #000;
+    box-shadow: var(--shadow-paper);
+    transform: rotate(-.35deg);
+  }
+
+  /* ===== 过程证据（钉在黑板上的资料卡） ===== */
+  .ev-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+  .ev { padding: 30px 26px 24px; transform: rotate(.4deg); }
+  .ev-grid .ev:nth-child(2n) { transform: rotate(-.55deg); }
+  .ev-grid .ev:nth-child(3n) { transform: rotate(.3deg); }
+  .ev::before {
+    width: 84px; top: -13px; left: 26px; transform: rotate(-8deg);
+    background-image: url("collage/tape-orange.png");
+  }
+  .ev:nth-child(2n)::before { background-image: url("collage/tape-lily.png"); left: auto; right: 26px; transform: rotate(7deg); }
+  .ev:nth-child(3n)::before { background-image: url("collage/tape-red.png"); }
+  .ev .ev-ic { font-size: 30px; }
+  .ev h4 {
+    font-family: var(--f-type); font-weight: 400; font-size: 18.5px;
+    margin: 10px 0 10px; letter-spacing: 1.5px; color: var(--ink);
+    border-bottom: 2px solid var(--ink); padding-bottom: 5px;
+  }
+  .ev ul { list-style: none; }
+  .ev li { font-size: 13.5px; color: var(--ink-soft); padding-left: 16px; position: relative; margin: 5px 0; line-height: 1.75; }
+  .ev li::before { content: "*"; position: absolute; left: 2px; top: -2px; color: var(--pin-deep); font-weight: 700; }
+  .ev code {
+    font-family: var(--f-mono); font-size: 12px; background: rgba(38,66,110,.12);
+    color: var(--navy); padding: 1px 5px; border-radius: 2px;
+  }
+
+  /* ===== 专题页（贴在纸上的大照片 + 黑色胶带标题） ===== */
+  .feature-hero {
+    overflow: hidden; height: 240px; margin: 8px 0 36px; position: relative;
+    border-radius: 2px;
+    background: var(--paper);
+    border: 1px solid #000;
+    padding: 12px;
+    box-shadow: var(--shadow-paper);
+    transform: rotate(-.4deg);
+  }
+  .feature-hero:nth-of-type(2n) { transform: rotate(.5deg); }
+  .feature-hero::before, .feature-hero::after {
+    content: ""; position: absolute; top: -14px; width: 120px; height: 32px; z-index: 3;
+    background: url("collage/tape-floral.png") center/100% 100% no-repeat;
+  }
+  .feature-hero::before { left: 30px; transform: rotate(-7deg); }
+  .feature-hero::after { right: 30px; transform: rotate(8deg); background-image: url("collage/tape-orange.png"); }
+  .feature-hero img {
+    width: 100%; height: 100%; object-fit: cover;
+    filter: sepia(.3) saturate(.82) contrast(.94);
+  }
+  .feature-hero:hover img { filter: none; }
+  .feature-hero .cap { position: absolute; left: 30px; right: 30px; bottom: 22px; }
+  .feature-hero .cap h3 {
+    display: inline-block;
+    background: #100d09; color: var(--paper);
+    font-family: var(--f-type); font-weight: 400; font-size: clamp(18px,2.4vw,26px);
+    letter-spacing: 3px; padding: 7px 22px 9px; margin-bottom: 8px;
+    box-shadow: 0 8px 18px rgba(0,0,0,.55); transform: rotate(-.8deg);
+  }
+  .feature-hero .cap p {
+    display: inline-block;
+    background: rgba(239,229,205,.95); color: var(--ink);
+    font-size: 13.5px; padding: 5px 14px; border: 1px solid #000;
+    transform: rotate(.5deg);
+  }
+  .f5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 30px; }
+  .f5 .card { padding-top: 30px; }
+  .f5 .card:nth-child(2n) { transform: rotate(.5deg); }
+  .f5 .card h4 {
+    font-family: var(--f-type); font-weight: 400; font-size: 18px;
+    letter-spacing: 2px; margin-bottom: 10px; color: var(--pin-deep);
+    border-bottom: 2px solid var(--ink); padding-bottom: 6px;
+  }
+  .f5 li { font-size: 14px; color: var(--ink-soft); list-style: none; padding-left: 16px; position: relative; margin: 7px 0; line-height: 1.8; }
+  .f5 li::before { content: "*"; position: absolute; left: 2px; top: -2px; color: var(--pin-deep); font-weight: 700; font-size: 17px; }
+  .f5 b { color: var(--ink); }
+
+  /* ===== 复盘（四色便签纸） ===== */
+  .review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 30px; }
+  .review-card { border: 1px solid #000; padding: 30px 26px 26px; border-top: 7px solid var(--pin); transform: rotate(-.45deg); }
+  .review-card:nth-child(2) { border-top-color: var(--teal); transform: rotate(.55deg); }
+  .review-card:nth-child(3) { border-top-color: var(--gold); transform: rotate(-.3deg); }
+  .review-card:nth-child(4) { border-top-color: var(--navy); transform: rotate(.5deg); }
+  .review-card h4 { font-family: var(--f-type); font-weight: 400; font-size: 18px; letter-spacing: 1.5px; margin-bottom: 12px; color: var(--ink); }
+  .review-card li { font-size: 14px; color: var(--ink-soft); list-style: none; padding-left: 16px; position: relative; margin: 7px 0; line-height: 1.75; }
+  .review-card li::before { content: "*"; position: absolute; left: 2px; top: -2px; color: var(--pin-deep); font-weight: 700; font-size: 17px; }
+
+  /* ===== 声明（旧信纸 + 印章） ===== */
+  .declare {
+    border: 1px solid #b39d72; padding: 34px 32px 30px;
+    background:
+      repeating-linear-gradient(transparent 0 29px, rgba(38,66,110,.22) 29px 30px),
+      var(--paper-3);
+  }
+  .declare::before {
+    width: 130px; left: auto; right: 40px; top: -15px;
+    transform: translateX(0) rotate(6deg);
+    background-image: url("collage/tape-red.png");
+  }
+  .declare .badge-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .badge {
+    font-family: var(--f-mono); font-size: 12.5px; font-weight: 700;
+    padding: 6px 15px; border-radius: 2px;
+    background: transparent; border: 1.5px solid var(--navy); color: var(--navy);
+    letter-spacing: .5px; transform: rotate(-.8deg);
+  }
+  .badge:nth-child(2n) { border-color: var(--pin-deep); color: var(--pin-deep); transform: rotate(.9deg); }
+  .declare p { font-size: 14px; color: var(--ink-soft); margin: 10px 0; line-height: 30px; }
+  .declare b { color: var(--ink); }
+
+  /* ===== 兴趣爱好（一排小卡片纸） ===== */
+  .hobbies { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 18px; margin-top: 32px; }
+  .hobby {
+    background:
+      radial-gradient(ellipse at 30% 0%, rgba(255,255,255,.55), transparent 60%),
+      var(--paper);
+    border: 1px solid #000;
+    text-align: center; padding: 24px 10px 20px; transition: .3s;
+    box-shadow: 0 10px 22px rgba(0,0,0,.45);
+    transform: rotate(-1.1deg);
+  }
+  .hobby:nth-child(2n) { transform: rotate(1.2deg); }
+  .hobby:nth-child(3n) { transform: rotate(-.5deg); }
+  .hobby:hover { transform: translateY(-7px) rotate(0deg); box-shadow: 0 18px 30px rgba(0,0,0,.5); }
+  .hobby .emoji { font-size: 36px; }
+  .hobby .t { font-family: var(--f-type); font-weight: 400; margin-top: 9px; font-size: 15px; letter-spacing: 1.5px; color: #000; }
+
+  /* ===== 留言板（牛皮纸本） ===== */
+  .board { max-width: 660px; margin: 0 auto; border: 1px solid #000; padding: 32px 30px; transform: rotate(-.3deg); }
+  .board::before {
+    content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+    width: 140px; height: 34px;
+    background: url("collage/tape-lily.png") center/100% 100% no-repeat;
+  }
+  .board-input { display: flex; gap: 12px; }
+  .board-input input {
+    flex: 1; padding: 12px 18px; border-radius: 0; font-size: 15px; min-width: 0;
+    font-family: var(--f-cn);
+    border: 1.5px solid var(--ink); background: var(--paper-3); color: var(--ink);
+    outline: none; transition: .3s; box-shadow: inset 0 2px 4px rgba(0,0,0,.12);
+  }
+  .board-input input::placeholder { color: #9a8764; }
+  .board-input input:focus { border-color: var(--pin); }
+  .board-input button {
+    border: 1px solid #000; padding: 12px 24px; border-radius: 0;
+    background: #100d09; color: var(--paper);
+    font-family: var(--f-type); font-size: 15px; letter-spacing: 2px;
+    cursor: pointer; transition: .25s; white-space: nowrap;
+  }
+  .board-input button:hover { background: var(--pin); transform: rotate(-1.5deg); }
+  #msgList { margin-top: 22px; display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; padding-right: 4px; }
+  .msg {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    background: var(--paper-2); border: 1px solid #b39d72;
+    padding: 11px 16px; font-size: 14px; color: var(--ink);
+    animation: pop .35s ease; box-shadow: 0 4px 10px rgba(0,0,0,.25);
+  }
+  .msg:nth-child(2n) { transform: rotate(-.4deg); background: #eadfbF; }
+  .msg:nth-child(2n+1) { transform: rotate(.35deg); }
+  @keyframes pop { from { transform: scale(.92) rotate(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .msg .del { border: none; background: none; cursor: pointer; font-size: 15px; opacity: .45; color: var(--ink); transition: .2s; }
+  .msg .del:hover { opacity: 1; color: var(--pin); transform: scale(1.25); }
+  .empty-tip { text-align: center; color: var(--ink-soft); font-size: 14px; padding: 18px 0; }
+
+  /* ===== 页脚 & 返回顶部 ===== */
+  footer {
+    text-align: center; padding: 40px 24px 30px;
+    color: var(--cream-dim); font-size: 14px;
+    border-top: 1px dashed rgba(236,225,198,.3);
+    font-family: var(--f-type); letter-spacing: 1px;
+  }
+  html[data-theme="light"] footer { border-top-color: rgba(36,27,16,.3); }
+  footer .heart { color: var(--pin); }
+  footer .ai-note { font-family: var(--f-cn); font-size: 12.5px; margin-top: 7px; letter-spacing: 0; }
+  #topBtn {
+    position: fixed; right: 26px; bottom: 26px; width: 48px; height: 48px; border-radius: 50%;
+    border: 2px solid #7d1019;
+    background: radial-gradient(circle at 35% 30%, #ff6b73, var(--pin) 55%, #9e1722);
+    color: #f7efd9; font-size: 19px; cursor: pointer;
+    opacity: 0; pointer-events: none; transition: .3s;
+    box-shadow: 0 8px 18px rgba(0,0,0,.5); z-index: 99;
+  }
+  #topBtn.show { opacity: 1; pointer-events: auto; }
+  #topBtn:hover { transform: translateY(-5px) rotate(12deg); }
+
+  /* ===== 右侧竖向快捷导航已移除 ===== */
+
+  /* ===== 全局固定拼贴装饰（边角蝴蝶干花） ===== */
+  .deco-fixed { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .deco-fixed img { position: absolute; opacity: .5; filter: drop-shadow(0 8px 12px rgba(0,0,0,.4)); }
+  .df-moth   { left: -26px; top: 120px; width: 120px; transform: rotate(-18deg); animation: sway 12s ease-in-out infinite alternate; }
+  .df-flower { left: -18px; bottom: 6%; width: 128px; transform: rotate(12deg); animation: floaty 10s ease-in-out infinite alternate-reverse; }
+  .df-butter { right: -20px; top: 42%; width: 110px; transform: rotate(14deg); animation: sway 14s ease-in-out infinite alternate-reverse; }
+  html[data-theme="light"] .deco-fixed img { opacity: .35; }
+
+  /* ===== 滚动浮现 ===== */
+  .reveal { opacity: 0; transform: translateY(28px) rotate(0); transition: .8s cubic-bezier(.22,.9,.35,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0) rotate(var(--r, 0)); }
+
+  /* ===== 旧 3D 魔方导航已停用（拼贴风改为小纸片链接） ===== */
+  .nav-tower { display: none !important; }
+
+  /* 顶部小纸片导航 */
+  .nav-fallback { display: flex; gap: 8px 14px; align-items: center; flex-wrap: wrap; }
+  .nav-fallback a {
+    font-family: var(--f-type); font-size: 13.5px; letter-spacing: 1.5px;
+    color: var(--text); text-decoration: none;
+    background: var(--paper); color: var(--ink);
+    border: 1px solid #000;
+    padding: 4px 13px 5px;
+    box-shadow: 0 3px 0 rgba(0,0,0,.35);
+    transform: rotate(-1deg);
+    transition: .2s;
+  }
+  .nav-fallback a:nth-child(2n) { transform: rotate(1.2deg); }
+  .nav-fallback a:nth-child(3n) { transform: rotate(-.5deg); }
+  .nav-fallback a:hover {
+    background: var(--pin); color: var(--paper);
+    transform: rotate(0deg) translateY(-2px);
+  }
+  .nav-fallback #themeBtn {
+    border: 1px solid #000; cursor: pointer;
+    width: 32px; height: 32px; border-radius: 0; font-size: 15px;
+    background: var(--gold); color: #1a1208;
+    box-shadow: 0 3px 0 rgba(0,0,0,.35);
+    transition: .2s; line-height: 1;
+  }
+  .nav-fallback #themeBtn:hover { transform: rotate(15deg) scale(1.08); }
+
+  /* Hero 名字打字机强调（无故障特效） */
+  .hero h1 .name { color: var(--pin); text-decoration: underline wavy rgba(207,32,44,.55); text-underline-offset: 8px; }
+
+  /* ===== 日光（牛皮纸）模式专用覆盖 ===== */
+  html[data-theme="light"] body::after { display: none; }
+  html[data-theme="light"] .btn-main { background: #100d09; color: var(--paper); border-color: #100d09; }
+  html[data-theme="light"] .btn-main:hover { background: var(--pin); border-color: var(--pin); }
+  html[data-theme="light"] .btn-ghost { color: var(--ink); }
+
+  @media (max-width: 900px) {
+    .nav-fallback { gap: 7px 10px; }
+  }
+  @media (max-width: 760px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .avatar-ring img { width: 190px; height: 190px; }
+    .nav-inner { flex-wrap: wrap; justify-content: center; gap: 8px; padding: 10px 16px; }
+    .logo { width: 100%; justify-content: center; font-size: 16px; letter-spacing: 2px; }
+    .nav-fallback { justify-content: center; gap: 7px; }
+    .nav-fallback a { font-size: 12px; padding: 3px 10px 4px; letter-spacing: 1px; }
+    .hero h1 { letter-spacing: 2px; }
+    .bar { padding: 8px 18px 10px; }
+    .bar .l1 { font-size: 26px; letter-spacing: 2px; white-space: normal; }
+    .bar .l2 { font-size: 13px; letter-spacing: 3px; white-space: normal; }
+    .board-input { flex-direction: column; }
+    .deco-fixed .df-flower, .deco-fixed .df-butter { display: none; }
+    .hc-statue, .hc-writer, .hc-typewriter, .hc-letter, .hc-mirror, .hc-lips { display: none; }
+    .hc-moon { width: 170px; top: 0; right: -6%; opacity: .7; }
+    .hc-balloon { width: 88px; }
+    .hc-zeppelin { width: 120px; }
+    .hc-book { width: 130vw; opacity: .55; }
+    .hc-fwhite { width: 84px; }
+    .hc-fyellow { width: 74px; }
+    .hc-polar { width: 64px; }
+    .hc-polar img { height: 64px; }
+    .hero-collage { opacity: .85; }
+    .sec-title { min-width: 0; padding: 14px 40px 17px; letter-spacing: 3px; }
+    .feature-hero { height: 190px; padding: 8px; }
+    .feature-hero .cap { left: 14px; right: 14px; bottom: 14px; }
+    #driftWall { border-width: 8px; }
+    #driftWall .dw-wall { height: 230px !important; }
+    /* 窄屏关闭 3D 透视，纯等比缩小并顶对齐，避免照片被压到底部 */
+    #driftWall .dw-viewport { perspective: none !important; }
+    #driftWall .dw-stage {
+      transform: scale(.284) !important;
+      transform-origin: top center !important;
+      margin-top: 0 !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= 导航（打字机小纸片） ================= -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">WYX · PORTFOLIO</div>
+    <div class="nav-fallback">
+      <div id="rubberNav" style="flex:0 1 auto;max-width:100%"></div>
+      <button id="themeBtn" title="切换黑板 / 牛皮纸模式">◐</button>
+    </div>
+  </div>
+</nav>
+
+<!-- 全局边角拼贴装饰（不拦截点击） -->
+<div class="deco-fixed" aria-hidden="true">
+  <img class="df-moth"   src="collage/moth-brown.png"      alt="">
+  <img class="df-flower" src="collage/flower-poppy.png"    alt="">
+  <img class="df-butter" src="collage/butterfly-peacock.png" alt="">
+</div>
+
+<!-- ================= 首屏（黑胶带标题 + 拍立得 + 拼贴） ================= -->
+<header class="hero" id="top">
+  <div class="hero-collage" aria-hidden="true">
+    <img class="hc hc-book"    src="collage/book.png"        alt="">
+    <img class="hc hc-moon"    src="collage/moon.png"        alt="">
+    <img class="hc hc-statue"  src="collage/statue.png"      alt="">
+    <img class="hc hc-balloon" src="collage/balloon.png"     alt="">
+    <img class="hc hc-zeppelin" src="collage/zeppelin.png"   alt="">
+    <img class="hc hc-mirror"  src="collage/mirror.png"      alt="">
+    <img class="hc hc-lips"    src="collage/lips.png"        alt="">
+    <img class="hc hc-typewriter" src="collage/typewriter.png" alt="">
+    <img class="hc hc-letter"  src="collage/letter-scrap.png" alt="">
+    <img class="hc hc-writer"  src="collage/writer.png"      alt="">
+    <img class="hc hc-fwhite"  src="collage/flower-white.png" alt="">
+    <img class="hc hc-fyellow" src="collage/flower-yellow.png" alt="">
+    <div class="hc hc-polar hc-p1"><img src="collage/polaroid-1.jpg" alt=""></div>
+    <div class="hc hc-polar hc-p2"><img src="collage/polaroid-3.jpg" alt=""></div>
+    <div class="hc hc-polar hc-p3"><img src="collage/polaroid-5.jpg" alt=""></div>
+  </div>
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <div class="hello">《数智编程技术基础及应用》课程作品集</div>
+      <h1>
+        <span class="bar"><span class="l1">你好，我是 <span class="name">wyx</span></span></span>
+        <span class="bar alt"><span class="l2">A COURSE PORTFOLIO · 2026</span></span>
+      </h1>
+      <div class="type-line"><span id="typeText"></span><span class="cursor"></span></div>
+      <div class="btns">
+        <a class="btn btn-main" href="#about">了解我 ⬇</a>
+        <a class="btn btn-ghost" href="#works">看成果 👀</a>
+      </div>
+    </div>
+    <div class="avatar-wrap">
+      <div id="quoteBubble">你好呀，我是 wyx！</div>
+      <div class="avatar-ring" id="avatar" title="点我一下试试">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=vintage%20collage%20art%20portrait%20of%20a%20young%20female%20art%20student%2C%20short%20dark%20hair%2C%20wearing%20round%20wire-rimmed%20glasses%20and%20cream%20retro%20sweater%2C%20holding%20an%20old%20typewritten%20book%2C%20paper%20cutout%20collage%20style%2C%20sepia%20cream%20and%20muted%20teal%20tones%2C%20old%20photograph%20grain%2C%20dried%20flowers%20and%20paper%20scraps%20around%2C%20dark%20chalkboard%20background%2C%20penning%20portraits%20aesthetic&image_size=square_hd" alt="wyx 的复古拼贴形象（AI 生成）">
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= 01 个人简介与能力说明 ================= -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="num-badge"><img src="collage/num-0-teal.png" alt="0"><img src="collage/num-1.png" alt="1"></span>
+      <h2 class="sec-title">个人简介与<span>能力说明</span></h2>
+      <p class="sec-sub">方向 · 工具 · 技能</p>
+    </div>
+    <div class="grid-2">
+      <div class="card reveal">
+        <h3 class="block-h">👋 关于我</h3>
+        <p class="muted small">我是 wyx，一名正在学习数智编程的学生。我喜欢把想法亲手做成可以玩、可以用的东西：从一行行代码写出消除小游戏，到做一个温柔的科普网页，再到搭建你正在看的这个作品集。</p>
+        <div class="info-list" style="margin-top:14px;">
+          <div class="info-item"><span class="k">🎈 昵称</span><span class="v">wyx</span></div>
+          <div class="info-item"><span class="k">🎒 身份</span><span class="v">学生</span></div>
+          <div class="info-item"><span class="k">🧭 方向</span><span class="v">游戏 / 网页 / 互动小工具</span></div>
+          <div class="info-item"><span class="k">🌟 座右铭</span><span class="v">把喜欢的事做到底</span></div>
+        </div>
+        <h3 class="block-h" style="margin-top:22px;">🧰 常用工具</h3>
+        <div class="chips">
+          <span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">JavaScript</span>
+          <span class="chip">Python（http.server）</span><span class="chip">localStorage</span>
+          <span class="chip">TRAE · AI 编程助手</span><span class="chip">Supabase 云数据库</span><span class="chip">响应式布局</span>
+        </div>
+      </div>
+      <div class="card reveal">
+        <h3 class="block-h">📊 技能掌握（自评）</h3>
+        <div class="skill"><div class="label"><span>🎮 游戏交互与逻辑设计</span><span>80%</span></div><div class="track"><div class="fill" data-w="80"></div></div></div>
+        <div class="skill"><div class="label"><span>💻 HTML / CSS 页面实现</span><span>78%</span></div><div class="track"><div class="fill" data-w="78"></div></div></div>
+        <div class="skill"><div class="label"><span>⚙️ JavaScript 交互逻辑</span><span>75%</span></div><div class="track"><div class="fill" data-w="75"></div></div></div>
+        <div class="skill"><div class="label"><span>☁️ 云端数据库与接口对接（Supabase）</span><span>68%</span></div><div class="track"><div class="fill" data-w="68"></div></div></div>
+        <div class="skill"><div class="label"><span>🐍 Python 基础与本地服务</span><span>65%</span></div><div class="track"><div class="fill" data-w="65"></div></div></div>
+        <div class="skill"><div class="label"><span>🔍 问题排查与调试</span><span>72%</span></div><div class="track"><div class="fill" data-w="72"></div></div></div>
+        <p class="muted small" style="margin-top:14px;">说明：百分比为本人学习阶段的主观自评，不是证书成绩。</p>
+      </div>
+    </div>
+
+    <h3 class="block-h reveal" style="text-align:center; margin-top:34px;">⭐ 课外也喜欢</h3>
+    <div class="hobbies">
+      <div class="hobby reveal"><div class="emoji">🎮</div><div class="t">玩游戏</div></div>
+      <div class="hobby reveal"><div class="emoji">✈️</div><div class="t">旅游</div></div>
+      <div class="hobby reveal"><div class="emoji">⭐</div><div class="t">追星</div></div>
+      <div class="hobby reveal"><div class="emoji">🧩</div><div class="t">Puzzle</div></div>
+      <div class="hobby reveal"><div class="emoji">🎬</div><div class="t">观影</div></div>
+      <div class="hobby reveal"><div class="emoji">💻</div><div class="t">敲代码</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 阶段作业 ================= -->
+<section class="section" id="coursework" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="num-badge"><img src="collage/num-0-pink.png" alt="0"><img src="collage/num-2.png" alt="2"></span>
+      <h2 class="sec-title">阶段<span>作业</span></h2>
+      <p class="sec-sub">按课程学习顺序展示，每一项都附可打开的成果，而不只是截图</p>
+    </div>
+    <div class="tbl-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>顺序</th><th>作业 / 阶段</th><th>对应成果（可点击）</th><th>状态</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>①</td>
+            <td>小游戏开发作业</td>
+            <td><a href="https://77767.mindock.ai/SQFEmk" target="_blank" rel="noopener">🎮 梦梦消消乐（在线试玩）</a></td>
+            <td>✅ 已完成并持续迭代</td>
+          </tr>
+          <tr>
+            <td>②</td>
+            <td>内容型互动网页作业</td>
+            <td><a href="性向测试小屋/index.html" target="_blank">🌈 心光谱 · 性向测试小屋</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>③</td>
+            <td>实用工具型网页作业</td>
+            <td><a href="运动技能自学/index.html" target="_blank">🏃 跃动 · 运动技能自学计划</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>④</td>
+            <td>AI 应用型网页作业</td>
+            <td><a href="AI穿搭推荐/index.html" target="_blank">👗 AI 穿搭推荐 · 虚拟形象试衣</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>⑤</td>
+            <td>创意工具型网页作业</td>
+            <td><a href="桌宠番茄钟/index.html" target="_blank">🐱 桌宠番茄钟 · 陪你专注</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>⑥</td>
+            <td>创意工具型网页作业</td>
+            <td><a href="Markdown笔记/index.html" target="_blank">📝 Markdown 笔记 · 极简写作</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>⑦</td>
+            <td>创意工具型网页作业</td>
+            <td><a href="待办事项/index.html" target="_blank">✅ 待办事项 · 任务管理</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>⑧</td>
+            <td>创意工具型网页作业</td>
+            <td><a href="天气查询/index.html" target="_blank">🌤️ 天气查询 · 实时气象</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>⑨</td>
+            <td>期末作品集（本站）</td>
+            <td><a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">🌸 wyx 个人作品集</a></td>
+            <td>🔄 持续迭代中</td>
+          </tr>
+          <tr>
+            <td>⑩</td>
+            <td>【其他阶段作业】</td>
+            <td class="muted">待按课程顺序补充链接</td>
+            <td>⏳ 待补充</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="todo-box reveal">
+      📌 <b>我还需要补的内容：</b>把表里【】标注处替换成老师实际布置的作业名称、周次和顺序；每次作业完成后立刻在本表加一行并挂可打开的链接（持续迭代，不期末突击）。
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 项目成果 ================= -->
+<section class="section" id="works" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="num-badge"><img src="collage/num-0-gold.png" alt="0"><img src="collage/num-3.png" alt="3"></span>
+      <h2 class="sec-title">项目<span>成果</span></h2>
+      <p class="sec-sub">功能 · 入口 · 关键页 · 技术说明（八件作品完全对应）</p>
+    </div>
+
+    <!-- ===== 作品漂流墙：进入板块先浏览三件作品（悬停抬升 / 点击进入项目） ===== -->
+    <div class="reveal" id="driftWall" style="margin-bottom:36px;border-radius:14px;overflow:hidden;"></div>
+
+    <div class="works-grid">
+      <!-- 项目 1：梦梦消消乐 -->
+      <div class="work reveal" id="work-card-game">
+        <div class="pic"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20match-3%20puzzle%20mobile%20game%20cover%20art%2C%20colorful%20cartoon%20pet%20animals%20cat%20puppy%20panda%20bunny%20on%20candy%20tiles%20grid%2C%20bright%20kawaii%20style%2C%20vibrant%20cheerful%20colors%2C%20high%20quality%20game%20illustration&image_size=landscape_16_9" alt="梦梦消消乐封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>🎮 梦梦消消乐</h3>
+          <ul class="feat-list">
+            <li>7×7 棋盘、7 种宠物图案，交换消除三连</li>
+            <li>账号注册/登录（密码以对象数组存储），进度存 localStorage</li>
+            <li>关卡步数限制（1–3关22步 / 4–6关24步 / 7关起26步）</li>
+            <li>💡提示（每关3次）、🔀洗牌、步数用尽的萌宠安慰页</li>
+            <li>☁️ 云端排行榜：接入 Supabase 云数据库，不同网络、不同设备的玩家共享同一张榜</li>
+            <li>云端数据库函数自动收分（同名玩家合并保留最高分）；三级降级：云端 → Python 本地接口 → 本机缓存，断网照常玩</li>
+            <li>手机触摸适配 + BGM 音效，移动端可玩</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="https://77767.mindock.ai/SQFEmk" target="_blank" rel="noopener">在线试玩 →</a></p>
+          <p class="kv"><b>🧩 关键页：</b>登录页 → 7×7 游戏页 → 步数用尽安慰页 → ☁️云端排行榜</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript、Supabase（PostgreSQL 云数据库 + REST/RPC 数据库函数）、Python http.server 备用接口、localStorage</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">游戏开发</span><span class="tag">Supabase 云数据库</span><span class="tag">移动端适配</span></div>
+          <a class="link" href="#feature-game">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 2：心光谱小屋（与项目1完全对应） -->
+      <div class="work reveal" id="work-card-hut">
+        <div class="pic"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=warm%20cozy%20psychological%20counseling%20room%20with%20soft%20pastel%20lights%2C%20rainbow%20spectrum%20heart%20and%20compass%2C%20cute%20flat%20illustration%2C%20peach%20rose%20lavender%20cream%20colors%2C%20gentle%20kawaii%20style&image_size=landscape_16_9" alt="心光谱小屋封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>🌈 心光谱 · 性向温柔测试与科普小屋</h3>
+          <ul class="feat-list">
+            <li>24 道温柔小题，做完生成六维光谱结果与朋友式解读</li>
+            <li>30 种取向全图鉴，结果类型丰富</li>
+            <li>科普专区：连续光谱、浪漫取向、易混概念辨析</li>
+            <li>四种科学测量模型介绍、FAQ 问答、去病理化小史</li>
+            <li>求助资源与温柔书影推荐，单文件零依赖，打开即用</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="性向测试小屋/index.html" target="_blank">进入小屋 →</a>（本站内页面）</p>
+          <p class="kv"><b>🧩 关键页：</b>开场页 → 24 题测试页 → 六维结果页 → 科普专区</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript 单文件（约 72 KB），无外部依赖</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">互动测评</span><span class="tag">科普内容</span><span class="tag">单页应用</span></div>
+          <a class="link" href="#feature-hut">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 3：跃动·运动技能自学（与前两张完全对应） -->
+      <div class="work reveal" id="work-card-sport">
+        <div class="pic"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=energetic%20mobile%20fitness%20app%20cover%20art%2C%20cute%20flat%20illustration%20of%20running%20swimming%20badminton%20basketball%20yoga%20icons%2C%20orange%20sunrise%20gradient%20sky%2C%20sporty%20kawaii%20style%2C%20warm%20vibrant%20colors&image_size=landscape_16_9" alt="跃动运动技能自学封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>🏃 跃动 · 运动技能自学计划</h3>
+          <ul class="feat-list">
+            <li>内置 16 种运动项目库：跑步、游泳（4 种泳姿）、羽毛球、篮球、瑜伽、力量、骑行、足球、跳绳、拉伸、乒乓、网球、排球、舞蹈、攀岩</li>
+            <li>自选天数与每日时长，一键智能生成“热身→主训练→体能→拉伸”三阶段计划</li>
+            <li>每个动作都配时长和动作要点，主训练动作可一键搜教学视频</li>
+            <li>环形计时器跟练：播放/暂停、上一个/下一个、动作自动连播与进度点</li>
+            <li>每日打卡 + 连续天数 + 进度环 + 三阶段结业里程碑，完成有撒花鼓励</li>
+            <li>计划存 localStorage 离线可用，480px 手机端优先、安全区适配</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="运动技能自学/index.html" target="_blank">进入应用 →</a>（本站内页面）</p>
+          <p class="kv"><b>🧩 关键页：</b>首页/定制计划 → 日历打卡与计划总览表 → 环形计时器跟练 → 进度与里程碑</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript 单文件（约 72 KB）、localStorage、SVG 环形计时器、移动端安全区适配</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">计划生成算法</span><span class="tag">计时器</span><span class="tag">移动端</span></div>
+          <a class="link" href="#feature-sport">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 4：AI 穿搭推荐（与前三张完全对应） -->
+      <div class="work reveal" id="work-card-outfit">
+        <div class="pic"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chic%20fashion%20magazine%20cover%20style%20illustration%2C%20elegant%20virtual%20avatar%20mannequin%20trying%20on%20clothes%2C%20klein%20blue%20and%20monochrome%20editorial%20layout%2C%20clothing%20cards%20floating%2C%20minimal%20boutique%20aesthetic%2C%20flat%20illustration&image_size=landscape_16_9" alt="AI 穿搭推荐封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>👗 AI 穿搭推荐 · 虚拟形象试衣</h3>
+          <ul class="feat-list">
+            <li>6 步流程：身体数据录入 → 捏脸生成形象 → 风格偏好问答 → 场合确认 → 生成穿搭方案 → 决策闭环</li>
+            <li>参数化 2D SVG 虚拟形象：脸型/发型/发色/眼型/眼色/肤色可调，体型随身体数据自动联动，正面/侧面/背面可切换</li>
+            <li>8 种主流风格 × 颜色偏好 × 穿搭技巧 × 场合多轮卡片式问答，所有选择即时反馈到形象预览</li>
+            <li>本地规则打分推荐引擎：每件单品带 styles/colors/occasions/bodyTypes/techniques 标签，按权重加权打分排序</li>
+            <li>方案实时渲染到虚拟形象试穿，同步生成穿搭介绍文案（设计理念/单品解析/显瘦显高技巧/搭配逻辑/适合原因）</li>
+            <li>不满意可定向微调（颜色/版型/单品/风格），保留已确认部分；满意一键跳转淘宝/天猫/京东/得物搜索</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="AI穿搭推荐/index.html" target="_blank">进入应用 →</a>（本站内页面）</p>
+          <p class="kv"><b>🧩 关键页：</b>首页 → 身体数据录入 → 捏脸生成形象 → 风格/颜色/技巧多轮问答 → 场合选择 → 方案详情与试穿</p>
+          <p class="kv"><b>🛠 技术：</b>React 18（CDN + Babel 运行时编译）+ Tailwind CSS、自研参数化 2D SVG 头像系统、useReducer + Context 全局状态、本地规则打分推荐引擎（约 88 KB 单文件）</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">Tailwind</span><span class="tag">SVG 参数化形象</span><span class="tag">推荐引擎</span></div>
+          <a class="link" href="#feature-outfit">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 5：桌宠番茄钟 -->
+      <div class="work reveal" id="work-card-pomodoro">
+        <div class="pic"><img class="no-vintage" src="covers/pomodoro.jpg" alt="桌宠番茄钟封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>🐱 桌宠番茄钟 · 陪你专注</h3>
+          <ul class="feat-list">
+            <li>可爱像素风桌宠陪伴：工作时蹦蹦跳跳，休息时闭眼打盹，完成时开心庆祝</li>
+            <li>三种模式一键切换：专注 25min / 短休 5min / 长休 15min，支持自定义时长</li>
+            <li>宠物气泡随机鼓励语： idle / working / resting / done 四种状态 12 条文案</li>
+            <li>完成番茄钟撒花庆祝动画 + 自动统计今日/累计番茄数与专注分钟</li>
+            <li>数据存 localStorage 持久化，空格键快捷开始/暂停</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="桌宠番茄钟/index.html" target="_blank">进入应用 →</a>（本站内页面）</p>
+          <p class="kv"><b>🧩 关键页：</b>宠物互动区 → 模式切换 → 倒计时 → 完成弹窗</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript 单文件、CSS 动画（bounce/sleep/blink）、localStorage</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">CSS 动画</span><span class="tag">番茄工作法</span><span class="tag">单页应用</span></div>
+          <a class="link" href="#feature-pomodoro">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 6：Markdown 笔记 -->
+      <div class="work reveal" id="work-card-markdown">
+        <div class="pic"><img class="no-vintage" src="covers/markdown.jpg" alt="Markdown 笔记封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>📝 Markdown 笔记 · 极简写作</h3>
+          <ul class="feat-list">
+            <li>左侧编辑 + 右侧实时预览双栏布局，语法高亮渲染标题/代码/列表/引用/表格/图片/链接</li>
+            <li>笔记列表侧边栏：标题、内容预览、最后更新时间一目了然</li>
+            <li>自动保存到 localStorage（1 秒防抖），刷新不丢内容，支持导出 .md 文件</li>
+            <li>字数统计、暗色代码风界面、响应式折叠侧边栏适配移动端</li>
+            <li>零依赖单文件，打开即用，无需后端</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="Markdown笔记/index.html" target="_blank">进入应用 →</a>（本站内页面）</p>
+          <p class="kv"><b>🧩 关键页：</b>笔记列表 → 新建/编辑 → 实时预览 → 导出</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript 单文件、正则 Markdown 解析、localStorage</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">Markdown</span><span class="tag">编辑器</span><span class="tag">本地存储</span></div>
+          <a class="link" href="#feature-markdown">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 7：待办事项 -->
+      <div class="work reveal" id="work-card-todo">
+        <div class="pic"><img class="no-vintage" src="covers/todo.jpg" alt="待办事项封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>✅ 待办事项 · 任务管理</h3>
+          <ul class="feat-list">
+            <li>任务 CRUD：添加/完成/编辑/删除，内容、标签、优先级三级属性</li>
+            <li>四色标签体系：💼 工作 / 📚 学习 / 🏠 生活 / 🔥 紧急，支持按标签筛选</li>
+            <li>三级优先级：高/中/低，彩色圆点直观标识</li>
+            <li>实时统计面板：全部/已完成/进行中/紧急任务数 + 完成进度条</li>
+            <li>数据存 localStorage，支持编辑模态框修改，移动端友好</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="待办事项/index.html" target="_blank">进入应用 →</a>（本站内页面）</p>
+          <p class="kv"><b>🧩 关键页：</b>添加任务 → 筛选标签 → 任务列表 → 编辑弹窗</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript 单文件、localStorage、CSS 动画</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">任务管理</span><span class="tag">筛选过滤</span><span class="tag">单页应用</span></div>
+          <a class="link" href="#feature-todo">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 8：天气查询 -->
+      <div class="work reveal" id="work-card-weather">
+        <div class="pic"><img class="no-vintage" src="covers/weather.jpg" alt="天气查询封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>🌤️ 天气查询 · 实时气象</h3>
+          <ul class="feat-list">
+            <li>6 个预设城市（北京/上海/广州/深圳/杭州/成都）一键切换，支持自定义搜索</li>
+            <li>主卡片：当前温度、天气状况、最高/最低温、动态天气图标浮动动画</li>
+            <li>6 项详情指标：湿度、风力、体感温度、能见度、风向、紫外线</li>
+            <li>24 小时逐时预报横向滚动 + 7 天每日预报列表</li>
+            <li>生活指数：穿衣/运动/洗车/感冒建议，玻璃拟态 UI 风格</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="天气查询/index.html" target="_blank">进入应用 →</a>（本站内页面）</p>
+          <p class="kv"><b>🧩 关键页：</b>城市搜索 → 天气主卡片 → 详情指标 → 逐时/逐日预报</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript 单文件、玻璃拟态设计、CSS 动画</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">数据可视化</span><span class="tag">玻璃拟态</span><span class="tag">响应式</span></div>
+          <a class="link" href="#feature-weather">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 过程证据 ================= -->
+<section class="section" id="process" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="num-badge"><img src="collage/num-0-teal.png" alt="0"><img src="collage/num-4.png" alt="4"></span>
+      <h2 class="sec-title">过程<span>证据</span></h2>
+      <p class="sec-sub">需求 · 原型 · 与 AI 交互关键步骤 · 版本 · 问题解决</p>
+    </div>
+    <div class="ev-grid">
+      <div class="ev reveal">
+        <div class="ev-ic">📝</div>
+        <h4>需求（真实约束）</h4>
+        <ul>
+          <li>玩家数据必须是 <code>[{name, pwd}]</code> 对象数组，不能是字符串数组</li>
+          <li>新账号必须先设密码才能登录</li>
+          <li>步数用尽不能自动重开，要显示萌宠安慰页（5个头像+随机鼓励语）</li>
+          <li>排行榜显示全部玩家分数，不截断成前10名</li>
+          <li>图案资源统一放“图案”文件夹，标题/欢迎语统一显示“梦梦消消乐”</li>
+        </ul>
+      </div>
+      <div class="ev reveal">
+        <div class="ev-ic">✏️</div>
+        <h4>原型</h4>
+        <ul>
+          <li>游戏布局一开始就定为 7×7，与 7 种宠物一一对应</li>
+          <li>卡片尺寸在原型基础上放大 14%，用 object-fit 防裁剪</li>
+          <li>作品集先用板块草图确认顺序：简介→作业→项目→证据→迭代→专题→复盘</li>
+        </ul>
+        <div class="todo-box" style="margin-top:10px;">📌 待补：手绘草图 / 线框图照片（后续贴入此处）</div>
+      </div>
+      <div class="ev reveal">
+        <div class="ev-ic">💬</div>
+        <h4>与 AI 交互的关键步骤</h4>
+        <ul>
+          <li><b>① 提需求：</b>说清要做什么（如“做一个有自我介绍和成果展示的个人网站”）</li>
+          <li><b>② 定细节：</b>确认形象风格、显示名称等关键选项后再动手</li>
+          <li><b>③ 看结果验收：</b>浏览器实际打开检查，不对的地方明确指出修改</li>
+          <li><b>④ 纠错澄清：</b>发现理解偏差立即纠正，确保做出来的就是自己真正想要的</li>
+          <li><b>⑤ 迭代收口：</b>一轮轮精简/增删，最终内容由本人拍板</li>
+        </ul>
+      </div>
+      <div class="ev reveal">
+        <div class="ev-ic">🏷️</div>
+        <h4>版本（作品集网站）</h4>
+        <ul>
+          <li><b>v1.0 · 2026-09-10</b>：初版上线（简介+成果+爱好+留言+深色模式）</li>
+          <li><b>v1.1 · 2026-09-10</b>：按本人反馈精简文案、身份改“学生”、作品链接更换</li>
+          <li><b>v1.2 · 2026-09-13</b>：接入“心光谱”小屋项目</li>
+          <li><b>v1.3 · 2026-09-14</b>：按课程考核标准重构为作品集结构</li>
+          <li><b>v1.4 · 2026-09-14</b>：小屋改为与游戏并列的完整项目卡片，专题页精简</li>
+          <li><b>v1.5 · 2026-09-14</b>：为小屋新增与游戏同构的专题复盘（问题/用户/方案/复盘）</li>
+          <li><b>v1.6 · 2026-09-14</b>：第三个项目《跃动·运动技能自学计划》接入，卡片、专题与前两件完全对应</li>
+          <li><b>v1.7 · 2026-09-18</b>：消消乐排行榜升级——接入 Supabase 云端 PostgreSQL，跨网络共享并三级降级</li>
+          <li><b>v1.8 · 2026-10-12</b>：接入第四个项目《AI 穿搭推荐 · 虚拟形象试衣》：新增同构项目卡与专题复盘，阶段作业表增加对应行</li>
+          <li><b>v1.9 · 2026-10-26</b>：接入四个新工具项目（桌宠番茄钟/Markdown 笔记/待办事项/天气查询）：各含同构项目卡与专题复盘，阶段作业表扩展至 10 行</li>
+        </ul>
+      </div>
+      <div class="ev reveal" style="grid-column: 1 / -1;">
+        <div class="ev-ic">🔧</div>
+        <h4>问题解决（真实踩坑与处理）</h4>
+        <ul>
+          <li><b>移动端点不动：</b>手机浏览器对 pointerdown 触发不稳定 → 改用 touchstart 事件监听解决。</li>
+          <li><b>音效不响：</b>浏览器禁止自动播放音频 → 放进触摸事件的同步调用栈里播放并 resume AudioContext。</li>
+          <li><b>无效交换不扣步：</b>发现规则漏洞后修正为——只要进行了交换，无论是否消成都消耗 1 步。</li>
+          <li><b>服务器常掉线：</b>Python HTTP 服务在电脑睡眠/清理后会退出 → 固定用“启动游戏.bat”一键重启。</li>
+          <li><b>公网分享失败：</b>尝试过 serveo 等 SSH 隧道，断连频繁 → 退回局域网 IP 方案，保证同班同学能稳定访问。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 迭代记录 ================= -->
+<section class="section" id="iterations" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="num-badge"><img src="collage/num-0-pink.png" alt="0"><img src="collage/num-5.png" alt="5"></span>
+      <h2 class="sec-title">迭代<span>记录</span></h2>
+      <p class="sec-sub">改了什么 · 为什么 · 效果 · 下一步</p>
+    </div>
+    <div class="tbl-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>日期</th><th>改了什么</th><th>为什么</th><th>效果</th><th>下一步</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>09-10<br>v1.0</td>
+            <td>从零搭建作品集网站首版</td>
+            <td>需要一个展示自己与作品的主页</td>
+            <td>简介、成果、留言板、深色模式全部可用</td>
+            <td>用真实反馈检验文案与信息密度</td>
+          </tr>
+          <tr>
+            <td>09-10<br>v1.1</td>
+            <td>删两段自我介绍；身份“学生·独立开发者”→“学生”；只留一个作品卡；换外链</td>
+            <td>希望页面更简洁，身份与实际一致，链接要能打开</td>
+            <td>首屏更清爽，信息全部属实</td>
+            <td>等有新项目再增补卡片</td>
+          </tr>
+          <tr>
+            <td>09-13<br>v1.2</td>
+            <td>新增“心光谱·性向测试小屋”项目入口</td>
+            <td>第二个真实项目需要有入口</td>
+            <td>两个项目均可点击使用</td>
+            <td>为项目补功能说明与技术说明</td>
+          </tr>
+          <tr>
+            <td>09-14<br>v1.3</td>
+            <td>按课程考核标准重构：新增阶段作业、过程证据、迭代记录、专题页、复盘、真实性声明</td>
+            <td>对照“内容与合格标准”自查，缺过程性内容</td>
+            <td>7 项必备内容齐全；外链有效；无敏感信息</td>
+            <td>补手绘原型/截图与各作业真实周次</td>
+          </tr>
+          <tr>
+            <td>09-14<br>v1.4</td>
+            <td>小屋改为与梦梦消消乐并列的完整项目卡片；AI 交互只留关键步骤；删掉专题页演示入口；恢复考核板块</td>
+            <td>两件作品展示规格要对应；过程证据要精炼；发现考核板块缺失需补回</td>
+            <td>两卡片完全同构并排；考核 7 项内容齐全</td>
+            <td>补真实截图、作业周次与长期托管网址</td>
+          </tr>
+          <tr>
+            <td>09-14<br>v1.5</td>
+            <td>为心光谱小屋新增与梦梦消消乐同构的专题复盘（横幅+问题/用户/方案/复盘）；两张项目卡底部链接统一指向各自专题</td>
+            <td>两件作品的展示深度要完全对应，不能厚此薄彼</td>
+            <td>两件作品在同一板块内各有一套完整专题</td>
+            <td>补真实截图与作业周次</td>
+          </tr>
+          <tr>
+            <td>09-14<br>v1.6</td>
+            <td>接入第三个项目《跃动·运动技能自学计划》：新增同构项目卡与专题复盘，阶段作业表增加对应行</td>
+            <td>三件作品的展示规格要完全对应，项目数量增加后仍保持统一结构</td>
+            <td>三件作品卡片/专题一一对齐，入口全部可打开</td>
+            <td>补真实截图与作业周次</td>
+          </tr>
+          <tr>
+            <td>09-18<br>v1.7</td>
+            <td>消消乐排行榜从本地 Python 接口升级为 Supabase 云端 PostgreSQL：REST/RPC 收分、同名合并最高分、云端→本地→缓存三级降级；作品集卡片与专题同步更新</td>
+            <td>本地服务器只在局域网共享且易掉线，外网好友无法同榜</td>
+            <td>任何网络的设备共享同一云端排行榜，断网时游戏和本地榜仍可用</td>
+            <td>实测云端连通与降级表现；后续可加战绩详情与历史曲线</td>
+          </tr>
+          <tr>
+            <td>10-12<br>v1.8</td>
+            <td>接入第四个项目《AI 穿搭推荐 · 虚拟形象试衣》：新增同构项目卡与专题复盘，阶段作业表增加对应行</td>
+            <td>四件作品的展示规格要完全对应，项目数量增加后仍保持统一结构</td>
+            <td>四件作品卡片/专题一一对齐，入口全部可打开</td>
+            <td>补真实截图与作业周次</td>
+          </tr>
+          <tr>
+            <td>10-26<br>v1.9</td>
+            <td>接入四个新工具项目：桌宠番茄钟（CSS 动画宠物 + 番茄钟）、Markdown 笔记（双栏编辑器 + 实时预览）、待办事项（标签 + 优先级 + 进度追踪）、天气查询（玻璃拟态 + 逐时/逐日预报）；各含同构项目卡与专题复盘，阶段作业表扩展至 10 行</td>
+            <td>作品集从 4 件扩展到 8 件，涵盖游戏、测评、工具、AI 应用四大类型，展示技术广度</td>
+            <td>8 张卡片/8 个专题全部同构对齐，入口全部可打开，各子页面保持独立风格</td>
+            <td>补真实截图与作业周次；考虑添加项目分类筛选</td>
+          </tr>
+          <tr>
+            <td colspan="5" class="muted small">游戏本体的迭代（步数用尽改安慰页、移动端触摸适配、云端排行榜升级等）见上方八件作品的专题复盘卡片。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 06 标志性成果专题页 ================= -->
+<section class="section" id="feature" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="num-badge"><img src="collage/num-0-gold.png" alt="0"><img src="collage/num-6.png" alt="6"></span>
+      <h2 class="sec-title">标志性成果<span>专题</span></h2>
+      <p class="sec-sub">八件作品：问题 · 用户 · 方案 · 复盘</p>
+    </div>
+    <div class="feature-hero reveal" id="feature-game">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=adorable%20kawaii%20match-3%20game%20screenshot%20style%20illustration%2C%207%20by%207%20grid%20of%20cute%20animal%20faces%2C%20pink%20purple%20candy%20UI%2C%20sparkles%2C%20mobile%20game%20art&image_size=landscape_16_9" alt="梦梦消消乐专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>🎮 梦梦消消乐</h3>
+        <p>一个有账号、有关卡、有排行榜、在手机上也能玩的消除小游戏</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>初学者练手多是“看完就扔”的小 demo，我想做一个<b style="color:var(--text)">功能完整、真的有人玩</b>的作品</li>
+          <li>步数用尽直接弹“失败+自动重开”，体验很挫败</li>
+          <li>想和同学比分数，但各玩各的没有共同排行榜</li>
+          <li>早期本地服务器榜只在同一局域网共享，换网络/关机就断，朋友在外网看不到分数</li>
+          <li>同学多用手机访问，电脑页面在手机上点不准、没声音</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>我自己（验证想法、日常试玩）</li>
+          <li>同班同学 / 朋友：手机浏览器随时打开，跨网络也能上同一张排行榜</li>
+          <li>任何网络环境下的设备：家里、教室、用流量都能看到同一份云端榜单</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>7×7 棋盘 + 7 种宠物，配置集中在 TYPES 数组，图案数量用 TYPES.length 动态读取</li>
+          <li>账号密码 + localStorage 存档，进度跨刷新保留</li>
+          <li>分档步数上限 + 提示/洗牌道具，控制难度曲线</li>
+          <li>步数用尽改为<b style="color:var(--text)">萌宠安慰页</b>（再来一次 / 登出换号），任何时候“重开”都可用</li>
+          <li><b style="color:var(--text)">Supabase 云端排行榜：</b>云数据库建 ranks 表，前端经 REST/RPC 调用数据库函数 submit_score 收分（同名玩家自动合并、保留最高分），任何网络的设备共享同一榜</li>
+          <li><b style="color:var(--text)">三级降级容错：</b>云端 → Python 本地 /api/ranks → localStorage 缓存逐级回退，页面显示实时同步状态；云连不上也不影响游戏</li>
+          <li>安全上只用可公开的 publishable 客户端密钥，写操作只能走数据库函数，service_role 主密钥不下发前端</li>
+          <li>touchstart 事件 + 同步调用栈播放音效，解决移动端问题</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>先定硬约束再写代码（数据格式、步数规则、命名统一），后期少返工</li>
+          <li><b style="color:var(--text)">踩坑的：</b>无效交换不扣步的漏洞、手机端事件差异、本地服务器/隧道易掉线</li>
+          <li><b style="color:var(--text)">升级：</b>把排行榜从本地服务器迁到 Supabase 云数据库，第一次实践“前端直连云库 + RPC 函数 + 多级降级”</li>
+          <li><b style="color:var(--text)">学到的：</b>真机测试不能省；“失败体验”也要设计；云服务要分清可公开密钥与主密钥；任何网络能力都要想好断了怎么办</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 标志成果 2：心光谱小屋（与上一专题结构完全对应） -->
+    <div class="feature-hero reveal" id="feature-hut" style="margin-top:56px;">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cozy%20little%20cottage%20room%20at%20night%20with%20warm%20lamp%20light%2C%20rainbow%20spectrum%20shining%20through%20window%2C%20soft%20bookshelves%20and%20tea%20cup%2C%20cute%20flat%20illustration%2C%20peach%20rose%20lavender%20cream%20colors%2C%20gentle%20kawaii%20style&image_size=landscape_16_9" alt="心光谱小屋专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>🌈 心光谱 · 性向温柔测试与科普小屋</h3>
+        <p>一个不贴标签、温柔讲科学的互动测评与科普网页</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>网上很多同类测试娱乐化、随便给人贴一个单一标签，甚至把取向“病理化”</li>
+          <li>想自我了解的同学，缺少温柔、讲科学、中文且无评判的入口</li>
+          <li>多数测试只给一个结果词，没有解释，更没有后续的科普和求助渠道</li>
+          <li>话题敏感，使用者会担心隐私：做过的题不能被别人看到或上传</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>想认真了解自己的青少年与同班同学</li>
+          <li>对多元性别 / 光谱概念好奇、想找靠谱科普的读者</li>
+          <li>正在自我认同中、需要温柔陪伴与求助资源的人</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>24 道单选题，从性吸引、浪漫渴望、情感联结、性别在心动中的分量、吸引流动性等<b style="color:var(--text)">六个维度</b>勾勒光谱，而非给单一标签</li>
+          <li>结果页输出六维光谱 + 朋友式温柔解读，不评判、不定性</li>
+          <li>30 种取向全图鉴；科普专区讲连续光谱、四种科学测量模型、易混概念与去病理化小史</li>
+          <li>FAQ 折叠问答 + 求助资源（含 24 小时危机干预热线 400-161-9995）</li>
+          <li>约 72 KB 单文件、零外部依赖，<b style="color:var(--text)">纯前端运行、不收集任何数据</b>，离线也能打开</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>把“温柔、不贴标签”定为设计原则，贯穿题目、结果和科普全部文案</li>
+          <li><b style="color:var(--text)">做对的：</b>不只做测试，还配科普与求助渠道，让作品有完整的价值闭环</li>
+          <li><b style="color:var(--text)">学到的：</b>敏感话题的措辞要反复斟酌，科学内容要先查证再落笔</li>
+          <li><b style="color:var(--text)">学到的：</b>“纯本地、不收集数据”本身就是安全感设计，单文件零依赖让任何人都能放心打开</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 标志成果 3：跃动·运动技能自学（与前两个专题结构完全对应） -->
+    <div class="feature-hero reveal" id="feature-sport" style="margin-top:56px;">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sunrise%20running%20track%20with%20cute%20flat%20illustration%20athlete%20silhouette%2C%20stopwatch%20and%20training%20plan%20calendar%20floating%2C%20orange%20yellow%20teal%20energetic%20colors%2C%20sporty%20kawaii%20style%2C%20soft%20shapes&image_size=landscape_16_9" alt="跃动运动技能自学专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>🏃 跃动 · 运动技能自学计划</h3>
+        <p>选一项运动，自动生成带计时跟练和打卡的从零自学计划</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>网上运动教程零散，初学者不知道从哪开始、按什么顺序练、每次练多久</li>
+          <li>通用健身 App 给的是通用计划，不是“从零学会某一项运动”的专项路径</li>
+          <li>自学容易跳过热身和拉伸导致受伤；没有阶段目标，练了也说不清进步在哪</li>
+          <li>跟视频练要反复暂停看时间，手机上缺一个能边练边计时的小工具</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>想利用课余碎片时间自学一项运动的同学（以手机使用为主）</li>
+          <li>没有教练、不去健身房，打算跟着手机从零练的初学者</li>
+          <li>我自己：需要计划、计时和打卡反馈才能坚持下来</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>内置 <b style="color:var(--text)">16 个项目的动作数据库</b>：每项 3 个阶段、基础+进阶各 5 个动作（含时长与要点），游泳再细分 4 种泳姿</li>
+          <li>输入总天数和每日时长，算法按 <b style="color:var(--text)">热身 15% / 主训练 60% / 体能 15% / 拉伸 10%</b> 自动排课，阶段内由基础到进阶渐进</li>
+          <li>SVG 环形计时器跟练：动作自动连播、上一个/下一个、进度点；主训练动作可一键搜索教学视频</li>
+          <li>每日打卡、连续天数、进度环和三阶段结业里程碑（如“连续慢跑 30 分钟”“连续蛙泳 100 米”）</li>
+          <li>完成打卡撒花 + 随机鼓励语；localStorage 离线保存；480px 手机优先并适配刘海屏安全区</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>把“学什么（动作要点）”和“怎么练（计时+打卡）”合成一个闭环，不用在多个 App 间切换</li>
+          <li><b style="color:var(--text)">做对的：</b>计划不是随机凑动作，而是有训练比例分配和基础→进阶的进阶曲线</li>
+          <li><b style="color:var(--text)">学到的：</b>数据结构先行——16 个项目共用一套数据格式，游泳用子类型扩展，以后加新项目只需填数据</li>
+          <li><b style="color:var(--text)">下一步：</b>给动作配示意图、支持训练记录导出、在计划中安排主动恢复日</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 标志成果 4：AI 穿搭推荐（与前三个专题结构完全对应） -->
+    <div class="feature-hero reveal" id="feature-outfit" style="margin-top:56px;">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=elegant%20fashion%20styling%20studio%20scene%2C%20virtual%20avatar%20mannequin%20wearing%20chic%20outfit%2C%20clothing%20recommendation%20cards%20floating%20around%2C%20klein%20blue%20and%20monochrome%20editorial%20magazine%20layout%2C%20minimal%20boutique%20aesthetic%2C%20flat%20illustration%2C%20Playfair%20Display%20typography%20vibe&image_size=landscape_16_9" alt="AI 穿搭推荐专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>👗 AI 穿搭推荐 · 虚拟形象试衣</h3>
+        <p>录入身体数据、捏出专属形象，AI 多轮对话生成穿搭方案并实时试穿</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>穿搭决策成本高：凭空想象"这件配那条"很抽象，买回来才发现不搭</li>
+          <li>通用推荐 App 不看身材数据，推荐的衣服穿在自己身上未必显瘦显高</li>
+          <li>网上买衣服看不到上身效果，没有自己的虚拟形象可以试穿</li>
+          <li>穿搭风格词汇多（日系/韩系/老钱/Y2K…），说不清自己适合哪种，更不知道怎么搭</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>想改善穿搭但不知道从哪下手的同学</li>
+          <li>想先看到上身效果再决定买不买的人</li>
+          <li>我自己：把"我适合穿什么"拆成一个可交互的产品</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>6 步流程串成完整决策链：身体数据 → 捏脸 → 风格问答 → 场合 → 方案 → 决策闭环</li>
+          <li>自研<b style="color:var(--text)">参数化 2D SVG 头像系统</b>：分层（身体/脸/发型/五官/服装），脸型/发型/发色/眼型/眼色/肤色全可调，体型随身高体重三围自动联动，正面/侧面/背面可切换</li>
+          <li>本地规则打分推荐引擎：每件单品带 styles/colors/occasions/bodyTypes/techniques 五维标签，<b style="color:var(--text)">score = Σ(权重 × 匹配度)</b> 按用户偏好加权排序</li>
+          <li>8 种主流风格 × 颜色偏好 × 穿搭技巧 × 场合多轮卡片式问答，所有选择即时反馈到形象预览</li>
+          <li>方案渲染到形象试穿 + 生成穿搭介绍文案（设计理念/单品解析/显瘦显高技巧/搭配逻辑/适合原因）</li>
+          <li>不满意可定向微调（颜色/版型/单品/风格）保留已确认部分；满意一键跳转淘宝/天猫/京东/得物搜索</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>用 SVG 参数化形象替代外部 3D 模型，零依赖单文件即可运行，原型阶段最轻量</li>
+          <li><b style="color:var(--text)">做对的：</b>把"穿搭推荐"拆成多轮卡片问答而非一次性表单，操作门槛最低化、每步即时反馈</li>
+          <li><b style="color:var(--text)">学到的：</b>推荐引擎的标签体系要先设计好——五维标签覆盖风格/颜色/场合/身材/技巧，后续加单品只需填标签</li>
+          <li><b style="color:var(--text)">下一步：</b>生产环境可替换为大模型 API 输入用户画像 JSON、接入 Ready Player Me 3D 头像 / 虚拟试衣 API</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 标志成果 5：桌宠番茄钟 -->
+    <div class="feature-hero reveal" id="feature-pomodoro" style="margin-top:56px;">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20pixel%20art%20workspace%20with%20cat%20mascot%20and%20pomodoro%20timer%2C%20cozy%20night%20study%20room%2C%20purple%20blue%20gradient%20lighting%2C%20kawaii%20aesthetic&image_size=landscape_16_9" alt="桌宠番茄钟专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>🐱 桌宠番茄钟 · 陪你专注</h3>
+        <p>一只小宠物用 CSS 动画陪你度过每一个番茄钟</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>一个人学习容易分心，缺乏陪伴感和正向反馈</li>
+          <li>普通番茄钟工具界面冷冰冰，完成没有成就感</li>
+          <li>想用一个可爱的虚拟宠物来"监督"自己专注</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>需要番茄工作法管理学习时间的同学</li>
+          <li>喜欢可爱事物、需要情感化激励的学习者</li>
+          <li>我自己：想做一个有温度的小工具</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>CSS 绘制像素风桌宠：圆脸 + 眨眼 + 腮红 + 微笑嘴，工作/休息/完成三种状态动画</li>
+          <li>气泡消息系统：4 种状态 × 3-4 条随机文案，点击宠物随机触发</li>
+          <li>标准番茄钟逻辑：25/5/15 分钟三模式，支持自定义时长，完成自动切换</li>
+          <li>完成时撒花动画 + 统计面板（今日/累计/分钟），localStorage 持久化</li>
+          <li>空格键快捷控制，无后端纯前端单文件</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>用纯 CSS 画宠物比引入图片资源更轻量，且动画可控性更强</li>
+          <li><b style="color:var(--text)">做对的：</b>情感化设计（宠物表情、鼓励文案、撒花）显著提升了完成番茄钟的愉悦感</li>
+          <li><b style="color:var(--text)">学到的：</b>CSS keyframe 动画组合（bounce + sleep + blink）可以做出很生动的微交互</li>
+          <li><b style="color:var(--text)">下一步：</b>加入宠物成长系统（完成番茄钟升级）、更多宠物皮肤、白噪音背景音</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 标志成果 6：Markdown 笔记 -->
+    <div class="feature-hero reveal" id="feature-markdown" style="margin-top:56px;">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=minimalist%20dark%20code%20editor%20with%20markdown%20preview%20split%20screen%2C%20blue%20accent%20lighting%2C%20clean%20developer%20workspace%2C%20professional%20tool%20aesthetic&image_size=landscape_16_9" alt="Markdown 笔记专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>📝 Markdown 笔记 · 极简写作</h3>
+        <p>左侧写、右侧看，零干扰的 Markdown 写作环境</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>想找一个轻量、无广告、可离线使用的 Markdown 笔记工具</li>
+          <li>在线编辑器要么要登录，要么功能臃肿，只想安静写东西</li>
+          <li>写好的笔记希望能导出为 .md 文件保存</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>需要写技术文档、学习笔记的同学</li>
+          <li>喜欢 Markdown 语法、追求极简写作体验的人</li>
+          <li>我自己：课程作业和日常笔记的统一管理工具</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>双栏布局：左侧 textarea 编辑，右侧实时渲染预览，正则解析 Markdown 语法</li>
+          <li>笔记管理：侧边栏列表 + 新建/保存/删除/导出，自动保存（1 秒防抖）</li>
+          <li>支持语法：标题/粗斜体/行内代码/代码块/列表/引用/链接/图片/分割线/表格</li>
+          <li>暗色代码风 UI（GitHub Dark 配色），字数统计，响应式折叠侧边栏</li>
+          <li>数据存 localStorage，刷新不丢，零依赖单文件</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>自动保存 + 防抖处理，写东西时完全不用操心保存</li>
+          <li><b style="color:var(--text)">做对的：</b>导出 .md 文件功能让数据可迁移，不被平台绑定</li>
+          <li><b style="color:var(--text)">学到的：</b>正则解析 Markdown 虽然不如 AST 精确，但对轻量场景足够且实现简单</li>
+          <li><b style="color:var(--text)">下一步：</b>支持标签分类、全文搜索、同步到 GitHub Gist / 云存储</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 标志成果 7：待办事项 -->
+    <div class="feature-hero reveal" id="feature-todo" style="margin-top:56px;">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=productivity%20app%20interface%20with%20colorful%20task%20cards%20and%20checkmarks%2C%20clean%20white%20background%2C%20organized%20workspace%20aesthetic%2C%20minimalist%20design&image_size=landscape_16_9" alt="待办事项专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>✅ 待办事项 · 任务管理</h3>
+        <p>标签分类 + 优先级 + 进度追踪，把任务管理得井井有条</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>待办事项散落在微信、便签、脑子里，经常忘记</li>
+          <li>简单清单没有分类和优先级，重要的事和琐事混在一起</li>
+          <li>完成多少、还剩多少没有直观反馈，缺乏成就感</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>需要管理日常学习任务和生活琐事的同学</li>
+          <li>喜欢清晰分类和可视化进度的人</li>
+          <li>我自己：课程作业、社团任务、个人计划的统一入口</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>任务模型：内容 + 标签（工作/学习/生活/紧急）+ 优先级（高/中/低）+ 完成状态</li>
+          <li>四色标签筛选 + 全部/进行中/已完成状态筛选，快速定位</li>
+          <li>统计面板：四宫格数字 + 完成进度条，一眼看清全局</li>
+          <li>编辑模态框：点击铅笔修改内容/标签/优先级，点击垃圾桶删除</li>
+          <li>localStorage 持久化，滑入动画，移动端适配</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>标签 + 优先级双维度分类，比单一列表实用得多</li>
+          <li><b style="color:var(--text)">做对的：</b>进度条和统计数字给了很强的正向反馈，推动"想清空的强迫症"</li>
+          <li><b style="color:var(--text)">学到的：</b>filter 系统用单数据源 + 计算属性最清晰，不要维护多份列表</li>
+          <li><b style="color:var(--text)">下一步：</b>加入截止日期和提醒、子任务拆分、数据导出为 JSON/CSV</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 标志成果 8：天气查询 -->
+    <div class="feature-hero reveal" id="feature-weather" style="margin-top:56px;">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beautiful%20weather%20app%20interface%20with%20sun%20cloud%20rain%20icons%2C%20glassmorphism%20design%2C%20deep%20blue%20sky%20gradient%2C%20modern%20minimal%20aesthetic&image_size=landscape_16_9" alt="天气查询专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>🌤️ 天气查询 · 实时气象</h3>
+        <p>玻璃拟态卡片 + 逐时预报 + 生活指数，一目了然看天气</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>手机自带天气 App 信息太简略，想看更详细的逐时预报和生活指数</li>
+          <li>第三方天气 App 广告多、推送烦，只想安静地查个天气</li>
+          <li>想练习做数据可视化和玻璃拟态 UI 设计</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>出门前想快速查天气和穿衣建议的同学</li>
+          <li>喜欢美观 UI、讨厌广告干扰的用户</li>
+          <li>我自己：练习前端数据展示和视觉设计</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>6 个预设城市数据 + 搜索框，一键切换，快速查询</li>
+          <li>玻璃拟态（Glassmorphism）UI：半透明背景 + backdrop-filter 模糊 + 微边框</li>
+          <li>主卡片：大温度数字 + 动态天气图标浮动动画 + 最高/最低温</li>
+          <li>6 项详情指标 + 24 小时横向滚动预报 + 7 天列表预报 + 4 项生活指数</li>
+          <li>纯 CSS 动画（shimmer 背景、float 图标、spin 加载），零依赖单文件</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>玻璃拟态风格很适合天气类应用，通透感和天空主题契合</li>
+          <li><b style="color:var(--text)">做对的：</b>把数据拆成"主卡片→详情→逐时→逐日→生活指数"五层，信息层级清晰</li>
+          <li><b style="color:var(--text)">学到的：</b>backdrop-filter 的兼容处理（-webkit- 前缀）和性能考量（模糊半径不宜过大）</li>
+          <li><b style="color:var(--text)">下一步：</b>接入真实天气 API（和风/高德）、添加定位自动获取城市、天气预警推送</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 最终学习复盘 ================= -->
+<section class="section" id="review" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="num-badge"><img src="collage/num-0-teal.png" alt="0"><img src="collage/num-7.png" alt="7"></span>
+      <h2 class="sec-title">最终学习<span>复盘</span></h2>
+      <p class="sec-sub">能力变化 · 方法 · 失败 · 计划</p>
+    </div>
+    <div class="review-grid">
+      <div class="review-card reveal">
+        <h4>📈 能力变化</h4>
+        <ul>
+          <li>从只能照着例子改，到能把“我想要一个游戏/一个测试页”拆成功能点并做出来</li>
+          <li>会用事件、localStorage、简单后端接口完成完整交互闭环</li>
+          <li>开始有“用户体验”意识：失败也要安慰、手机也要能玩</li>
+        </ul>
+      </div>
+      <div class="review-card reveal">
+        <h4>🧭 方法</h4>
+        <ul>
+          <li>小步迭代：先做能跑的最小版本，再按反馈一轮轮改</li>
+          <li>把需求写成“硬约束”清单，避免边写边忘</li>
+          <li>真机/真浏览器验证，不靠想象判断“应该能用”</li>
+          <li>把踩过的坑记下来（如移动端事件差异），下次直接绕开</li>
+        </ul>
+      </div>
+      <div class="review-card reveal">
+        <h4>💥 失败与教训</h4>
+        <ul>
+          <li>公网隧道方案在当前网络下频繁断连，前期投入浪费——选技术方案要先验证环境</li>
+          <li>一次需求没说清楚，接入了不是自己想要的文件，发现后当天删除并换成正确的项目——沟通有歧义要当场澄清</li>
+          <li>只在电脑上测试，导致手机端点击/音频问题很晚才暴露</li>
+        </ul>
+      </div>
+      <div class="review-card reveal">
+        <h4>🚀 下一步计划</h4>
+        <ul>
+          <li>补齐阶段作业表与真实截图、手绘原型证据</li>
+          <li>给作品集找一个长期可访问的托管地址（目前本地/临时链接不够稳定）</li>
+          <li>继续学习响应式布局与一个前端框架，减少纯手写重复代码</li>
+          <li>再做 1 个新项目，保持持续迭代而不是期末突击</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 真实性与安全声明 ================= -->
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="declare reveal">
+      <div class="badge-row">
+        <span class="badge">① 可访问：导航清晰 / 桌面与移动端适配</span>
+        <span class="badge">② 有入口：所有项目链接真实有效</span>
+        <span class="badge">③ 真实：如实说明 AI 协作</span>
+        <span class="badge">④ 安全：无密钥 / 密码 / 隐私泄露</span>
+      </div>
+      <p><b>真实性声明：</b>本作品集所展示的《梦梦消消乐》《心光谱 · 性向温柔测试与科普小屋》《跃动 · 运动技能自学计划》《AI 穿搭推荐 · 虚拟形象试衣》《桌宠番茄钟 · 陪你专注》《Markdown 笔记 · 极简写作》《待办事项 · 任务管理》《天气查询 · 实时气象》及本网站，均为本人在课程期间真实提出需求、参与设计决策并验收完成的项目。开发过程中使用了 TRAE AI 编程助手辅助生成与调试代码、整理资料；卡通头像与封面示意图由 AI 文生图生成（图中已标注），文案取舍、功能定义与最终判断均由本人完成；未使用付费模板，未把他人作品冒充为自己的成果。</p>
+      <p><b>安全声明：</b>本网站为纯静态页面，不包含服务器密码、数据库主密钥（service_role）或他人隐私信息；游戏排行榜使用 Supabase 提供的<b>可公开 publishable 客户端密钥</b>（该密钥设计上可暴露在前端），写入只能通过数据库函数完成，数据库主密钥仅保存在云服务端、从不下发；游戏账号数据保存在玩家自己浏览器的 localStorage 中。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 留言板 ================= -->
+<section class="section" id="guestbook" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <h2 class="sec-title">留言<span>板</span></h2>
+      <p class="sec-sub">老师/同学如果有建议，欢迎留在这里 💜（仅保存在本机浏览器）</p>
+    </div>
+    <div class="board reveal">
+      <div class="board-input">
+        <input id="msgInput" type="text" maxlength="60" placeholder="留下你的建议吧～（最多60字）" onkeydown="if(event.key==='Enter')addMsg()">
+        <button onclick="addMsg()">发送 💌</button>
+      </div>
+      <div id="msgList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 页脚 ================= -->
+<footer>
+  <p>© 2026 wyx · 《数智编程技术基础及应用》课程作品集 · 用 <span class="heart">❤</span> 持续迭代中</p>
+  <p class="ai-note">卡通形象与封面示意图由 AI 生成，代码在 AI 助手辅助下由本人验收完成</p>
+</footer>
+
+<button id="topBtn" title="回到顶部">🚀</button>
+
+<script>
+/* ===== 日夜模式（两个按钮都能触发） ===== */
+const themeBtns = document.querySelectorAll('#themeBtn, #themeBtn2');
+const savedTheme = localStorage.getItem('wyx-theme');
+if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+themeBtns.forEach(b => b.addEventListener('click', () => {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('wyx-theme', html.dataset.theme);
+  updateThemeIcon();
+}));
+function updateThemeIcon() {
+  const isDark = document.documentElement.dataset.theme !== 'light';
+  themeBtns.forEach(b => { b.textContent = isDark ? '☼' : '◐'; b.title = isDark ? '切换到牛皮纸模式' : '切换到黑板模式'; });
+}
+updateThemeIcon();
+
+/* ===== 打字机效果 ===== */
+const roles = ['小游戏开发者 🎮', '互动网页制作者 🌈', '持续迭代的学习者 📈'];
+const typeText = document.getElementById('typeText');
+let rIdx = 0, cIdx = 0, deleting = false;
+(function type() {
+  const word = roles[rIdx];
+  typeText.textContent = word.slice(0, cIdx);
+  let delay = deleting ? 60 : 160;
+  if (!deleting && cIdx === word.length) { delay = 1400; deleting = true; }
+  else if (deleting && cIdx === 0) { deleting = false; rIdx = (rIdx + 1) % roles.length; delay = 400; }
+  else cIdx += deleting ? -1 : 1;
+  setTimeout(type, delay);
+})();
+
+/* ===== 卡通形象点击彩蛋 ===== */
+const quotes = [
+  '你好呀，我是 wyx！很高兴认识你～',
+  '嘿嘿，被你发现了～',
+  '今天也要元气满满哦！',
+  '往下滑，有完整的项目复盘 →',
+  '《梦梦消消乐》等你来玩！'
+];
+const avatar = document.getElementById('avatar');
+const bubble = document.getElementById('quoteBubble');
+let qi = 0, bubbleTimer;
+avatar.addEventListener('click', () => {
+  avatar.classList.remove('wobble');
+  void avatar.offsetWidth;
+  avatar.classList.add('wobble');
+  bubble.textContent = quotes[qi % quotes.length];
+  qi++;
+  bubble.classList.add('show');
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => bubble.classList.remove('show'), 2600);
+});
+
+/* ===== 滚动浮现 + 技能条：已迁移到 gsap-anim.js（GSAP ScrollTrigger） ===== */
+
+/* ===== 留言板 ===== */
+const KEY = 'wyx-guestbook';
+const msgList = document.getElementById('msgList');
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function getMsgs() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
+function render() {
+  const msgs = getMsgs();
+  if (!msgs.length) {
+    msgList.innerHTML = '<div class="empty-tip">还没有留言，来做第一个留言的人吧～ 🐣</div>';
+    return;
+  }
+  msgList.innerHTML = msgs.map((m, i) =>
+    `<div class="msg"><span>💬 ${esc(m)}</span><button class="del" data-i="${i}" title="删除">✖</button></div>`
+  ).join('');
+}
+function addMsg() {
+  const input = document.getElementById('msgInput');
+  const v = input.value.trim();
+  if (!v) return;
+  const msgs = getMsgs();
+  msgs.unshift(v);
+  localStorage.setItem(KEY, JSON.stringify(msgs));
+  input.value = '';
+  render();
+  if (window.gsap) gsap.from('#msgList .msg:first-child', { y: -16, opacity: 0, rotation: 2, duration: 0.45, ease: 'back.out(1.7)' });
+}
+msgList.addEventListener('click', e => {
+  if (!e.target.classList.contains('del')) return;
+  const msgs = getMsgs();
+  msgs.splice(+e.target.dataset.i, 1);
+  localStorage.setItem(KEY, JSON.stringify(msgs));
+  render();
+});
+render();
+
+/* ===== 返回顶部 ===== */
+const topBtn = document.getElementById('topBtn');
+window.addEventListener('scroll', () => {
+  topBtn.classList.toggle('show', window.scrollY > 400);
+});
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+
+<!-- ===== 启动页：FuzzyText 模糊失真文字 + 机械音效 + 朗读 ===== -->
+<script src="fuzzy-text.js?v=12"></script>
+<script>
+(function () {
+  if (window.FuzzyText) {
+    try {
+      window.__fuzzy = new FuzzyText({
+        text: 'Welcome to my world',
+        baseIntensity: 0.2,
+        hoverIntensity: 0.8,
+        enableHover: true,
+        wordsPerGroup: 2,
+        groupDelay: 750,
+      });
+      console.log('[FuzzyText] instance created');
+    } catch (e) {
+      console.error('[FuzzyText] init error:', e);
+    }
+  } else {
+    console.error('[FuzzyText] class not found');
+  }
+})();
+</script>
+
+<!-- ===== 作品漂流墙 DriftWall：3D 漂浮照片墙，项目封面 + 名称 ===== -->
+<script src="drift-wall.js?v=1"></script>
+<script>
+(function () {
+  function initDriftWall() {
+    var host = document.getElementById('driftWall');
+    if (!host || !window.DriftWall) return;
+    var IMG = 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=';
+    var V = 'vintage%20paper%20cutout%20collage%20art%2C%20sepia%20cream%20old%20photograph%20grain%2C%20muted%20teal%20mustard%20and%20red%20pin%20accents%2C%20dark%20chalkboard%20background%2C%20penning%20portraits%20scrapbook%20aesthetic%2C%20';
+    var items = [
+      {
+        title: '梦梦消消乐',
+        image: IMG + V + 'cute%20match-3%20puzzle%20game%20with%20little%20paper%20cutout%20cat%20puppy%20panda%20bunny%20animals%20on%20old%20newspaper%20squares%2C%20washi%20tape%20pieces&image_size=landscape_16_9',
+        href: '#work-card-game',
+      },
+      {
+        title: '心光谱小屋',
+        image: IMG + V + 'cozy%20old%20study%20room%20with%20antique%20desk%20lamp%20dried%20flowers%20paper%20letters%20and%20a%20small%20heart%20compass%2C%20sepia%20nostalgic%20mood&image_size=landscape_16_9',
+        href: '#work-card-hut',
+      },
+      {
+        title: '跃动·运动自学',
+        image: IMG + V + 'paper%20cutout%20running%20shoes%20badminton%20racket%20basketball%20and%20swimming%20figures%20pinned%20with%20red%20pins%20on%20grid%20notebook%20paper%2C%20retro%20sports%20journal&image_size=landscape_16_9',
+        href: '#work-card-sport',
+      },
+      {
+        title: 'AI穿搭推荐',
+        image: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=chic%20fashion%20magazine%20cover%20style%20illustration%2C%20elegant%20virtual%20avatar%20mannequin%20trying%20on%20clothes%2C%20klein%20blue%20and%20monochrome%20editorial%20layout%2C%20clothing%20cards%20floating%2C%20minimal%20boutique%20aesthetic%2C%20flat%20illustration&image_size=landscape_16_9',
+        href: '#work-card-outfit',
+      },
+      {
+        title: '桌宠番茄钟',
+        image: 'covers/pomodoro.jpg',
+        href: '#work-card-pomodoro',
+        noVintage: true,
+      },
+      {
+        title: 'Markdown笔记',
+        image: 'covers/markdown.jpg',
+        href: '#work-card-markdown',
+        noVintage: true,
+      },
+      {
+        title: '待办事项',
+        image: 'covers/todo.jpg',
+        href: '#work-card-todo',
+        noVintage: true,
+      },
+      {
+        title: '天气查询',
+        image: 'covers/weather.jpg',
+        href: '#work-card-weather',
+        noVintage: true,
+      },
+    ];
+    window.__driftWall = new DriftWall(host, {
+      items: items,
+      columns: 5,
+      tileWidth: 200,
+      tileHeight: 132,
+      gap: 24,
+      tilt: 14,
+      turn: -12,
+      perspective: 1200,
+      depth: 110,
+      speed: 42,
+      direction: 'up',
+      variance: 0.45,
+      parallax: 0.6,
+      lift: 60,
+      fade: 0.6,
+      dim: 0.5,
+      overlayColor: '#080706',
+      hint: '作品漂流墙 · 悬停查看 · 点击跳转到介绍卡片',
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDriftWall);
+  } else {
+    initDriftWall();
+  }
+})();
+</script>
+<!-- GSAP 动效（本地库：E:\github\GSAP dist） -->
+<script src="gsap/gsap.min.js?v=1"></script>
+<script src="gsap/ScrollTrigger.min.js?v=1"></script>
+<script src="gsap-anim.js?v=2"></script>
+<!-- 背景飘浮微粒（黑板白尘） -->
+<script src="particles-bg.js?v=1"></script>
+<!-- 橡皮筋弹性分段导航 -->
+<script src="rubber-segment.js?v=2"></script>
+<script>
+(function () {
+  var SECTIONS = [
+    { label: '简介', target: '#about' },
+    { label: '作业', target: '#coursework' },
+    { label: '成果', target: '#works' },
+    { label: '证据', target: '#process' },
+    { label: '迭代', target: '#iterations' },
+    { label: '专题', target: '#feature' },
+    { label: '复盘', target: '#review' },
+    { label: '留言', target: '#guestbook' },
+  ];
+  function mountNav() {
+    new RubberSegment(document.getElementById('rubberNav'), {
+      items: SECTIONS,
+      onChange: function (value, index) { /* value.target 已滚动 */ },
+      trackColor: '#27272a',
+      thumbColor: '#efe5cd',
+      size: 'md',
+      radius: 8,
+      inset: 3,
+      equalSlots: true,
+      stretch: 100,
+      squash: 3,
+      speed: 1,
+      glide: 75,
+      draggable: true,
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountNav);
+  } else {
+    mountNav();
+  }
+})();
+</script>
+</body>
+</html>

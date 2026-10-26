@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>跃动 · 运动技能自学计划</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🦋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+:root{
+  --bg:#f4f1ea;
+  --bg2:#fff9f0;
+  --panel:#ffffff;
+  --panel2:#f8f5ef;
+  --line:#e8e2d5;
+  --text:#2d2640;
+  --muted:#8a8599;
+  --accent:#ff6b35;
+  --accent2:#ffc233;
+  --good:#2ec4b6;
+  --warn:#e71d36;
+  --sky:#4cc9f0;
+  --rad:18px;
+  --shadow:0 8px 30px rgba(45,38,64,.08);
+  --shadow-lg:0 12px 44px rgba(45,38,64,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Noto Sans SC',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow:hidden;
+  letter-spacing:.01em;
+}
+/* 阳光背景纹理 */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255,194,51,.25), transparent 38%),
+    radial-gradient(circle at 88% 12%, rgba(76,201,240,.15), transparent 40%),
+    radial-gradient(circle at 75% 90%, rgba(46,196,182,.12), transparent 42%),
+    repeating-linear-gradient(45deg, transparent 0 14px, rgba(255,194,51,.02) 14px 15px);
+}
+#app{
+  position:relative;z-index:1;
+  max-width:480px;margin:0 auto;height:100vh;
+  display:flex;flex-direction:column;
+  background:linear-gradient(180deg,var(--bg2) 0%,var(--bg) 100%);
+  box-shadow:0 0 50px rgba(45,38,64,.1);
+  overflow:hidden;
+}
+.header{
+  flex-shrink:0;padding:16px 20px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--line);
+  background:rgba(255,255,255,.7);
+  backdrop-filter:blur(12px);
+}
+.logo{font-family:'Fredoka','Noto Sans SC',sans-serif;font-weight:700;font-size:24px;letter-spacing:.02em;color:var(--text)}
+.logo span{color:var(--accent)}
+.header .pill{
+  font-size:12px;color:var(--accent);font-weight:600;
+  padding:6px 14px;border:1.5px solid rgba(255,107,53,.25);
+  border-radius:30px;background:rgba(255,107,53,.06);
+}
+.viewport{flex:1;overflow-y:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch}
+.viewport::-webkit-scrollbar{width:0}
+.tabbar{
+  flex-shrink:0;display:flex;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+  padding:6px 0 max(6px,env(safe-area-inset-bottom));
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 0;color:var(--muted);font-size:11px;cursor:pointer;transition:.25s;
+  border:none;background:none;font-family:inherit;font-weight:500;
+}
+.tab .ico{font-size:20px;transition:.25s}
+.tab.active{color:var(--accent)}
+.tab.active .ico{transform:translateY(-3px) scale(1.1)}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* 通用组件 */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 20px;border-radius:14px;border:none;cursor:pointer;
+  font-family:inherit;font-weight:600;font-size:15px;transition:.2s;
+  background:linear-gradient(135deg,var(--accent),#ff8556);color:#fff;
+  box-shadow:0 6px 18px rgba(255,107,53,.25);
+}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:var(--panel);color:var(--text);border:1.5px solid var(--line);box-shadow:none}
+.btn.block{width:100%}
+.btn.sm{padding:8px 14px;font-size:13px;border-radius:10px}
+.btn.done{background:linear-gradient(135deg,var(--good),#45d4c6)}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--rad);padding:18px;margin:14px;
+  box-shadow:var(--shadow);
+}
+.section-title{
+  display:flex;align-items:center;gap:10px;
+  font-size:15px;font-weight:700;margin:20px 20px 10px;color:var(--text);
+}
+.section-title::before{content:"";width:4px;height:18px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:4px}
+
+/* 首页 */
+.hero{
+  margin:14px;border-radius:22px;
+  padding:26px 24px;color:#fff;position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 80% 0%, rgba(255,194,51,.5), transparent 55%),
+    radial-gradient(circle at 10% 100%, rgba(255,107,53,.3), transparent 50%),
+    linear-gradient(135deg,#ff6b35,#ff3d6a);
+  box-shadow:0 10px 36px rgba(255,107,53,.2);
+}
+.hero::after{
+  content:"☀️";position:absolute;top:-10px;right:14px;font-size:42px;opacity:.25;
+  animation:sunPulse 3s ease-in-out infinite;
+}
+@keyframes sunPulse{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.1) rotate(15deg)}}
+.hero h1{font-family:'Fredoka','Noto Sans SC',sans-serif;font-size:28px;font-weight:700;letter-spacing:.02em;margin-bottom:6px}
+.hero p{font-size:13px;opacity:.92}
+.hero .stat-row{display:flex;gap:12px;margin-top:18px}
+.hero .stat{flex:1;background:rgba(255,255,255,.15);border-radius:14px;padding:12px;backdrop-filter:blur(4px)}
+.hero .stat .n{font-size:22px;font-weight:700}
+.hero .stat .l{font-size:11px;opacity:.85}
+.quick-list{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 14px}
+.quick-item{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:14px 6px;text-align:center;cursor:pointer;transition:.2s;
+  box-shadow:var(--shadow);
+}
+.quick-item:active{transform:scale(.93)}
+.quick-item .emoji{font-size:28px}
+.quick-item .name{font-size:11px;margin-top:6px;color:var(--text);font-weight:500}
+
+/* 表单 */
+.field{margin:14px 20px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:500}
+.field input,.field select{
+  width:100%;padding:14px 16px;background:var(--panel);border:1.5px solid var(--line);
+  border-radius:12px;color:var(--text);font-size:15px;font-family:inherit;outline:none;
+  transition:.2s;
+}
+.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,107,53,.1)}
+.sport-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:8px 20px}
+.sport-card{
+  background:var(--panel);border:2px solid var(--line);border-radius:16px;
+  padding:16px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px;
+  box-shadow:var(--shadow);
+}
+.sport-card.sel{border-color:var(--accent);background:linear-gradient(135deg,rgba(255,107,53,.08),transparent)}
+.sport-card .emoji{font-size:30px}
+.sport-card .info .n{font-weight:600;font-size:14px;color:var(--text)}
+.sport-card .info .d{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* 计划总览 */
+.plan-head{
+  margin:14px;padding:20px;border-radius:20px;
+  background:linear-gradient(135deg,#fff9f0,#fff4e6);
+  border:1.5px solid rgba(255,194,51,.3);
+  box-shadow:var(--shadow);
+}
+.plan-head h2{font-family:'Fredoka','Noto Sans SC',sans-serif;font-size:22px;margin-bottom:6px;color:var(--text)}
+.plan-head .meta{font-size:12px;color:var(--muted)}
+.stage-tabs{display:flex;gap:8px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+.stage-tabs::-webkit-scrollbar{display:none}
+.stage-chip{
+  flex-shrink:0;padding:8px 14px;border-radius:30px;
+  background:var(--panel);border:1.5px solid var(--line);font-size:12px;font-weight:500;
+  color:var(--muted);cursor:pointer;transition:.2s;
+}
+.stage-chip.active{background:linear-gradient(135deg,var(--accent),#ff8556);color:#fff;border-color:transparent}
+.stage-chip.done{background:rgba(46,196,182,.12);color:var(--good);border-color:rgba(46,196,182,.4)}
+.day-list{padding:8px 14px 20px}
+.day-row{
+  display:flex;align-items:center;gap:12px;
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:14px;margin-bottom:10px;cursor:pointer;transition:.2s;
+  box-shadow:var(--shadow);
+}
+.day-row:active{transform:scale(.99)}
+.day-row.checked{opacity:.55}
+.day-num{
+  width:44px;height:44px;border-radius:14px;
+  background:linear-gradient(135deg,var(--accent2),#ffd55e);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:700;font-size:16px;flex-shrink:0;color:var(--text);
+}
+.day-row.checked .day-num{background:linear-gradient(135deg,var(--good),#45d4c6);color:#fff}
+.day-info{flex:1}
+.day-info .t{font-size:14px;font-weight:600;color:var(--text)}
+.day-info .s{font-size:11px;color:var(--muted);margin-top:2px}
+.day-act{font-size:20px}
+
+/* 单日详情 */
+.ex-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:14px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+.ex-card.warmup{border-left:4px solid var(--accent2)}
+.ex-card.main{border-left:4px solid var(--accent)}
+.ex-card.cooldown{border-left:4px solid var(--good)}
+.ex-head{display:flex;align-items:center;justify-content:space-between}
+.ex-head .name{font-weight:600;font-size:15px;color:var(--text)}
+.ex-head .tag{font-size:11px;color:var(--muted);background:var(--panel2);padding:3px 10px;border-radius:20px}
+.ex-body{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.6}
+.ex-actions{display:flex;gap:8px;margin-top:12px}
+.ex-actions button{flex:1}
+.video-btn{
+  display:flex;align-items:center;gap:6px;padding:10px;border-radius:10px;
+  background:rgba(255,107,53,.08);color:var(--accent);border:1px solid rgba(255,107,53,.2);
+  cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;
+}
+.video-btn:active{transform:scale(.98)}
+
+/* 跟练模态 */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(45,38,64,.4);backdrop-filter:blur(6px);z-index:50;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-bg.show{display:flex}
+.modal{
+  background:linear-gradient(180deg,#fff9f0,#fff);border-radius:28px;padding:24px;width:100%;max-width:420px;
+  border:1px solid var(--line);position:relative;box-shadow:var(--shadow-lg);
+}
+.timer-ring{
+  width:220px;height:220px;margin:10px auto;position:relative;
+}
+.timer-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.timer-ring circle{fill:none;stroke-width:10;stroke-linecap:round}
+.timer-ring .track{stroke:#f0ebe0}
+.timer-ring .prog{stroke:var(--accent);transition:stroke-dashoffset .3s linear}
+.timer-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.timer-time{font-size:44px;font-weight:700;font-family:'Fredoka','Noto Sans SC',sans-serif;color:var(--text)}
+.timer-ex{font-size:14px;color:var(--muted);text-align:center;padding:0 20px;margin-top:4px}
+.timer-ctrl{display:flex;justify-content:center;gap:12px;margin-top:14px}
+.timer-ctrl button{
+  width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--accent),#ff8556);color:#fff;font-size:22px;
+  box-shadow:0 6px 18px rgba(255,107,53,.25);
+}
+.timer-ctrl button.sq{background:var(--panel2);box-shadow:none;color:var(--text)}
+.timer-progress{display:flex;gap:4px;margin:14px 0;flex-wrap:wrap}
+.timer-dot{width:8px;height:8px;border-radius:50%;background:#e0dccf;flex:0 0 auto}
+.timer-dot.cur{background:var(--accent);transform:scale(1.3)}
+.timer-dot.done{background:var(--good)}
+.modal-close{
+  position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;
+  background:var(--panel2);border:none;color:var(--muted);cursor:pointer;font-size:18px;
+}
+
+/* 进度页 */
+.progress-circle{
+  width:180px;height:180px;margin:20px auto;position:relative;
+}
+.progress-circle svg{width:100%;height:100%;transform:rotate(-90deg)}
+.progress-circle .track{fill:none;stroke:#f0ebe0;stroke-width:12}
+.progress-circle .prog{fill:none;stroke:url(#grad);stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset .6s}
+.progress-circle .center{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.progress-circle .pct{font-size:40px;font-weight:700;font-family:'Fredoka','Noto Sans SC',sans-serif;color:var(--text)}
+.progress-circle .lbl{font-size:12px;color:var(--muted)}
+.milestone{
+  display:flex;gap:12px;padding:14px;background:var(--panel);
+  border-radius:16px;margin:0 14px 10px;border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+.milestone.done{background:linear-gradient(135deg,rgba(46,196,182,.08),transparent);border-color:rgba(46,196,182,.4)}
+.milestone .ic{
+  width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent2),#ffd55e);
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;
+}
+.milestone.done .ic{background:linear-gradient(135deg,var(--good),#45d4c6)}
+.milestone .info h4{font-size:14px;color:var(--text)}
+.milestone .info p{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* 我的 */
+.toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;border-bottom:1px solid var(--line);
+}
+.toggle{
+  width:44px;height:24px;background:#e0dccf;border-radius:30px;position:relative;cursor:pointer;
+  transition:.25s;
+}
+.toggle.on{background:var(--good)}
+.toggle::after{
+  content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
+  background:#fff;transition:.25s;box-shadow:0 2px 6px rgba(0,0,0,.15);
+}
+.toggle.on::after{left:22px}
+
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:var(--text);color:#fff;padding:12px 20px;border-radius:30px;
+  font-size:13px;z-index:100;box-shadow:var(--shadow-lg);
+  animation:toastIn .3s ease;
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1}}
+
+.confetti{position:fixed;width:8px;height:8px;z-index:200;pointer-events:none;border-radius:2px}
+@keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+.empty{
+  text-align:center;padding:60px 30px;color:var(--muted);
+}
+.empty .emoji{font-size:60px;margin-bottom:16px}
+.empty h3{font-size:18px;margin-bottom:8px;color:var(--text)}
+.empty p{font-size:13px;line-height:1.7}
+
+/* 计划表格 */
+.plan-table-wrap{margin:0 14px 20px;overflow:hidden;border-radius:16px;border:1px solid var(--line);background:var(--panel)}
+.plan-table{width:100%;border-collapse:collapse;font-size:12px}
+.plan-table th{
+  background:linear-gradient(180deg,var(--panel2),#f4f0e6);color:var(--muted);font-weight:600;
+  padding:8px 6px;text-align:center;white-space:nowrap;position:sticky;top:0;
+}
+.plan-table td{
+  padding:8px 6px;text-align:center;border-top:1px solid var(--line);
+  vertical-align:middle;color:var(--text);
+}
+.plan-table tr.done td{opacity:.45}
+.plan-table tr.done td:first-child{text-decoration:line-through}
+.plan-table tr.today td{background:rgba(255,107,53,.06)}
+.plan-table .stage-tag{
+  display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;
+}
+.plan-table .day-cell{font-weight:700;font-size:13px}
+.plan-table .action-cell{font-size:11px;color:var(--muted);line-height:1.5}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="header">
+    <div class="logo">跃动<span>.</span></div>
+    <div class="pill" id="streakPill">🔥 0 天连胜</div>
+  </header>
+  <div class="viewport" id="viewport"></div>
+  <nav class="tabbar">
+    <button class="tab active" data-tab="home"><span class="ico">🏠</span>首页</button>
+    <button class="tab" data-tab="plan"><span class="ico">📅</span>计划</button>
+    <button class="tab" data-tab="progress"><span class="ico">📊</span>进度</button>
+    <button class="tab" data-tab="me"><span class="ico">👤</span>我的</button>
+  </nav>
+</div>
+
+<div class="modal-bg" id="timerModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeTimer()">✕</button>
+    <div class="timer-ring">
+      <svg viewBox="0 0 220 220">
+        <circle class="track" cx="110" cy="110" r="100"></circle>
+        <circle class="prog" cx="110" cy="110" r="100" id="ringProg" stroke-dasharray="628" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-time" id="timerTime">00:00</div>
+        <div class="timer-ex" id="timerEx">准备开始</div>
+      </div>
+    </div>
+    <div class="timer-progress" id="timerDots"></div>
+    <div class="timer-ctrl">
+      <button class="sq" onclick="prevEx()">⏮</button>
+      <button id="playBtn" onclick="togglePlay()">▶</button>
+      <button class="sq" onclick="nextEx()">⏭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================== 数据：运动项目库 ==================== */
+const SPORTS = {
+  run:{
+    name:'跑步',emoji:'🏃',desc:'心肺耐力之王',
+    stages:['起步适应','基础有氧','配速进阶'],
+    basics:[
+      {name:'正确跑姿入门',dur:10,tip:'挺胸放松，前脚掌或中足着地，步频约180步/分钟'},
+      {name:'慢跑10分钟',dur:10,tip:'心率保持在最大心率的60-70%，能正常说话为宜'},
+      {name:'呼吸节奏练习',dur:5,tip:'三步一吸三步一呼，避免口呼吸'},
+      {name:'核心稳定跑',dur:8,tip:'保持身体中轴稳定，不左右晃动'},
+      {name:'坡度走跑交替',dur:12,tip:'走2分钟+慢跑1分钟，循环4组'}
+    ],
+    advances:[
+      {name:'间歇跑400m×6',dur:20,tip:'每组400米全力，组间慢跑恢复2分钟'},
+      {name:'节奏跑20分钟',dur:25,tip:'比舒适跑快10-15秒/公里，保持稳定'},
+      {name:'法特莱克跑',dur:30,tip:'快慢交替：快1分钟慢2分钟，循环6-8组'},
+      {name:'长距离慢跑',dur:40,tip:'心率70%以下，感受脂肪供能'},
+      {name:'5km计时挑战',dur:25,tip:'记录时间，每月复测一次'}
+    ],
+    searchQuery:'跑步 教学 零基础'
+  },
+  swim:{
+    name:'游泳',emoji:'🏊',desc:'全身无损伤有氧',
+    subTypes:{
+      breaststroke:{
+        name:'蛙泳',emoji:'🐸',
+        stages:['水性适应','蛙泳技术','蛙泳提速'],
+        basics:[
+          {name:'水中站立与漂浮',dur:10,tip:'放松肩膀，让水托住身体，感受浮力'},
+          {name:'呼吸换气练习',dur:10,tip:'抬头吸气、低头呼气，节奏稳定不慌张'},
+          {name:'蛙泳腿分解',dur:15,tip:'收翻蹬夹四步：收腿慢、翻脚掌、蹬腿快、夹水合并'},
+          {name:'浮板蛙泳腿',dur:12,tip:'手持浮板练习蛙泳腿，感受蹬夹推进力'},
+          {name:'徒手划臂练习',dur:10,tip:'高肘抱水向外划，内收夹水，前伸滑行'}
+        ],
+        advances:[
+          {name:'完整配合游25米',dur:15,tip:'划臂→换气→蹬腿→滑行，一组节奏完成后滑行2秒'},
+          {name:'蛙泳换气配合',dur:15,tip:'双臂内收时抬头换气，前伸时低头入水'},
+          {name:'连续游100米',dur:20,tip:'保持节奏不中断，每趟控制划水次数'},
+          {name:'蛙泳转身技术',dur:12,tip:'双手触壁后转身蹬壁，滑行3秒后启动'},
+          {name:'50米计时挑战',dur:10,tip:'全力游进，记录成绩作为基准'}
+        ],
+        searchQuery:'蛙泳 教学 零基础'
+      },
+      freestyle:{
+        name:'自由泳',emoji:'⚡',
+        stages:['水性适应','自由泳技术','自由泳提速'],
+        basics:[
+          {name:'水中站立与漂浮',dur:10,tip:'放松肩膀，让水托住身体，感受浮力'},
+          {name:'浮板打腿练习',dur:15,tip:'脚背绷直，由髋部发力鞭状打腿，不弯曲膝盖'},
+          {name:'侧身换气练习',dur:10,tip:'身体侧转45度，口鼻出水面吸气'},
+          {name:'单臂划水练习',dur:12,tip:'一手持浮板，另一手练习划水，体会抱水推水'},
+          {name:'打腿+换气配合',dur:12,tip:'打6次腿侧头换气一次，建立节奏'}
+        ],
+        advances:[
+          {name:'完整自由泳25米',dur:15,tip:'左右臂交替划水，打腿6次换气1次'},
+          {name:'前交叉配合',dur:12,tip:'一手入水另一手再划，延长滑行距离'},
+          {name:'连续游200米',dur:25,tip:'保持稳定节奏，控制每50米划水次数'},
+          {name:'前滚翻转身',dur:12,tip:'到壁前1米翻滚，蹬壁滑行3秒'},
+          {name:'100米自由泳计时',dur:15,tip:'记录时间，每月复测追踪进步'}
+        ],
+        searchQuery:'自由泳 教学 零基础'
+      },
+      backstroke:{
+        name:'仰泳',emoji:'🌟',
+        stages:['水性适应','仰泳技术','仰泳提速'],
+        basics:[
+          {name:'水中站立与漂浮',dur:10,tip:'放松肩膀，让水托住身体，感受浮力'},
+          {name:'仰面漂浮练习',dur:10,tip:'平躺水面，头部后仰，腹部收紧保持平直'},
+          {name:'仰泳打腿',dur:15,tip:'手持浮板仰面打腿，脚背绷直髋部发力'},
+          {name:'单臂仰泳划水',dur:12,tip:'一手持板，另一手练习仰泳划水，小指先入水'},
+          {name:'仰泳换气节奏',dur:10,tip:'一臂出水时呼气，入水时吸气'}
+        ],
+        advances:[
+          {name:'完整仰泳25米',dur:15,tip:'左右臂交替划水，身体纵轴转动45度'},
+          {name:'仰泳连续50米',dur:15,tip:'保持稳定节奏，注意方向不偏离'},
+          {name:'仰泳转身',dur:12,tip:'倒数5米时翻滚转身，安全触壁蹬出'},
+          {name:'连续游100米',dur:20,tip:'控制呼吸节奏和身体位置'},
+          {name:'仰泳50米计时',dur:10,tip:'全力游进，记录成绩'}
+        ],
+        searchQuery:'仰泳 教学 零基础'
+      },
+      butterfly:{
+        name:'蝶泳',emoji:'🦋',
+        stages:['水性适应','蝶泳技术','蝶泳提速'],
+        basics:[
+          {name:'水中站立与漂浮',dur:10,tip:'放松肩膀，让水托住身体，感受浮力'},
+          {name:'蝶泳打腿（海豚腿）',dur:15,tip:'腰腹发力，身体波浪状上下鞭打，双腿同步'},
+          {name:'浮板蝶泳腿',dur:12,tip:'手持浮板，练习蝶泳打腿，体会波浪传导'},
+          {name:'单臂蝶泳划水',dur:12,tip:'一手持板，另一手练习蝶泳划水，大拇指入水'},
+          {name:'蝶泳划臂分解',dur:10,tip:'双手同步入水、抱水、推水、空中移臂'}
+        ],
+        advances:[
+          {name:'完整蝶泳15米',dur:15,tip:'一次划臂+两次打腿+换气，波浪式前进'},
+          {name:'蝶泳换气配合',dur:12,tip:'推水时抬头换气，入水时低头'},
+          {name:'蝶泳连续25米',dur:15,tip:'保持节奏，每两划换气一次'},
+          {name:'蝶泳转身',dur:10,tip:'双手同时触壁，转身蹬壁滑行'},
+          {name:'蝶泳50米挑战',dur:12,tip:'尽力完成，记录成绩'}
+        ],
+        searchQuery:'蝶泳 教学 零基础'
+      }
+    }
+  },
+  badminton:{
+    name:'羽毛球',emoji:'🏸',desc:'敏捷反应与步法',
+    stages:['握拍与挥拍','步法衔接','攻防战术'],
+    basics:[
+      {name:'正反手握拍',dur:10,tip:'正手握拍虎口对准窄面，反手握拍拇指顶住宽面'},
+      {name:'高远球挥拍',dur:15,tip:'侧身引拍、转体挥臂、小臂内旋击球'},
+      {name:'发球练习',dur:10,tip:'正手发高远球，击球点在腰以下'},
+      {name:'基础前后步法',dur:12,tip:'并步+交叉步，击球后回中心'},
+      {name:'网前搓球',dur:8,tip:'放松手腕，拍面切击球托底部'}
+    ],
+    advances:[
+      {name:'杀球技术',dur:20,tip:'高点击球，拍面正前，发力集中'},
+      {name:'吊球与劈吊',dur:15,tip:'轻击球托，控制落点'},
+      {name:'米字步法综合',dur:20,tip:'全场六个点快速移动'},
+      {name:'双打跑位',dur:20,tip:'前后站位+左右轮转'},
+      {name:'多球对抗训练',dur:25,tip:'连续30球一组，提升实战能力'}
+    ],
+    searchQuery:'羽毛球 教学 零基础'
+  },
+  basketball:{
+    name:'篮球',emoji:'🏀',desc:'投篮与团队配合',
+    stages:['球感与运球','投篮与突破','战术配合'],
+    basics:[
+      {name:'原地运球',dur:10,tip:'手指手腕发力，非手掌，球反弹高度在腰部'},
+      {name:'行进间运球',dur:12,tip:'抬头看前方，运球力度控制'},
+      {name:'原地投篮',dur:15,tip:'三威胁姿势，手腕拨球，辅助手不发力'},
+      {name:'三步上篮',dur:12,tip:'一大二小三起跳，出手要柔和'},
+      {name:'防守步伐',dur:10,tip:'屈膝低重心，滑步不交叉'}
+    ],
+    advances:[
+      {name:'变向运球',dur:15,tip:'低重心快速变向，重心切换'},
+      {name:'急停跳投',dur:15,tip:'两步急停，垂直起跳投篮'},
+      {name:'传切配合',dur:15,tip:'传球后切入，无球跑动'},
+      {name:'挡拆配合',dur:20,tip:'掩护后下顺或外弹'},
+      {name:'1v1攻防对抗',dur:20,tip:'实战应用所有技术'}
+    ],
+    searchQuery:'篮球 教学 零基础'
+  },
+  yoga:{
+    name:'瑜伽',emoji:'🧘',desc:'柔韧与身心平衡',
+    stages:['呼吸与放松','基础体式','流瑜伽进阶'],
+    basics:[
+      {name:'腹式呼吸',dur:8,tip:'吸气肚子鼓，呼气肚子收，缓慢深长'},
+      {name:'猫牛式',dur:6,tip:'配合呼吸，脊柱逐节活动'},
+      {name:'下犬式',dur:10,tip:'坐骨向上推，脚跟下沉，背部延展'},
+      {name:'战士系列',dur:12,tip:'战士一/二/三式，注意膝盖不超脚尖'},
+      {name:'婴儿式放松',dur:5,tip:'跪坐前趴，额头触地，完全放松'}
+    ],
+    advances:[
+      {name:'拜日式A',dur:10,tip:'12个动作为一组，配合呼吸流畅完成'},
+      {name:'平衡体式',dur:15,tip:'树式、战士三式，提升核心稳定'},
+      {name:'开髋系列',dur:15,tip:'鸽子式、蜥蜴式，循序渐进'},
+      {name:'倒立入门',dur:12,tip:'靠墙头倒立，肩颈发力'},
+      {name:'流瑜伽串联',dur:25,tip:'流畅衔接多个体式，呼吸带动动作'}
+    ],
+    searchQuery:'瑜伽 教学 零基础'
+  },
+  weight:{
+    name:'力量训练',emoji:'🏋️',desc:'增肌塑形基础',
+    stages:['动作模式','复合动作','分化训练'],
+    basics:[
+      {name:'空杆深蹲',dur:15,tip:'髋膝同屈，膝盖方向与脚尖一致，腰背挺直'},
+      {name:'俯卧撑',dur:12,tip:'身体一条直线，手肘45度，下到胸部接近地面'},
+      {name:'俯身划船',dur:12,tip:'背部发力拉向腹部，肩胛骨后收'},
+      {name:'平板支撑',dur:10,tip:'核心收紧，屁股不塌不翘，均匀呼吸'},
+      {name:'罗马尼亚硬拉',dur:12,tip:'髋部后推，脊柱中立，感受腘绳肌拉伸'}
+    ],
+    advances:[
+      {name:'杠铃卧推',dur:20,tip:'肩胛骨收紧，杠铃下至胸中部，4秒离心'},
+      {name:'引体向上',dur:15,tip:'下巴过杠，离心3秒，做不动可用弹力带辅助'},
+      {name:'肩推',dur:15,tip:'核心收紧，杠铃直上直下，不耸肩'},
+      {name:'臀桥/臀推',dur:15,tip:'顶端停1秒，感受臀部收缩'},
+      {name:'超级组训练',dur:25,tip:'推+拉组合，组间休息60秒'}
+    ],
+    searchQuery:'力量训练 教学 零基础'
+  },
+  cycling:{
+    name:'骑行',emoji:'🚴',desc:'户外耐力燃脂',
+    stages:['车感与骑行','踏频控制','长距离耐力'],
+    basics:[
+      {name:'车辆调整与佩戴',dur:10,tip:'调整坐垫高度、把立位置，佩戴头盔手套'},
+      {name:'起步与刹车',dur:8,tip:'平稳起步，前后刹配合，避免急刹'},
+      {name:'基础踏频',dur:15,tip:'保持每分钟90转左右的踏频'},
+      {name:'变速练习',dur:12,tip:'上坡变轻，下坡变重，提前预判'},
+      {name:'30分钟轻松骑',dur:30,tip:'心率60-70%，熟悉车感'}
+    ],
+    advances:[
+      {name:'爬坡训练',dur:30,tip:'找连续坡度，保持踏频70-80'},
+      {name:'间歇冲刺',dur:25,tip:'全力30秒+恢复90秒，循环8组'},
+      {name:'长距离骑行',dur:60,tip:'平稳配速，注意补水补给'},
+      {name:'冲刺训练',dur:20,tip:'10秒全力冲刺，组间3分钟恢复'},
+      {name:'团队跟车',dur:30,tip:'保持安全距离，利用风阻节省体力'}
+    ],
+    searchQuery:'骑行 教学 零基础'
+  },
+  soccer:{
+    name:'足球',emoji:'⚽',desc:'控球与团队战术',
+    stages:['球感与传接','射门与突破','战术跑位'],
+    basics:[
+      {name:'颠球练习',dur:10,tip:'用脚面轻击球底，控制高度在膝盖以下'},
+      {name:'脚内侧传接球',dur:15,tip:'脚尖翘起，用足弓中部击球'},
+      {name:'运球过桩',dur:12,tip:'脚内外侧交替触球，抬头观察'},
+      {name:'原地射门',dur:12,tip:'支撑脚在球侧15cm，脚背正面击球中部'},
+      {name:'防守姿势',dur:8,tip:'低重心，侧滑步，不轻易出脚'}
+    ],
+    advances:[
+      {name:'变向过人',dur:15,tip:'假动作+突然变向，重心压低'},
+      {name:'任意球',dur:15,tip:'助跑3-5步，脚背内侧搓球'},
+      {name:'二过一配合',dur:15,tip:'传切配合，传球后前插'},
+      {name:'角球战术',dur:20,tip:'前点后点包抄，设计跑动路线'},
+      {name:'小场对抗',dur:30,tip:'5v5小场，实战演练'}
+    ],
+    searchQuery:'足球 教学 零基础'
+  },
+  rope:{
+    name:'跳绳',emoji:'🪢',desc:'高效燃脂协调',
+    stages:['基础跳法','花式跳绳','耐力组合'],
+    basics:[
+      {name:'握绳与摇绳',dur:8,tip:'绳柄在末端，手腕发力，小臂不动'},
+      {name:'并脚跳30秒',dur:10,tip:'前脚掌着地，膝盖微屈缓冲'},
+      {name:'双脚交替跳',dur:10,tip:'像原地跑，左右脚交替'},
+      {name:'开合跳',dur:8,tip:'跳同时双脚开合，配合节奏'},
+      {name:'连续跳绳1分钟',dur:12,tip:'目标80-100个/分钟'}
+    ],
+    advances:[
+      {name:'双摇跳',dur:15,tip:'跳得高，摇得快，一次跳摇两下'},
+      {name:'交叉跳',dur:12,tip:'摇绳时双臂在胸前交叉'},
+      {name:'高抬腿跳',dur:10,tip:'膝盖抬高到腰部，配合摇绳'},
+      {name:'花式组合',dur:15,tip:'并脚-交替-开合-交叉连贯完成'},
+      {name:'3分钟耐力跳',dur:15,tip:'保持节奏不中断'}
+    ],
+    searchQuery:'跳绳 教学 零基础'
+  },
+  stretch:{
+    name:'拉伸柔韧',emoji:'🤸',desc:'身体柔韧性提升',
+    stages:['基础拉伸','深度柔韧','柔韧+力量'],
+    basics:[
+      {name:'颈部环绕',dur:5,tip:'缓慢前后左右绕环，每个方向5次'},
+      {name:'肩部拉伸',dur:8,tip:'一手横过胸前，另一手轻推，保持30秒'},
+      {name:'大腿前侧拉伸',dur:8,tip:'站立抓脚背拉向臀部，膝盖朝下'},
+      {name:'坐姿体前屈',dur:10,tip:'双腿伸直，从髋部折叠向前'},
+      {name:'蝴蝶式',dur:8,tip:'脚掌相对，膝盖下沉，腰背挺直'}
+    ],
+    advances:[
+      {name:'横叉练习',dur:15,tip:'循序渐进，每天压一点，不暴力'},
+      {name:'竖叉练习',dur:15,tip:'前后腿伸直，髋部摆正'},
+      {name:'下腰',dur:10,tip:'先做桥式，逐步过渡到站立下腰'},
+      {name:'开肩训练',dur:12,tip:'借助墙壁或毛巾，逐步增加肩关节活动度'},
+      {name:'柔韧流动',dur:20,tip:'连贯完成多个拉伸动作，配合呼吸'}
+    ],
+    searchQuery:'拉伸 柔韧 教学'
+  },
+  pingpong:{
+    name:'乒乓球',emoji:'🏓',desc:'手眼协调与旋转',
+    stages:['握拍与球感','发球与搓推','攻球与弧圈'],
+    basics:[
+      {name:'直/横拍握拍',dur:10,tip:'横拍虎口卡住拍肩，食指搭拍背，放松手腕'},
+      {name:'正手攻球挥拍',dur:12,tip:'转腰带动小臂，击球中上部，前臂快收'},
+      {name:'反手拨球',dur:12,tip:'肘部前顶，前臂前拨，手腕外展发力'},
+      {name:'搓球练习',dur:12,tip:'拍面后仰，切击球中下部，控制弧线低平'},
+      {name:'正手发下旋球',dur:10,tip:'抛球后切球底部，制造下旋，落点控制'}
+    ],
+    advances:[
+      {name:'正手弧圈球',dur:20,tip:'蹬地转腰，前臂快收摩擦球中上部，制造强上旋'},
+      {name:'反手拧拉',dur:15,tip:'手腕内收后弹拨，摩擦球侧部制造旋转'},
+      {name:'发球抢攻',dur:15,tip:'发短下旋后侧身抢拉，连贯衔接'},
+      {name:'推挡结合攻',dur:15,tip:'反手推挡过渡，机会球正手抢攻'},
+      {name:'比赛模拟10分',dur:20,tip:'实战对抗，检验技术稳定性'}
+    ],
+    searchQuery:'乒乓球 教学 零基础'
+  },
+  tennis:{
+    name:'网球',emoji:'🎾',desc:'力量与精准的博弈',
+    stages:['握拍与正手','反手与发球','战术与比赛'],
+    basics:[
+      {name:'东方式正手握拍',dur:10,tip:'虎口对准拍柄上棱面，手腕固定'},
+      {name:'正手挥拍轨迹',dur:15,tip:'从低到高画C字，击球点在身前侧方'},
+      {name:'底线正手对拉',dur:15,tip:'侧身引拍，击球后顺势随挥到对侧肩'},
+      {name:'双手反手',dur:12,tip:'辅手发力主导，双手协同挥拍击球'},
+      {name:'基本发球',dur:12,tip:'侧身抛球，拍头从后上向前下击球'}
+    ],
+    advances:[
+      {name:'上旋发球',dur:15,tip:'拍头加速摩擦球顶部，身体向上蹬起发力'},
+      {name:'切削球',dur:12,tip:'拍面后仰，从高到低切击球后下部'},
+      {name:'网前截击',dur:12,tip:'缩短引拍，前送挡击，拍面微开'},
+      {name:'底线战术组合',dur:20,tip:'深球压底线→变线攻击空当'},
+      {name:'模拟比赛',dur:30,tip:'记分对抗，检验实战能力'}
+    ],
+    searchQuery:'网球 教学 零基础'
+  },
+  volleyball:{
+    name:'排球',emoji:'🏐',desc:'弹跳与团队配合',
+    stages:['传球与垫球','发球与扣球','战术配合'],
+    basics:[
+      {name:'正面双手传球',dur:10,tip:'十指触球，手腕弹拨，用指腕力量传出'},
+      {name:'正面双手垫球',dur:12,tip:'双臂夹紧，前臂平面垫击球下部'},
+      {name:'侧面移动垫球',dur:10,tip:'滑步到位后保持垫球姿势稳定'},
+      {name:'下手发球',dur:10,tip:'抛球约30cm，掌根击球下部，过网即可'},
+      {name:'发球接垫球',dur:12,tip:'一人发球一人垫球到位，循环练习'}
+    ],
+    advances:[
+      {name:'上手飘球',dur:15,tip:'抛球高击球中部，掌心击球不旋转'},
+      {name:'助跑起跳扣球',dur:15,tip:'两步助跑双脚踏跳，满掌击球上部'},
+      {name:'单人拦网',dur:10,tip:'判断扣球路线，双手伸过网封堵'},
+      {name:'一传到位配合',dur:20,tip:'接发球→二传→扣球，三击配合'},
+      {name:'6v6模拟赛',dur:30,tip:'实战检验，轮转站位'}
+    ],
+    searchQuery:'排球 教学 零基础'
+  },
+  dance:{
+    name:'舞蹈',emoji:'💃',desc:'节奏律动与表现力',
+    stages:['节奏与律动','基本功组合','成品舞表演'],
+    basics:[
+      {name:'身体隔离（Isolation）',dur:10,tip:'头肩胸胯各部位独立移动，其他部位不动'},
+      {name:'Bounce弹动律动',dur:12,tip:'配合音乐节拍，膝盖上下弹动'},
+      {name:'基本Groove',dur:12,tip:'身体随节拍前后左右摇摆，找到律动感'},
+      {name:'上下身分离',dur:10,tip:'上身不动下身动，反之亦然'},
+      {name:'基础步伐组合',dur:15,tip:'串连2-3个基本步法，配合音乐'}
+    ],
+    advances:[
+      {name:'八拍组合动作',dur:20,tip:'设计8拍连贯动作，注意衔接流畅'},
+      {name:'力量与控制',dur:15,tip:'快慢交替，体现张弛有度的质感'},
+      {name:'即兴Solo',dur:15,tip:'听音乐即兴跳舞，释放身体表达'},
+      {name:'成品舞学习',dur:30,tip:'跟视频学一支30秒成品舞'},
+      {name:'录影复盘',dur:15,tip:'录制跳舞视频，观察并改进细节'}
+    ],
+    searchQuery:'舞蹈 教学 零基础'
+  },
+  climbing:{
+    name:'攀岩',emoji:'🧗',desc:'全身协调与胆量',
+    stages:['基础攀爬','技术动作','线路挑战'],
+    basics:[
+      {name:'安全装备穿戴',dur:10,tip:'检查安全带、绳索、镁粉，确认锁扣拧紧'},
+      {name:'三点固定法',dur:12,tip:'移动时保持两脚一手或两手一脚三点接触岩壁'},
+      {name:'脚法精准踩点',dur:10,tip:'脚尖踩点而非脚掌，节省腿部力量'},
+      {name:'直臂原则',dur:10,tip:'尽量保持手臂伸直，用骨骼支撑而非肌肉'},
+      {name:'简单线路攀爬',dur:15,tip:'V0难度线路，体会身体重心转移'}
+    ],
+    advances:[
+      {name:'侧身动作',dur:12,tip:'身体侧转贴壁，伸远侧手抓点'},
+      {name:'动态跳跃（Dyno）',dur:12,tip:'蹬腿发力跳向远端手点'},
+      {name:'换脚换手',dur:10,tip:'平稳过渡，保持重心不晃'},
+      {name:'V2-V3线路挑战',dur:20,tip:'尝试中等难度线路，练习技术组合'},
+      {name:'攀岩录像复盘',dur:15,tip:'录制攀爬过程，分析动作效率'}
+    ],
+    searchQuery:'攀岩 教学 零基础'
+  }
+};
+
+/* 热身库 */
+const WARMUP = [
+  {name:'原地高抬腿',dur:45,tip:'膝盖抬至腰部，摆臂配合，激活下肢'},
+  {name:'手臂环绕',dur:30,tip:'向前向后各15秒，活动肩关节'},
+  {name:'髋部环绕',dur:40,tip:'双手叉腰，骨盆画圈，前后各20秒'},
+  {name:'弓步压腿',dur:50,tip:'左右腿各25秒，感受后腿髋屈肌拉伸'},
+  {name:'手腕脚踝活动',dur:40,tip:'关节缓慢绕环，预防扭伤'},
+  {name:'动态深蹲',dur:45,tip:'下蹲时手肘推膝盖内侧，打开髋部'},
+  {name:'原地小跑',dur:45,tip:'放松身体，提升心率进入状态'},
+  {name:'肩部绕环',dur:30,tip:'双肩向前向后绕动'}
+];
+
+/* 拉伸库 */
+const COOLDOWN = [
+  {name:'婴儿式放松',dur:45,tip:'跪坐前趴，完全放松呼吸'},
+  {name:'股四头肌拉伸',dur:40,tip:'站立抓脚拉向臀部，左右各20秒'},
+  {name:'腘绳肌拉伸',dur:45,tip:'一腿伸直身体前压，左右交替'},
+  {name:'背部拉伸',dur:40,tip:'坐姿抱膝团身，缓慢滚动放松脊柱'},
+  {name:'肩颈放松',dur:40,tip:'头缓慢偏向两侧，手轻拉加深'},
+  {name:'深呼吸放松',dur:30,tip:'闭眼深吸慢呼，让心跳降下来'}
+];
+
+/* 体能模块（安排在部分天） */
+const FITNESS = {
+  core:[
+    {name:'平板支撑',dur:45,tip:'身体一条直线，均匀呼吸'},
+    {name:'卷腹',dur:40,tip:'下背部贴地，用腹肌发力卷起'},
+    {name:'俄罗斯转体',dur:40,tip:'坐姿双脚抬起，左右转体触地'},
+    {name:'死虫式',dur:40,tip:'对侧手脚伸展，腰不离开地面'}
+  ],
+  cardiopulmonary:[
+    {name:'开合跳',dur:45,tip:'手脚同时开合，节奏稳定'},
+    {name:'波比跳',dur:40,tip:'下蹲-后跳-俯卧撑-跳起来'},
+    {name:'登山跑',dur:45,tip:'俯卧位交替提膝，核心收紧'}
+  ],
+  balance:[
+    {name:'单脚站立',dur:30,tip:'左右各15秒，闭眼增加难度'},
+    {name:'单腿硬拉',dur:40,tip:'支撑腿微屈，对侧手触脚尖'}
+  ]
+};
+
+/* 阶段结业任务 */
+const MILESTONES = {
+  run:['连续慢跑15分钟不走路','连续慢跑30分钟','完成5km计时跑'],
+  swim:{
+    breaststroke:['连续蛙泳游50米不扶池壁','连续蛙泳游100米','完成蛙泳50米计时'],
+    freestyle:['连续自由泳游50米不扶池壁','连续自由泳游200米','完成自由泳100米计时'],
+    backstroke:['连续仰泳游50米','连续仰泳游100米','完成仰泳50米计时'],
+    butterfly:['连续蝶泳游25米','连续蝶泳游50米','完成蝶泳50米计时']
+  },
+  badminton:['正确击打50个高远球','完成全场步法10组','与球友对打10分钟'],
+  basketball:['连续投中10个罚球','完成5次三步上篮','打一场3v3'],
+  yoga:['连续完成10次拜日式A','保持单腿树式30秒','完成一套20分钟流瑜伽'],
+  weight:['完成标准深蹲10次×3组','完成俯卧撑15次×3组','硬拉自身体重1次'],
+  cycling:['连续骑行30分钟','完成一次5km爬坡','骑行距离超过30km'],
+  soccer:['连续颠球10次','命中射门5/10','踢满一场小场比赛'],
+  rope:['连续跳绳1分钟不停','完成10次双摇','3分钟跳绳超过200个'],
+  stretch:['坐姿体前屈手过脚尖','完成横叉贴地','完成站立下腰'],
+  pingpong:['连续搓球20板','发10球中7球落点达标','打一场11分比赛'],
+  tennis:['底线正手连续对拉10回合','发球10次8次进区','打一场短盘比赛'],
+  volleyball:['连续垫球30个','上手发球10次7次过网','完成一次扣球得分'],
+  dance:['独立完成8拍组合','完成30秒成品舞','跟音乐即兴solo'],
+  climbing:['独立完成V0线路','完成V2线路','完攀V3线路']
+};
+
+/* 鼓励语 */
+const CHEERS = [
+  '坚持就是胜利，你今天很棒！',
+  '每一次努力都在变成更好的你',
+  '汗水不会辜负你，继续加油！',
+  '运动是最好的自我投资',
+  '今天的坚持，明天的蜕变',
+  '身体记住了每一次努力',
+  '超越昨天的自己就是胜利',
+  '你比想象中更强大！'
+];
+
+/* 建议语 */
+const ADVICES = [
+  '保持规律作息，睡眠是恢复的关键。',
+  '训练前后注意补水，少量多次。',
+  '出现疼痛立即停止，区分酸痛和伤痛。',
+  '蛋白质摄入有助于肌肉恢复。',
+  '循序渐进，不要急于加量。',
+  '热身和拉伸不要省略，预防伤病。',
+  '记录训练感受，找到最适合自己的节奏。',
+  '休息日同样重要，给身体恢复时间。'
+];
+
+/* ==================== 工具函数 ==================== */
+const $ = s=>document.querySelector(s);
+const $$ = s=>document.querySelectorAll(s);
+const storage = {
+  get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
+  set(k,v){localStorage.setItem(k,JSON.stringify(v))}
+};
+
+// 从数组中取n个不重复元素
+function pick(arr,n){
+  const c=[...arr],r=[];
+  for(let i=0;i<n&&c.length;i++){
+    r.push(c.splice(Math.floor(Math.random()*c.length),1)[0]);
+  }
+  return r;
+}
+function pickOne(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+/* ==================== 状态管理 ==================== */
+let state = storage.get('sportApp',{
+  config:null,      // {sport, totalDays, perDayMin}
+  plan:null,        // [{day, stage, main:[], warmup:[], cooldown:[], fitness:[]}]
+  done:{},          // {dayIndex:true}
+  streak:0,
+  lastCheckIn:null,
+  notify:true,
+  notifyTime:'20:00',
+  currentSport:null,
+  currentSubType:null
+});
+
+function save(){storage.set('sportApp',state)}
+
+// 解析运动配置（含泳姿子类型）
+function getSportData(sport, subType){
+  const sp = SPORTS[sport];
+  if(sp.subTypes && subType && sp.subTypes[subType]){
+    const sub = sp.subTypes[subType];
+    return {
+      ...sp,
+      ...sub,
+      name: sp.name+' '+sub.name,
+      emoji: sub.emoji || sp.emoji,
+      subTypeName: sub.name
+    };
+  }
+  return sp;
+}
+
+// 获取里程碑列表
+function getMilestones(sport, subType){
+  const m = MILESTONES[sport];
+  if(Array.isArray(m)) return m;
+  if(m && subType && m[subType]) return m[subType];
+  return ['持续练习，稳步提升','技术熟练，稳步提升','挑战自我，突破极限'];
+}
+
+/* ==================== 计划生成 ==================== */
+function generatePlan(config){
+  const {sport, totalDays, perDayMin, subType} = config;
+  const sp = getSportData(sport, subType);
+  const days = [];
+  const numStages = sp.stages.length;
+  const daysPerStage = Math.floor(totalDays/numStages);
+
+  // 热身时长 15%，拉伸 10%，主训练 60%，体能 15%
+  const warmupDur = Math.max(3, Math.round(perDayMin*0.15));
+  const cooldownDur = Math.max(3, Math.round(perDayMin*0.1));
+  const fitnessDur = perDayMin>=20 ? Math.round(perDayMin*0.15) : 0;
+  const mainDur = perDayMin - warmupDur - cooldownDur - fitnessDur;
+
+  for(let i=0;i<totalDays;i++){
+    const stageIdx = Math.min(Math.floor(i/daysPerStage), numStages-1);
+    const stageName = sp.stages[stageIdx];
+    
+    // 热身
+    const warmupCount = Math.max(3, Math.min(6, Math.floor(warmupDur/0.5)));
+    const warmup = pick(WARMUP, warmupCount).map(w=>({...w}));
+
+    // 拉伸
+    const cooldownCount = Math.max(2, Math.min(5, Math.floor(cooldownDur/0.5)));
+    const cooldown = pick(COOLDOWN, cooldownCount).map(c=>({...c}));
+
+    // 主训练：前1/3用基础动作，中间混合，后1/3用进阶动作
+    const stageProgress = (i % daysPerStage) / daysPerStage;
+    let pool;
+    if(stageProgress < 0.4) pool = sp.basics;
+    else if(stageProgress < 0.8) pool = [...sp.basics, ...sp.advances];
+    else pool = sp.advances;
+
+    // 每个动作约3-5分钟
+    const mainCount = Math.max(2, Math.floor(mainDur/3));
+    const main = pick(pool, Math.min(mainCount, pool.length)).map(m=>({...m}));
+
+    // 体能（非每天都有，隔2天安排）
+    let fitness = [];
+    if(fitnessDur>0 && i%2===1){
+      const fitPool = [...FITNESS.core, ...FITNESS.cardiopulmonary, ...FITNESS.balance];
+      const fitCount = Math.max(2, Math.floor(fitnessDur/1));
+      fitness = pick(fitPool, Math.min(fitCount, fitPool.length)).map(f=>({...f}));
+    }
+
+    days.push({
+      day:i+1,
+      stage:stageIdx,
+      stageName,
+      warmup,
+      main,
+      cooldown,
+      fitness
+    });
+  }
+
+  return {sport, subType, totalDays, perDayMin, days, stages:sp.stages};
+}
+
+/* ==================== 视图渲染 ==================== */
+let currentTab = 'home';
+
+function switchTab(tab){
+  currentTab = tab;
+  $$('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  render();
+}
+
+function render(){
+  const vp = $('#viewport');
+  switch(currentTab){
+    case 'home': renderHome(vp); break;
+    case 'plan': renderPlan(vp); break;
+    case 'progress': renderProgress(vp); break;
+    case 'me': renderMe(vp); break;
+  }
+  $('#streakPill').textContent = `🔥 ${state.streak} 天连胜`;
+}
+
+function renderHome(vp){
+  if(!state.plan){
+    vp.innerHTML = `
+      <div class="hero">
+        <h1>开启你的<br>运动之旅</h1>
+        <p>输入想学的体育项目，智能生成专属训练计划</p>
+        <button class="btn" style="margin-top:18px" onclick="switchTab('plan')">📝 定制我的计划</button>
+      </div>
+      <div class="section-title">热门运动项目</div>
+      <div class="quick-list">
+        ${Object.entries(SPORTS).map(([k,v])=>`
+          <div class="quick-item" onclick="quickSelect('${k}')">
+            <div class="emoji">${v.emoji}</div>
+            <div class="name">${v.name}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    return;
+  }
+
+  const today = state.plan.days.find((d,i)=>!state.done[i]) || state.plan.days[state.plan.days.length-1];
+  const todayIdx = state.plan.days.indexOf(today);
+  const doneCount = Object.keys(state.done).length;
+  const totalDays = state.plan.totalDays;
+  const sport = getSportData(state.plan.sport, state.plan.subType);
+
+  vp.innerHTML = `
+    <div class="hero">
+      <h1>${sport.emoji} ${sport.name}</h1>
+      <p>${state.plan.totalDays}天计划 · 每天${state.plan.perDayMin}分钟</p>
+      <div class="stat-row">
+        <div class="stat"><div class="n">${doneCount}</div><div class="l">已完成</div></div>
+        <div class="stat"><div class="n">${totalDays-doneCount}</div><div class="l">待完成</div></div>
+        <div class="stat"><div class="n">${state.streak}</div><div class="l">连续天数</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="cursor:pointer" onclick="openDay(${todayIdx})">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:12px;color:var(--muted)">第 ${today.day} 天 · ${today.stageName}</div>
+          <div style="font-size:18px;font-weight:700;margin-top:6px">今日训练</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:4px">
+            热身${today.warmup.length}个 · 主训练${today.main.length}个 · 拉伸${today.cooldown.length}个
+          </div>
+        </div>
+        <div style="font-size:36px">${state.done[todayIdx]?'✅':'▶️'}</div>
+      </div>
+    </div>
+
+    <div class="section-title">当前阶段目标</div>
+    <div class="card">
+      <div style="font-size:15px;font-weight:600;margin-bottom:8px">🎯 ${today.stageName}</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">${getMilestones(state.plan.sport, state.plan.subType)[today.stage]||'持续练习，稳步提升'}</div>
+    </div>
+
+    <div class="section-title">📋 计划概览表</div>
+    <div class="plan-table-wrap">
+      <div style="overflow-x:auto">
+      <table class="plan-table">
+        <thead>
+          <tr>
+            <th>天</th>
+            <th>阶段</th>
+            <th>热身</th>
+            <th>主训练</th>
+            <th>拉伸</th>
+            <th>状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${state.plan.days.map((d,idx)=>{
+            const isDone = state.done[idx];
+            const isToday = idx===todayIdx;
+            const stageColors = ['#ff6a3d','#ffb547','#3ddc97','#5b8def','#c77dff'];
+            const sc = stageColors[d.stage%5];
+            return `<tr class="${isDone?'done':''} ${isToday?'today':''}">
+              <td class="day-cell">${d.day}</td>
+              <td><span class="stage-tag" style="background:${sc}22;color:${sc}">${d.stageName}</span></td>
+              <td class="action-cell">${d.warmup.map(w=>w.name).join('<br>')}</td>
+              <td class="action-cell">${d.main.map(m=>'•'+m.name).join('<br>')}</td>
+              <td class="action-cell">${d.cooldown.map(c=>c.name).join('<br>')}</td>
+              <td>${isDone?'✅':isToday?'▶️':'—'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="section-title">运动项目</div>
+    <div class="quick-list">
+      ${Object.entries(SPORTS).map(([k,v])=>`
+        <div class="quick-item" onclick="quickSelect('${k}')">
+          <div class="emoji">${v.emoji}</div>
+          <div class="name">${v.name}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="height:20px"></div>
+  `;
+}
+
+function renderPlan(vp){
+  if(!state.plan){
+    vp.innerHTML = renderPlanForm();
+    return;
+  }
+  renderPlanOverview(vp);
+}
+
+function renderPlanForm(){
+  const sport = state.currentSport || 'run';
+  const sp = SPORTS[sport];
+  return `
+    <div class="hero" style="background:linear-gradient(135deg,#2a3645,#161e28)">
+      <h1 style="font-size:20px">定制训练计划</h1>
+      <p>选择项目、周期和每日时间</p>
+    </div>
+
+    <div class="section-title">选择运动项目</div>
+    <div class="sport-grid">
+      ${Object.entries(SPORTS).map(([k,v])=>`
+        <div class="sport-card ${sport===k?'sel':''}" onclick="state.currentSport='${k}';state.currentSubType=null;render()">
+          <div class="emoji">${v.emoji}</div>
+          <div class="info">
+            <div class="n">${v.name}</div>
+            <div class="d">${v.desc}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    ${sp.subTypes?`
+      <div class="section-title">选择${sp.name}类型</div>
+      <div class="sport-grid">
+        ${Object.entries(sp.subTypes).map(([k,v])=>`
+          <div class="sport-card ${(state.currentSubType||Object.keys(sp.subTypes)[0])===k?'sel':''}" onclick="state.currentSubType='${k}';render()">
+            <div class="emoji">${v.emoji}</div>
+            <div class="info">
+              <div class="n">${v.name}</div>
+              <div class="d">${v.stages.join('→')}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `:''}
+
+    <div class="field">
+      <label>学习周期（天数）</label>
+      <input type="range" id="daysInput" min="7" max="60" value="21" oninput="$('#daysVal').textContent=this.value+' 天'">
+      <div style="text-align:center;font-size:18px;font-weight:700;color:var(--accent);margin-top:10px"><span id="daysVal">21 天</span></div>
+    </div>
+
+    <div class="field">
+      <label>每日训练时间（分钟）</label>
+      <input type="range" id="timeInput" min="15" max="90" step="5" value="30" oninput="$('#timeVal').textContent=this.value+' 分钟'">
+      <div style="text-align:center;font-size:18px;font-weight:700;color:var(--accent);margin-top:10px"><span id="timeVal">30 分钟</span></div>
+    </div>
+
+    <div style="padding:14px 20px 40px">
+      <button class="btn block" onclick="createPlan()">🚀 生成训练计划</button>
+    </div>
+  `;
+}
+
+let currentStageFilter = -1;
+
+function renderPlanOverview(vp){
+  const sp = getSportData(state.plan.sport, state.plan.subType);
+  const stages = state.plan.stages;
+  vp.innerHTML = `
+    <div class="plan-head">
+      <h2>${sp.emoji} ${sp.name}训练计划</h2>
+      <div class="meta">${state.plan.totalDays}天 · 每天${state.plan.perDayMin}分钟 · 共${stages.length}个阶段</div>
+      <button class="btn ghost sm" style="margin-top:14px" onclick="resetPlan()">🔄 重新制定</button>
+    </div>
+
+    <div class="stage-tabs">
+      <div class="stage-chip ${currentStageFilter===-1?'active':''}" onclick="currentStageFilter=-1;render()">全部</div>
+      ${stages.map((s,i)=>{
+        const stageDays = state.plan.days.filter(d=>d.stage===i);
+        const stageDone = stageDays.filter((d,j)=>state.done[state.plan.days.indexOf(d)]).length;
+        const allDone = stageDays.length>0 && stageDone===stageDays.length;
+        return `<div class="stage-chip ${currentStageFilter===i?'active':''} ${allDone?'done':''}" onclick="currentStageFilter=${i};render()">${i+1}.${s}</div>`;
+      }).join('')}
+    </div>
+
+    <div class="day-list">
+      ${state.plan.days.filter(d=>currentStageFilter===-1||d.stage===currentStageFilter).map((d)=>{
+        const idx = state.plan.days.indexOf(d);
+        const done = state.done[idx];
+        return `
+          <div class="day-row ${done?'checked':''}" onclick="openDay(${idx})">
+            <div class="day-num">${d.day}</div>
+            <div class="day-info">
+              <div class="t">${d.stageName}</div>
+              <div class="s">主训练${d.main.length}个 · 热身${d.warmup.length}个 · 拉伸${d.cooldown.length}个</div>
+            </div>
+            <div class="day-act">${done?'✅':'›'}</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function openDay(idx){
+  const day = state.plan.days[idx];
+  const done = state.done[idx];
+  const sp = getSportData(state.plan.sport, state.plan.subType);
+  
+  $('#viewport').innerHTML = `
+    <div style="padding:14px 20px;display:flex;align-items:center;gap:10px">
+      <button class="btn ghost sm" onclick="switchTab('${currentTab}')">← 返回</button>
+      <div style="flex:1">
+        <div style="font-size:18px;font-weight:700">第 ${day.day} 天</div>
+        <div style="font-size:12px;color:var(--muted)">${day.stageName} · ${sp.name}</div>
+      </div>
+      ${done?'<span style="color:var(--good)">✅ 已完成</span>':''}
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-weight:600">🎯 阶段任务</div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.7">${getMilestones(state.plan.sport, state.plan.subType)[day.stage]}</div>
+    </div>
+
+    <div class="section-title">🔥 热身活动</div>
+    ${day.warmup.map((e,i)=>exCard(e,'warmup',idx,'w',i)).join('')}
+
+    ${day.fitness.length?`
+      <div class="section-title">💪 体能补充</div>
+      ${day.fitness.map((e,i)=>exCard(e,'main',idx,'f',i)).join('')}
+    `:''}
+
+    <div class="section-title">🎯 主训练</div>
+    ${day.main.map((e,i)=>exCard(e,'main',idx,'m',i)).join('')}
+
+    <div class="section-title">🧘 拉伸放松</div>
+    ${day.cooldown.map((e,i)=>exCard(e,'cooldown',idx,'c',i)).join('')}
+
+    <div style="padding:14px 20px 40px">
+      ${done ? `<button class="btn block" onclick="startFollow('${idx}')">🔄 重新跟练</button>` : `<button class="btn block" onclick="startFollow('${idx}')">▶ 开始跟练</button>`}
+    </div>
+  `;
+  $('#viewport').scrollTop = 0;
+}
+
+function exCard(e,type,dayIdx,pool,idx){
+  const tag = {warmup:'热身',main:'主训练',cooldown:'拉伸',fitness:'体能'}[type]||'';
+  const vidBtn = type==='main' ? `<button class="video-btn" onclick="openVideo('${state.plan.sport}','${e.name}')">▶ 教学视频</button>` : '';
+  return `
+    <div class="ex-card ${type}">
+      <div class="ex-head">
+        <div class="name">${e.name}</div>
+        <div class="tag">${tag} · ${e.dur}秒</div>
+      </div>
+      <div class="ex-body">${e.tip}</div>
+      <div class="ex-actions">
+        ${vidBtn}
+        <button class="btn sm ghost" onclick="startSingleEx(${dayIdx},'${pool}',${idx})">⏱ 计时</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderProgress(vp){
+  if(!state.plan){
+    vp.innerHTML = empty('还没有训练计划','定制一份计划，开始你的运动之旅吧');
+    return;
+  }
+  const doneCount = Object.keys(state.done).length;
+  const total = state.plan.totalDays;
+  const pct = Math.round(doneCount/total*100);
+  const circ = 2*Math.PI*90;
+  const offset = circ * (1 - pct/100);
+  const sp = getSportData(state.plan.sport, state.plan.subType);
+
+  vp.innerHTML = `
+    <svg style="display:none">
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#9e1722"/>
+          <stop offset="100%" stop-color="#c08f24"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div class="progress-circle">
+      <svg viewBox="0 0 200 200">
+        <circle class="track" cx="100" cy="100" r="90"></circle>
+        <circle class="prog" cx="100" cy="100" r="90" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"></circle>
+      </svg>
+      <div class="center">
+        <div class="pct">${pct}%</div>
+        <div class="lbl">${doneCount}/${total} 天</div>
+      </div>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <div style="font-size:36px">${state.streak}🔥</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px">连续训练天数</div>
+    </div>
+
+    <div class="section-title">阶段里程碑</div>
+    ${state.plan.stages.map((s,i)=>{
+      const stageDays = state.plan.days.filter(d=>d.stage===i);
+      const stageDone = stageDays.filter(d=>state.done[state.plan.days.indexOf(d)]).length;
+      const done = stageDays.length>0 && stageDone===stageDays.length;
+      return `
+        <div class="milestone ${done?'done':''}">
+          <div class="ic">${done?'🏆':'🎯'}</div>
+          <div class="info">
+            <h4>第${i+1}阶段：${s}</h4>
+            <p>${getMilestones(state.plan.sport, state.plan.subType)[i]} · ${stageDone}/${stageDays.length}天</p>
+          </div>
+        </div>
+      `;
+    }).join('')}
+
+    <div class="section-title">导师建议</div>
+    <div class="card">
+      <div style="font-size:30px;margin-bottom:10px">🧑‍🏫</div>
+      <div style="font-size:14px;line-height:1.8;color:var(--muted)">${getAdvice()}</div>
+      <button class="btn sm ghost" style="margin-top:12px" onclick="render()">换一条建议</button>
+    </div>
+
+    <div style="height:30px"></div>
+  `;
+}
+
+function getAdvice(){
+  const doneCount = Object.keys(state.done).length;
+  const total = state.plan.totalDays;
+  const pct = doneCount/total;
+  if(pct===0) return '万事开头难，今天就是最好的开始。先从热身活动做起，感受身体的变化。';
+  if(pct<0.3) return '已经起步了！保持每天训练的节奏，不要急于求成，身体需要适应过程。';
+  if(pct<0.6) return '你已经进入状态了！注意观察身体反馈，适当调整训练强度，避免过度疲劳。';
+  if(pct<0.9) return '距离目标不远了！继续保持，注意营养和睡眠，让恢复跟上训练节奏。';
+  return '即将完成计划！回顾一下自己的进步，制定下一个目标，运动是终身的习惯。';
+}
+
+function renderMe(vp){
+  vp.innerHTML = `
+    <div class="section-title">提醒设置</div>
+    <div class="card">
+      <div class="toggle-row">
+        <div>
+          <div style="font-weight:600">每日锻炼提醒</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">到点弹出通知，提醒你开始训练</div>
+        </div>
+        <div class="toggle ${state.notify?'on':''}" onclick="state.notify=!state.notify;save();render()"></div>
+      </div>
+      ${state.notify?`
+        <div class="toggle-row" style="border:none">
+          <div>
+            <div style="font-weight:600">提醒时间</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">每天这个时间提醒你</div>
+          </div>
+          <input type="time" value="${state.notifyTime}" style="background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:8px 12px;border-radius:8px;font-family:inherit" onchange="state.notifyTime=this.value;save();startNotifyLoop()">
+        </div>
+      `:''}
+    </div>
+
+    <div class="section-title">当前计划</div>
+    ${state.plan?`
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:36px">${getSportData(state.plan.sport, state.plan.subType).emoji}</div>
+          <div style="flex:1">
+            <div style="font-weight:600">${getSportData(state.plan.sport, state.plan.subType).name}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">${state.plan.totalDays}天 · 每天${state.plan.perDayMin}分钟</div>
+          </div>
+        </div>
+      </div>
+    `:'<div class="card" style="color:var(--muted);text-align:center">暂无计划</div>'}
+
+    <div class="section-title">关于</div>
+    <div class="card">
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        跃动运动技能自学计划<br>
+        帮你科学入门各类运动项目<br>
+        涵盖热身、主训练、拉伸全流程<br>
+        每天坚持，遇见更好的自己 💪
+      </div>
+    </div>
+
+    <div style="padding:14px 20px 40px">
+      ${state.plan?`<button class="btn ghost block" onclick="resetPlan()">清空当前计划</button>`:''}
+    </div>
+  `;
+}
+
+function empty(title,desc){
+  return `
+    <div class="empty">
+      <div class="emoji">🏃</div>
+      <h3>${title}</h3>
+      <p>${desc}</p>
+      <button class="btn" style="margin-top:20px" onclick="switchTab('plan')">去定制</button>
+    </div>
+  `;
+}
+
+/* ==================== 操作 ==================== */
+function quickSelect(key){
+  state.currentSport = key;
+  state.currentSubType = null;
+  if(!state.plan){
+    switchTab('plan');
+  }else{
+    // 切换运动项目
+    if(confirm(`切换到 ${SPORTS[key].name} 会重新生成计划，当前进度会清除，确定吗？`)){
+      state.currentSport = key;
+      state.currentSubType = null;
+      state.plan = null;
+      state.done = {};
+      save();
+      switchTab('plan');
+    }
+  }
+}
+
+function createPlan(){
+  const sport = state.currentSport || 'run';
+  const sp = SPORTS[sport];
+  const subType = sp.subTypes ? (state.currentSubType || Object.keys(sp.subTypes)[0]) : null;
+  const days = parseInt($('#daysInput').value);
+  const time = parseInt($('#timeInput').value);
+  const config = {sport, subType, totalDays:days, perDayMin:time};
+  state.config = config;
+  state.plan = generatePlan(config);
+  state.done = {};
+  state.streak = 0;
+  save();
+  currentStageFilter = -1;
+  toast('✅ 计划生成成功！');
+  switchTab('home');
+}
+
+function resetPlan(){
+  if(!confirm('确定要清空当前计划吗？所有进度将丢失。')) return;
+  state.plan = null;
+  state.done = {};
+  state.config = null;
+  currentStageFilter = -1;
+  save();
+  switchTab('plan');
+}
+
+function openVideo(sport, name){
+  const sp = getSportData(sport, state.plan?.subType);
+  const kw = `${sp.name} ${name}`;
+  const url = `https://search.bilibili.com/all?keyword=${encodeURIComponent(kw)}&order=click`;
+  window.open(url,'_blank');
+}
+
+/* ==================== 跟练计时器 ==================== */
+let timerState = null;
+
+function startFollow(dayIdxStr){
+  const dayIdx = parseInt(dayIdxStr);
+  const day = state.plan.days[dayIdx];
+  // 构造序列：热身 → 体能 → 主训练 → 拉伸
+  const seq = [];
+  day.warmup.forEach(e=>seq.push({...e,type:'热身'}));
+  if(day.fitness) day.fitness.forEach(e=>seq.push({...e,type:'体能'}));
+  day.main.forEach(e=>seq.push({...e,type:'主训练'}));
+  day.cooldown.forEach(e=>seq.push({...e,type:'拉伸'}));
+  
+  timerState = {
+    dayIdx,
+    seq,
+    cur:0,
+    remain:seq[0].dur,
+    total:seq[0].dur,
+    playing:true,
+    interval:null
+  };
+  $('#timerModal').classList.add('show');
+  renderTimer();
+  startTick();
+}
+
+function startSingleEx(dayIdx, pool, idx){
+  const day = state.plan.days[dayIdx];
+  const e = pool==='w'?day.warmup[idx]:pool==='m'?day.main[idx]:pool==='c'?day.cooldown[idx]:day.fitness[idx];
+  timerState = {
+    dayIdx,
+    seq:[{...e,type:'计时'}],
+    cur:0,
+    remain:e.dur,
+    total:e.dur,
+    playing:true,
+    interval:null
+  };
+  $('#timerModal').classList.add('show');
+  renderTimer();
+  startTick();
+}
+
+function renderTimer(){
+  const t = timerState;
+  const e = t.seq[t.cur];
+  $('#timerTime').textContent = formatTime(t.remain);
+  $('#timerEx').textContent = `${e.type} · ${e.name}`;
+  const pct = t.remain/t.total;
+  $('#ringProg').style.strokeDashoffset = 628*(1-pct);
+  $('#playBtn').textContent = t.playing?'⏸':'▶';
+  
+  // dots
+  $('#timerDots').innerHTML = t.seq.map((ex,i)=>
+    `<div class="timer-dot ${i<t.cur?'done':i===t.cur?'cur':''}"></div>`
+  ).join('');
+}
+
+function startTick(){
+  if(timerState.interval) clearInterval(timerState.interval);
+  timerState.interval = setInterval(()=>{
+    if(!timerState.playing) return;
+    timerState.remain--;
+    if(timerState.remain<=0){
+      beep(800,.15);
+      if(timerState.cur < timerState.seq.length-1){
+        timerState.cur++;
+        timerState.total = timerState.seq[timerState.cur].dur;
+        timerState.remain = timerState.total;
+        renderTimer();
+      }else{
+        // 全部完成
+        clearInterval(timerState.interval);
+        timerState.playing=false;
+        finishDay(timerState.dayIdx);
+      }
+    }else{
+      // 最后3秒提示
+      if(timerState.remain<=3) beep(600,.08);
+      $('#timerTime').textContent = formatTime(timerState.remain);
+      const pct = timerState.remain/timerState.total;
+      $('#ringProg').style.strokeDashoffset = 628*(1-pct);
+    }
+  },1000);
+}
+
+function togglePlay(){
+  timerState.playing = !timerState.playing;
+  $('#playBtn').textContent = timerState.playing?'⏸':'▶';
+  startTick();
+}
+
+function prevEx(){
+  if(timerState.cur>0){
+    timerState.cur--;
+    timerState.total = timerState.seq[timerState.cur].dur;
+    timerState.remain = timerState.total;
+    renderTimer();
+  }
+}
+
+function nextEx(){
+  if(timerState.cur<timerState.seq.length-1){
+    timerState.cur++;
+    timerState.total = timerState.seq[timerState.cur].dur;
+    timerState.remain = timerState.total;
+    renderTimer();
+  }else{
+    finishDay(timerState.dayIdx);
+  }
+}
+
+function closeTimer(){
+  if(timerState && timerState.interval) clearInterval(timerState.interval);
+  $('#timerModal').classList.remove('show');
+}
+
+function formatTime(s){
+  const m = Math.floor(s/60);
+  const sec = s%60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+// 提示音
+let audioCtx;
+function beep(freq,dur){
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.01, audioCtx.currentTime+dur);
+    osc.start();
+    osc.stop(audioCtx.currentTime+dur);
+  }catch(e){}
+}
+
+function finishDay(dayIdx){
+  if(state.done[dayIdx]){
+    closeTimer();
+    return;
+  }
+  state.done[dayIdx] = true;
+  
+  // 连胜逻辑
+  const today = new Date().toDateString();
+  if(state.lastCheckIn !== today){
+    const yesterday = new Date(Date.now()-86400000).toDateString();
+    state.streak = state.lastCheckIn===yesterday ? state.streak+1 : 1;
+    state.lastCheckIn = today;
+  }
+  save();
+  closeTimer();
+  confetti();
+  toast(pickOne(CHEERS));
+  
+  // 检查阶段完成
+  checkStageComplete(dayIdx);
+  // 检查全部完成
+  const allDone = Object.keys(state.done).length === state.plan.totalDays;
+  if(allDone){
+    setTimeout(()=>{
+      alert('🎉 恭喜你完成全部训练计划！\n你已经在'+getSportData(state.plan.sport, state.plan.subType).name+'上迈出了坚实的一步，继续保持！');
+    },500);
+  }
+  
+  setTimeout(render, 800);
+}
+
+function checkStageComplete(dayIdx){
+  const day = state.plan.days[dayIdx];
+  const stageDays = state.plan.days.filter(d=>d.stage===day.stage);
+  const stageDone = stageDays.filter(d=>state.done[state.plan.days.indexOf(d)]).length;
+  if(stageDays.length>0 && stageDone===stageDays.length){
+    setTimeout(()=>{
+      alert('🏆 阶段完成提醒\n\n你已完成【'+day.stageName+'】阶段的所有训练！\n阶段任务：'+getMilestones(state.plan.sport, state.plan.subType)[day.stage]+'\n\n继续加油，向下一阶段进发！');
+    },1200);
+  }
+}
+
+function confetti(){
+  const colors=['#ff6b35','#ffc233','#2ec4b6','#4cc9f0','#e71d36'];
+  for(let i=0;i<40;i++){
+    const c = document.createElement('div');
+    c.className='confetti';
+    c.style.left=Math.random()*100+'%';
+    c.style.top='-10px';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animation=`fall ${1+Math.random()*2}s ease-out forwards`;
+    c.style.animationDelay=Math.random()*0.3+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
+  }
+}
+
+function toast(msg){
+  const t = document.createElement('div');
+  t.className='toast';
+  t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+
+/* ==================== 通知 ==================== */
+let notifyLoopId;
+function startNotifyLoop(){
+  if(notifyLoopId) clearInterval(notifyLoopId);
+  if(!state.notify) return;
+  // 每分钟检查一次
+  notifyLoopId = setInterval(()=>{
+    const now = new Date();
+    const hm = String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    if(hm === state.notifyTime && now.getSeconds()<2){
+      sendNotify();
+    }
+  },15000);
+}
+
+async function sendNotify(){
+  // 请求权限
+  if(!('Notification' in window)){
+    toast('到锻炼时间啦！');
+    return;
+  }
+  let perm = Notification.permission;
+  if(perm==='default'){
+    perm = await Notification.requestPermission();
+  }
+  if(perm==='granted' && state.plan){
+    const sp = getSportData(state.plan.sport, state.plan.subType);
+    const nextDay = state.plan.days.find((d,i)=>!state.done[i]);
+    const title = `💪 该锻炼啦！${sp.name}`;
+    const body = nextDay ? `第${nextDay.day}天 · ${nextDay.stageName}\n${nextDay.main.length}个动作等你来` : '今天的计划已完成，休息一下吧~';
+    try{
+      new Notification(title,{body});
+    }catch(e){
+      toast(title+' '+body);
+    }
+  }else{
+    toast('💪 到锻炼时间啦！');
+  }
+}
+
+/* ==================== 初始化 ==================== */
+$$('.tab').forEach(t=>t.addEventListener('click',()=>switchTab(t.dataset.tab)));
+
+// 加载时请求通知权限
+if(state.notify && 'Notification' in window && Notification.permission==='default'){
+  // 不立即请求，避免骚扰，在首次设置时请求
+}
+
+startNotifyLoop();
+render();
+</script>
+</body>
+</html>

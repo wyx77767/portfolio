@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>wyx · 数智编程作品集</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>�</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=VT323&family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  /* ===== Y2K 蓝调 Vaporwave 主题（参考素材：深蓝+Windows98+青蓝高亮+金属铬） ===== */
+  :root {
+    --bg: #050d24;                    /* 深宝蓝背景（素材主调，比之前更深更饱和） */
+    --bg-soft: #16245a;               /* 深蓝亮一级 */
+    --card: #e8e8f0;                  /* Windows98 浅灰白面板 */
+    --card-dark: #d0d0dc;             /* Windows98 深灰面板 */
+    --text: #0a1530;                  /* 深蓝文字（卡片上深字） */
+    --dark-text: #e8e8f0;             /* 深蓝背景上的浅字 */
+    --muted: #6b8fd4;                 /* 亮蓝灰（参考素材的蓝调） */
+    --primary: #5ab8ff;               /* 亮青蓝高亮（素材主点缀，更亮） */
+    --accent: #ff4fc3;                /* 品红（仅 glitch 用，克制） */
+    --chrome: linear-gradient(180deg, #e8f4ff 0%, #88b8e8 45%, #3a6ba8 55%, #88b8e8 100%); /* 金属铬 */
+    --grad: linear-gradient(135deg, #5ab8ff 0%, #ff4fc3 100%);
+    --shadow: 4px 4px 0 #000;         /* Windows98 硬阴影 */
+    --border: #5a7ab0;                /* Windows98 边框色（蓝调） */
+    --border-light: #b8d4f0;          /* Windows98 上/左亮边 */
+    --border-dark: #2a4a80;           /* Windows98 下/右暗边 */
+    --warn-bg: #fffacd;
+    --warn-bd: #c0a000;
+    --warn-tx: #806000;
+    --grid: rgba(90, 184, 255, .12);
+    /* 背景面板（深蓝背景上的卡片用） */
+    --dark-card: linear-gradient(135deg, #16245a, #050d24);
+  }
+  html[data-theme="light"] {
+    --bg: #eaf2ff;                    /* 浅蓝背景（参考素材的浅蓝调） */
+    --bg-soft: #d0e4ff;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #4a6a9a;
+    --primary: #1976d2;
+    --accent: #e91e63;
+    --chrome: linear-gradient(180deg, #ffffff 0%, #c0d8f0 45%, #6a9ad0 55%, #c0d8f0 100%);
+    --grad: linear-gradient(135deg, #1976d2 0%, #e91e63 100%);
+    --shadow: 2px 2px 10px rgba(15,23,42,.08);
+    --border: rgba(25,118,210,.18);
+    --grid: rgba(25,118,210,.05);
+    --body-text: #0f172a;
+    --card-bg: rgba(255,255,255,.92);
+    --card-border: rgba(25,118,210,.14);
+    --nav-bg: rgba(255,255,255,.88);
+    --nav-text: rgba(15,23,42,.85);
+    --nav-muted: rgba(15,23,42,.5);
+    --tower-bg: rgba(255,255,255,.82);
+    --tower-text: #0f172a;
+    --tower-border: rgba(25,118,210,.22);
+  }
+  /* 深色模式（默认） */
+  :root {
+    --body-text: #e8f0ff;
+    --card-bg: rgba(22, 36, 90, .65);
+    --card-border: rgba(90, 184, 255, .18);
+    --nav-bg: rgba(5, 13, 36, .8);
+    --nav-text: rgba(232, 240, 255, .75);
+    --nav-muted: rgba(232, 240, 255, .55);
+    --tower-bg: rgba(22, 36, 90, .55);
+    --tower-text: rgba(232, 240, 255, .9);
+    --tower-border: rgba(90, 184, 255, .3);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--body-text);
+    line-height: 1.7;
+    max-width: 100%;
+    overflow-x: hidden;
+    font-size: 15px;
+    transition: background .4s, color .4s;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 60px 60px;
+    background-attachment: fixed;
+  }
+  body::before {
+    /* 深蓝径向光雾（参考素材：大面积蓝光晕） */
+    content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background:
+      radial-gradient(ellipse 70% 60% at 20% 10%, rgba(90, 184, 255, .22), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(90, 184, 255, .12), transparent 55%),
+      radial-gradient(ellipse 90% 80% at 50% 100%, rgba(22, 36, 90, .9), transparent 70%),
+      radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255, 79, 195, .04), transparent 60%);
+  }
+  body::after {
+    /* 密集 glitch 水平条纹 + 扫描线（素材核心元素） */
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(90, 184, 255, .06) 2px, rgba(90, 184, 255, .06) 3px),
+      repeating-linear-gradient(0deg, transparent 0px, transparent 4px, rgba(0,0,0,.15) 4px, rgba(0,0,0,.15) 5px);
+    mix-blend-mode: screen;
+    animation: scanMove 8s linear infinite;
+  }
+  @keyframes scanMove { 0%{background-position:0 0} 100%{background-position:0 100px} }
+  section { scroll-margin-top: 76px; }
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ===== 导航（城市天际线背景图 + 暗色遮罩 + 玻璃拟态） ===== */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background:
+      linear-gradient(180deg, rgba(8,14,36,.88) 0%, rgba(8,14,36,.72) 50%, rgba(8,14,36,.88) 100%),
+      url("https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cyberpunk%20city%20skyline%20at%20night%2C%20neon%20cyan%20magenta%20purple%20lights%2C%20futuristic%20skyscrapers%2C%20rain%20wet%20street%20reflections%2C%20holographic%20signs%2C%20dark%20deep%20blue%20atmosphere%2C%20wide%20panoramic%20cityscape&image_size=landscape_16_9") center/cover no-repeat;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  /* 日光模式：浅色遮罩，保持图片但文字可读 */
+  html[data-theme="light"] nav {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.86) 0%, rgba(255,255,255,.7) 50%, rgba(255,255,255,.86) 100%),
+      url("https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cyberpunk%20city%20skyline%20at%20night%2C%20neon%20cyan%20magenta%20purple%20lights%2C%20futuristic%20skyscrapers%2C%20rain%20wet%20street%20reflections%2C%20holographic%20signs%2C%20dark%20deep%20blue%20atmosphere%2C%20wide%20panoramic%20cityscape&image_size=landscape_16_9") center/cover no-repeat;
+  }
+  .nav-inner {
+    max-width: 1080px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .logo {
+    font-family: "Bebas Neue", sans-serif; font-weight: 400; font-size: 20px;
+    color: var(--body-text); letter-spacing: 3px; white-space: nowrap;
+  }
+  .logo span { color: var(--primary); }
+  .nav-links { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .nav-links a {
+    color: var(--nav-muted); text-decoration: none;
+    font-size: 14px; font-weight: 500; transition: .2s; white-space: nowrap; letter-spacing: .5px;
+  }
+  .nav-links a:hover { color: var(--primary); }
+  #themeBtn {
+    border: 1px solid rgba(79, 195, 247, .3); background: rgba(255,255,255,.06);
+    cursor: pointer; width: 32px; height: 32px; border-radius: 6px; font-size: 14px;
+    color: #4fc3f7; transition: .2s;
+  }
+  #themeBtn:hover { background: rgba(79,195,247,.1); border-color: #4fc3f7; }
+
+  /* ===== Hero ===== */
+  .hero { position: relative; padding: 48px 0 40px; overflow: clip; }
+  .hero-inner { display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
+  .hero-text { flex: 1 1 420px; }
+  .hello { font-size: 13px; color: var(--primary); letter-spacing: 3px; text-transform: uppercase; opacity: .85; }
+  .hero h1 {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: clamp(36px, 6vw, 48px); font-weight: 400;
+    line-height: 1.15; margin: 6px 0 14px; letter-spacing: 1px;
+    color: var(--body-text);
+  }
+  .hero h1 .name {
+    color: var(--primary);
+    text-shadow: 2px 2px 0 rgba(255,79,195,.5);
+  }
+  .type-line { font-size: 15px; color: var(--primary); min-height: 22px; letter-spacing: .5px; opacity: .9; }
+  .type-line .cursor { display: inline-block; width: 2px; height: 1.1em; background: var(--primary); vertical-align: -3px; margin-left: 2px; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .btns { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 26px; }
+  .btn {
+    display: inline-block; padding: 10px 24px; text-decoration: none;
+    font-family: "Bebas Neue", sans-serif; font-weight: 400; font-size: 16px;
+    transition: .2s; letter-spacing: 2px;
+  }
+  .btn-main {
+    background: var(--chrome); color: #0a1530; border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.4);
+    border: 1px solid rgba(90,184,255,.5);
+  }
+  .btn-main:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-ghost {
+    background: rgba(90,184,255,.08); color: var(--body-text); border: 1px solid rgba(90,184,255,.4); border-radius: 4px;
+  }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); background: rgba(90,184,255,.15); }
+
+  .avatar-wrap { position: relative; flex: 0 1 320px; display: flex; justify-content: center; }
+  .avatar-ring {
+    padding: 3px; border-radius: 50%;
+    background: linear-gradient(135deg, #4fc3f7, #ff4fc3);
+    cursor: pointer; transition: .3s;
+  }
+  .avatar-ring:hover { transform: scale(1.04); }
+  .avatar-ring img { display: block; width: 220px; height: 220px; border-radius: 50%; object-fit: cover; border: 4px solid #0a1530; }
+  .avatar-ring.wobble { animation: wobble .6s ease; }
+  @keyframes wobble { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-8deg)} 75%{transform:rotate(8deg)} }
+  #quoteBubble {
+    position: absolute; top: -8px; left: 50%; transform: translate(-50%, -100%) scale(.8);
+    background: rgba(18, 30, 60, .9); border: 1px solid rgba(79,195,247,.3); color: #4fc3f7;
+    padding: 10px 18px; border-radius: 6px; font-size: 13px; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,.3); opacity: 0; pointer-events: none; transition: .3s;
+  }
+  #quoteBubble.show { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+
+  /* ===== 通用板块 ===== */
+  .section { padding: 80px 0; }
+  .sec-title { font-family: "Bebas Neue", sans-serif; text-align: center; font-size: clamp(32px, 5vw, 42px); font-weight: 400; margin-bottom: 8px; letter-spacing: 2px; color: var(--body-text); }
+  .sec-title span { color: var(--primary); }
+  .sec-sub { text-align: center; color: var(--muted); font-size: 15px; margin-bottom: 48px; }
+  .sec-no {
+    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 2px;
+    color: var(--primary); border: 1px solid var(--primary); border-radius: 2px;
+    padding: 3px 12px; margin-bottom: 14px; background: transparent; text-transform: uppercase;
+  }
+  .sec-head { text-align: center; margin-bottom: 48px; }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 28px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, .25), 0 0 0 1px rgba(90,184,255,.05);
+    backdrop-filter: blur(16px);
+    position: relative;
+  }
+  /* Windows 98 风格标题栏 */
+  .card::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 24px;
+    background: linear-gradient(90deg, rgba(90,184,255,.25), rgba(90,184,255,.05));
+    border-radius: 10px 10px 0 0;
+    border-bottom: 1px solid var(--card-border);
+  }
+  .card h3, .card .muted, .card .small, .card p, .card li { color: var(--body-text); }
+  .card .muted { color: var(--muted); }
+  .card h3.block-h { font-family: "Bebas Neue", sans-serif; font-size: 20px; color: var(--primary); letter-spacing: 1px; border-bottom: 1px solid var(--card-border); padding-bottom: 8px; margin-top: 8px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: start; }
+
+  h3.block-h { font-family: "Bebas Neue", sans-serif; font-size: 20px; margin-bottom: 14px; letter-spacing: 1px; color: var(--body-text); }
+  .muted { color: var(--muted); font-size: 14px; }
+  .small { font-size: 14px; color: var(--muted); }
+
+  .info-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info-item { background: rgba(79,195,247,.06); border-radius: 6px; padding: 12px 16px; font-size: 14px; border: 1px solid var(--card-border); color: var(--body-text); }
+  .info-item .k { color: var(--muted); margin-right: 8px; }
+  .info-item .v { font-weight: 700; color: var(--body-text); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip { font-size: 12px; font-weight: 500; padding: 4px 12px; border-radius: 20px; background: rgba(79,195,247,.08); border: 1px solid rgba(79,195,247,.25); color: #4fc3f7; }
+  .skill { margin-top: 18px; }
+  .skill .label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 6px; gap: 8px; color: var(--body-text); opacity: .85; }
+  .skill .track { height: 8px; border-radius: 4px; background: rgba(79,195,247,.08); overflow: hidden; }
+  .skill .fill { height: 100%; width: 0; border-radius: 4px; background: linear-gradient(90deg, #4fc3f7, #ff4fc3); transition: width 1.2s cubic-bezier(.22,.9,.35,1); }
+
+  /* ===== 阶段作业表 ===== */
+  .tbl-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--card-border); box-shadow: 0 4px 24px rgba(0,0,0,.12); background: var(--card-bg); }
+  table { width: 100%; border-collapse: collapse; min-width: 640px; }
+  th, td { padding: 12px 16px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--card-border); vertical-align: top; color: var(--body-text); }
+  th { background: rgba(79,195,247,.06); font-weight: 600; white-space: nowrap; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--primary); }
+  tr:last-child td { border-bottom: none; }
+  td a { color: var(--primary); font-weight: 500; text-decoration: none; }
+  td a:hover { text-decoration: underline; }
+  .todo-box {
+    border: 1px dashed var(--primary); background: rgba(79,195,247,.05); color: var(--primary);
+    border-radius: 8px; padding: 14px 18px; font-size: 14px; margin-top: 18px;
+  }
+
+  /* ===== 项目成果 ===== */
+  .works-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+  .work {
+    scroll-margin-top: 76px;   /* 锚点跳转时不被吸顶导航遮挡 */
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,.15);
+    transition: .25s ease; display: flex; flex-direction: column;
+    backdrop-filter: blur(16px);
+  }
+  .work:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 8px 32px rgba(0,0,0,.2); }
+  /* 漂流墙点击跳转后，目标卡片高亮闪一下 */
+  .work:target { animation: cardFlash 1.6s ease; }
+  @keyframes cardFlash {
+    0% { box-shadow: 0 0 0 2px var(--primary), 0 0 30px rgba(25,118,210,.6); }
+    60% { box-shadow: 0 0 0 1px var(--primary), 0 0 18px rgba(25,118,210,.3); }
+    100% { box-shadow: 0 4px 24px rgba(0,0,0,.15); }
+  }
+  .work .pic { overflow: hidden; height: 180px; position: relative; border-bottom: 1px solid var(--card-border); }
+  .work .pic img { width: 100%; height: 100%; object-fit: cover; transition: .5s; }
+  .work:hover .pic img { transform: scale(1.04); }
+  .work .body { padding: 20px; flex: 1; display: flex; flex-direction: column; color: var(--body-text); }
+  .work h3 { font-family: "Bebas Neue", sans-serif; font-size: 20px; letter-spacing: 1px; color: var(--primary); border-bottom: 1px solid var(--card-border); padding-bottom: 6px; margin-bottom: 8px; }
+  .feat-list { list-style: none; margin: 6px 0 12px; }
+  .feat-list li { font-size: 13.5px; color: var(--muted); padding-left: 14px; position: relative; margin: 2px 0; }
+  .feat-list li::before { content: "›"; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+  .kv { font-size: 12.5px; margin: 3px 0; color: var(--muted); }
+  .kv b { color: var(--body-text); font-weight: 600; }
+  .kv a { color: var(--primary); text-decoration: none; font-weight: 500; }
+  .kv a:hover { text-decoration: underline; }
+  .tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+  .tag { font-size: 11px; font-weight: 500; padding: 2px 8px; background: rgba(79,195,247,.08); color: var(--primary); border-radius: 2px; }
+  .work .link { margin-top: auto; color: var(--primary); text-decoration: none; font-weight: 500; font-size: 14px; }
+  .work .link:hover { text-decoration: underline; }
+
+  /* ===== 过程证据 ===== */
+  .ev-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+  .ev {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 24px; box-shadow: 0 4px 24px rgba(0,0,0,.15);
+    backdrop-filter: blur(16px);
+  }
+  .ev .ev-ic { font-size: 32px; }
+  .ev h4 { font-family: "Bebas Neue", sans-serif; font-size: 18px; margin: 8px 0 10px; letter-spacing: 1px; color: var(--primary); border-bottom: 1px solid var(--card-border); padding-bottom: 4px; }
+  .ev ul { list-style: none; }
+  .ev li { font-size: 13px; color: var(--body-text); padding-left: 14px; position: relative; margin: 4px 0; }
+  .ev li::before { content: "›"; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+
+  /* ===== 专题页 ===== */
+  .feature-hero {
+    overflow: hidden; height: 220px; margin-bottom: 28px; position: relative;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.25);
+    border: 1px solid rgba(79, 195, 247, .12);
+  }
+  .feature-hero img { width: 100%; height: 100%; object-fit: cover; }
+  .feature-hero .cap { position: absolute; inset: auto 0 0 0; padding: 30px 28px 20px; background: linear-gradient(transparent, rgba(10, 10, 20, .85)); color: #fff; }
+  .feature-hero .cap h3 { font-size: 26px; }
+  .f5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 22px; }
+  .f5 .card h4 { font-size: 16px; margin-bottom: 8px; color: var(--accent); }
+  .f5 li { font-size: 14px; color: var(--muted); list-style: none; padding-left: 18px; position: relative; margin: 6px 0; }
+  .f5 li::before { content: "▸"; position: absolute; left: 0; color: var(--primary); }
+
+  /* ===== 复盘 ===== */
+  .review-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap: 22px; }
+  .review-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 26px; box-shadow: var(--shadow); border-top: 4px solid var(--accent); }
+  .review-card:nth-child(2) { border-top-color: var(--primary); }
+  .review-card:nth-child(3) { border-top-color: #f5b94b; }
+  .review-card:nth-child(4) { border-top-color: #79c2a5; }
+  .review-card h4 { font-size: 17px; margin-bottom: 10px; }
+  .review-card li { font-size: 14px; color: var(--muted); list-style: none; padding-left: 18px; position: relative; margin: 6px 0; }
+  .review-card li::before { content: "•"; position: absolute; left: 4px; color: var(--accent); font-weight: 900; }
+
+  /* ===== 声明 ===== */
+  .declare { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 22px; padding: 28px; }
+  .declare .badge-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .badge { font-size: 13px; font-weight: 700; padding: 6px 16px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); color: #2e9e6b; }
+  .declare p { font-size: 14px; color: var(--muted); margin: 8px 0; }
+
+  /* ===== 兴趣爱好 ===== */
+  .hobbies { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 14px; margin-top: 30px; }
+  .hobby {
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px;
+    text-align: center; padding: 22px 10px; transition: .3s; box-shadow: var(--shadow);
+  }
+  .hobby:hover { transform: translateY(-6px); border-color: var(--accent); }
+  .hobby .emoji { font-size: 36px; }
+  .hobby .t { font-weight: 700; margin-top: 8px; font-size: 15px; color: #000; }
+
+  /* ===== 留言板 ===== */
+  .board { max-width: 640px; margin: 0 auto; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 28px; box-shadow: var(--shadow); }
+  .board-input { display: flex; gap: 12px; }
+  .board-input input {
+    flex: 1; padding: 13px 18px; border-radius: 999px; font-size: 15px; min-width: 0;
+    border: 2px solid var(--border); background: var(--bg-soft); color: var(--text); outline: none; transition: .3s;
+  }
+  .board-input input:focus { border-color: var(--accent); }
+  .board-input button { border: none; padding: 13px 26px; border-radius: 999px; background: var(--grad); color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; transition: .3s; white-space: nowrap; }
+  .board-input button:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(255,126,182,.4); }
+  #msgList { margin-top: 22px; display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; }
+  .msg { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--bg-soft); border-radius: 16px 16px 16px 4px; padding: 12px 16px; font-size: 14px; animation: pop .35s ease; }
+  @keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .msg .del { border: none; background: none; cursor: pointer; font-size: 15px; opacity: .4; transition: .2s; }
+  .msg .del:hover { opacity: 1; transform: scale(1.2); }
+  .empty-tip { text-align: center; color: var(--muted); font-size: 14px; padding: 16px 0; }
+
+  /* ===== 页脚 & 返回顶部 ===== */
+  footer { text-align: center; padding: 38px 24px 28px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--border); }
+  footer .heart { color: #ff7eb6; }
+  footer .ai-note { font-size: 12.5px; margin-top: 6px; }
+  #topBtn {
+    position: fixed; right: 26px; bottom: 26px; width: 46px; height: 46px; border-radius: 50%;
+    border: none; background: var(--grad); color: #fff; font-size: 20px; cursor: pointer;
+    opacity: 0; pointer-events: none; transition: .3s; box-shadow: 0 8px 20px rgba(166,107,255,.4); z-index: 99;
+  }
+  #topBtn.show { opacity: 1; pointer-events: auto; }
+  #topBtn:hover { transform: translateY(-5px); }
+
+  /* ===== 滚动浮现 ===== */
+  .reveal { opacity: 0; transform: translateY(30px); transition: .8s cubic-bezier(.22,.9,.35,1); }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ===== 3D 魔方导航 ===== */
+  .nav-tower {
+    perspective: 900px;
+    position: relative;
+    width: 160px; height: 160px;
+    cursor: grab;
+    user-select: none;
+  }
+  .nav-tower.dragging { cursor: grabbing; }
+  .tower-stage {
+    position: relative; width: 100%; height: 100%;
+    transform-style: preserve-3d;
+    transform: rotateY(-30deg) rotateX(20deg);
+  }
+  /* 6 面魔方：每面 3×3 网格背景 */
+  .tower-face {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px;
+    border: 2px solid #0a1530;
+    box-shadow: inset 0 0 30px rgba(0,0,0,.3);
+    backface-visibility: visible;
+    border-radius: 6px;
+    /* 3×3 网格：9 个小方块 */
+    background-image:
+      linear-gradient(#0a1530 2px, transparent 2px),
+      linear-gradient(90deg, #0a1530 2px, transparent 2px);
+    background-size: calc(100%/3 + 0.7px) calc(100%/3 + 0.7px);
+  }
+  /* 每面不同主色（魔方正对经典配色，融入主题） */
+  .tower-face.f1 { background-color: #0288d1; }  /* 蓝 正面 */
+  .tower-face.f2 { background-color: #e91e63; }  /* 品红 右面 */
+  .tower-face.f3 { background-color: #4fc3f7; }  /* 青 背面 */
+  .tower-face.f4 { background-color: #ff6b9d; }  /* 粉 左面 */
+  .tower-face.f5 { background-color: #ffffff; color: #0a1530 !important; } /* 白 顶面 */
+  .tower-face.f6 { background-color: #0f172a; }  /* 深蓝 底面 */
+  .tower-face a {
+    color: #fff; text-decoration: none; font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; transition: .15s;
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    text-shadow: 0 1px 2px rgba(0,0,0,.5);
+  }
+  .tower-face.f5 a { color: #0f172a; text-shadow: none; }
+  .tower-face a:hover { opacity: .8; transform: scale(1.05); }
+  .tower-face .theme-btn {
+    border: 1px solid #fff; background: rgba(255,255,255,.2); cursor: pointer;
+    width: 26px; height: 26px; border-radius: 50%; font-size: 13px;
+    transition: .2s; color: #fff;
+  }
+  .tower-face .theme-btn:hover { background: rgba(255,255,255,.4); }
+  .tower-face.f5 .theme-btn { border-color: #0f172a; color: #0f172a; background: rgba(15,23,42,.1); }
+  /* 六面位置（立方体半宽 = 80px） */
+  .tower-face.f1 { transform: translateZ(80px); }
+  .tower-face.f2 { transform: rotateY(90deg) translateZ(80px); }
+  .tower-face.f3 { transform: rotateY(180deg) translateZ(80px); }
+  .tower-face.f4 { transform: rotateY(-90deg) translateZ(80px); }
+  .tower-face.f5 { transform: rotateX(90deg) translateZ(80px); }
+  .tower-face.f6 { transform: rotateX(-90deg) translateZ(80px); }
+  /* 魔方无塔顶装饰 */
+  .tower-top { display: none; }
+
+  /* Hero h1 故障风（克制：只在名字上） */
+  .hero h1 .glitch { position: relative; display: inline-block; }
+  .hero h1 .glitch::before,
+  .hero h1 .glitch::after {
+    content: attr(data-text); position: absolute; inset: 0;
+    overflow: hidden; pointer-events: none;
+  }
+  .hero h1 .glitch::before {
+    left: 2px; color: #00f0ff;
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    animation: glitchShift 2.8s infinite linear alternate-reverse;
+  }
+  .hero h1 .glitch::after {
+    left: -2px; color: #ff4fc3;
+    clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+    animation: glitchShift 3.2s infinite linear alternate;
+  }
+  @keyframes glitchShift { 0%{transform:translateX(0)} 20%{transform:translateX(-2px)} 40%{transform:translateX(2px)} 60%{transform:translateX(-1px)} 80%{transform:translateX(1px)} 100%{transform:translateX(0)} }
+  .nav-fallback { display: none; gap: 14px; align-items: center; }
+  .nav-fallback a { color: var(--text); text-decoration: none; font-size: 13px; font-weight: 500; opacity: .8; }
+  .nav-fallback a:hover { opacity: 1; color: var(--primary); }
+
+  /* ===== 日光模式专用覆盖 ===== */
+  html[data-theme="light"] body::before {
+    background:
+      radial-gradient(ellipse 50% 40% at 20% 0%, rgba(2,136,209,.07), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 85% 10%, rgba(233,30,99,.04), transparent 55%),
+      #f5f7fa;
+  }
+  html[data-theme="light"] body::after { display: none; }
+  html[data-theme="light"] .tower-face a:hover { color: var(--primary); }
+  html[data-theme="light"] .hero h1 .name { text-shadow: 2px 2px 0 rgba(233,30,99,.35); }
+  html[data-theme="light"] .btn-main { background: var(--primary); color: #fff; }
+  html[data-theme="light"] .btn-main:hover { background: #0277bd; }
+  html[data-theme="light"] .btn-ghost { color: var(--primary); border-color: var(--primary); }
+  html[data-theme="light"] .feature-hero { box-shadow: 0 4px 16px rgba(15,23,42,.08); border-color: var(--card-border); }
+
+  @media (max-width: 900px) {
+    .nav-tower { display: none; }
+    .nav-fallback { display: flex; flex-wrap: wrap; justify-content: flex-end; }
+  }
+  @media (max-width: 760px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .avatar-ring img { width: 190px; height: 190px; }
+    .nav-fallback { gap: 8px; }
+    .hero h1 { letter-spacing: 0; }
+    .board-input { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= 导航（3D 旋转未来风建筑） ================= -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo">WYX // PORTFOLIO</div>
+    <!-- 3D 魔方：6 面导航 -->
+    <div class="nav-tower" id="navTower">
+      <div class="tower-stage" id="towerStage">
+        <div class="tower-face f1">
+          <a href="#about">ABOUT</a>
+          <a href="#coursework">WORK</a>
+        </div>
+        <div class="tower-face f2">
+          <a href="#works">PROJECTS</a>
+          <a href="#process">PROCESS</a>
+        </div>
+        <div class="tower-face f3">
+          <a href="#iterations">ITERATIONS</a>
+          <a href="#feature">FEATURE</a>
+        </div>
+        <div class="tower-face f4">
+          <a href="#review">REVIEW</a>
+          <a href="#guestbook">GUESTBOOK</a>
+        </div>
+        <div class="tower-face f5">
+          <button class="theme-btn" id="themeBtn2" title="切换日夜模式">◐</button>
+          <a href="#about">PORTFOLIO</a>
+        </div>
+        <div class="tower-face f6">
+          <a href="#works">PROJECTS</a>
+          <a href="#feature">FEATURE</a>
+        </div>
+      </div>
+    </div>
+    <!-- 窄屏降级 -->
+    <div class="nav-fallback">
+      <a href="#about">简介</a>
+      <a href="#coursework">作业</a>
+      <a href="#works">成果</a>
+      <a href="#feature">专题</a>
+      <a href="#review">复盘</a>
+      <a href="#guestbook">留言</a>
+      <button id="themeBtn" title="切换日夜模式">◐</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= 首屏 ================= -->
+<header class="hero" id="top">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <div class="hello">✨ 《数智编程技术基础及应用》课程作品集</div>
+      <h1>你好，我是 <span class="glitch name" data-text="wyx">wyx</span></h1>
+      <div class="type-line"><span id="typeText"></span><span class="cursor"></span></div>
+      <div class="btns">
+        <a class="btn btn-main" href="#about">了解我 ⬇</a>
+        <a class="btn btn-ghost" href="#works">看成果 👀</a>
+      </div>
+    </div>
+    <div class="avatar-wrap">
+      <div id="quoteBubble">你好呀，我是 wyx！</div>
+      <div class="avatar-ring" id="avatar" title="点我一下试试">
+        <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20chibi%20cyberpunk%20girl%20avatar%2C%20neon%20cyan%20and%20magenta%20highlights%2C%20glowing%20mechanical%20eye%20patch%2C%20short%20tousled%20dark%20hair%20with%20cyan%20streaks%2C%20techwear%20jacket%20with%20neon%20circuit%20patterns%2C%20holding%20a%20holographic%20laptop%2C%20glitch%20effect%20overlay%2C%20dark%20purple%20background%20with%20neon%20grid%2C%20flat%20cartoon%20style%2C%20vibrant%20cyberpunk%20colors&image_size=square_hd" alt="wyx 的赛博朋克形象（AI 生成）">
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= 01 个人简介与能力说明 ================= -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-no">01</span>
+      <h2 class="sec-title">个人简介与<span>能力说明</span></h2>
+      <p class="sec-sub">方向 · 工具 · 技能</p>
+    </div>
+    <div class="grid-2">
+      <div class="card reveal">
+        <h3 class="block-h">👋 关于我</h3>
+        <p class="muted small">我是 wyx，一名正在学习数智编程的学生。我喜欢把想法亲手做成可以玩、可以用的东西：从一行行代码写出消除小游戏，到做一个温柔的科普网页，再到搭建你正在看的这个作品集。</p>
+        <div class="info-list" style="margin-top:14px;">
+          <div class="info-item"><span class="k">🎈 昵称</span><span class="v">wyx</span></div>
+          <div class="info-item"><span class="k">🎒 身份</span><span class="v">学生</span></div>
+          <div class="info-item"><span class="k">🧭 方向</span><span class="v">游戏 / 网页 / 互动小工具</span></div>
+          <div class="info-item"><span class="k">🌟 座右铭</span><span class="v">把喜欢的事做到底</span></div>
+        </div>
+        <h3 class="block-h" style="margin-top:22px;">🧰 常用工具</h3>
+        <div class="chips">
+          <span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">JavaScript</span>
+          <span class="chip">Python（http.server）</span><span class="chip">localStorage</span>
+          <span class="chip">TRAE · AI 编程助手</span><span class="chip">Supabase 云数据库</span><span class="chip">响应式布局</span>
+        </div>
+      </div>
+      <div class="card reveal">
+        <h3 class="block-h">📊 技能掌握（自评）</h3>
+        <div class="skill"><div class="label"><span>🎮 游戏交互与逻辑设计</span><span>80%</span></div><div class="track"><div class="fill" data-w="80"></div></div></div>
+        <div class="skill"><div class="label"><span>💻 HTML / CSS 页面实现</span><span>78%</span></div><div class="track"><div class="fill" data-w="78"></div></div></div>
+        <div class="skill"><div class="label"><span>⚙️ JavaScript 交互逻辑</span><span>75%</span></div><div class="track"><div class="fill" data-w="75"></div></div></div>
+        <div class="skill"><div class="label"><span>☁️ 云端数据库与接口对接（Supabase）</span><span>68%</span></div><div class="track"><div class="fill" data-w="68"></div></div></div>
+        <div class="skill"><div class="label"><span>🐍 Python 基础与本地服务</span><span>65%</span></div><div class="track"><div class="fill" data-w="65"></div></div></div>
+        <div class="skill"><div class="label"><span>🔍 问题排查与调试</span><span>72%</span></div><div class="track"><div class="fill" data-w="72"></div></div></div>
+        <p class="muted small" style="margin-top:14px;">说明：百分比为本人学习阶段的主观自评，不是证书成绩。</p>
+      </div>
+    </div>
+
+    <h3 class="block-h reveal" style="text-align:center; margin-top:34px;">⭐ 课外也喜欢</h3>
+    <div class="hobbies">
+      <div class="hobby reveal"><div class="emoji">🎮</div><div class="t">玩游戏</div></div>
+      <div class="hobby reveal"><div class="emoji">✈️</div><div class="t">旅游</div></div>
+      <div class="hobby reveal"><div class="emoji">⭐</div><div class="t">追星</div></div>
+      <div class="hobby reveal"><div class="emoji">🧩</div><div class="t">Puzzle</div></div>
+      <div class="hobby reveal"><div class="emoji">🎬</div><div class="t">观影</div></div>
+      <div class="hobby reveal"><div class="emoji">💻</div><div class="t">敲代码</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 阶段作业 ================= -->
+<section class="section" id="coursework" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-no">02</span>
+      <h2 class="sec-title">阶段<span>作业</span></h2>
+      <p class="sec-sub">按课程学习顺序展示，每一项都附可打开的成果，而不只是截图</p>
+    </div>
+    <div class="tbl-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>顺序</th><th>作业 / 阶段</th><th>对应成果（可点击）</th><th>状态</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>①</td>
+            <td>小游戏开发作业</td>
+            <td><a href="https://77767.mindock.ai/SQFEmk" target="_blank" rel="noopener">🎮 梦梦消消乐（在线试玩）</a></td>
+            <td>✅ 已完成并持续迭代</td>
+          </tr>
+          <tr>
+            <td>②</td>
+            <td>内容型互动网页作业</td>
+            <td><a href="性向测试小屋/index.html" target="_blank">🌈 心光谱 · 性向测试小屋</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>③</td>
+            <td>实用工具型网页作业</td>
+            <td><a href="运动技能自学/index.html" target="_blank">🏃 跃动 · 运动技能自学计划</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>④</td>
+            <td>期末作品集（本站）</td>
+            <td><a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">🌸 wyx 个人作品集</a></td>
+            <td>🔄 持续迭代中</td>
+          </tr>
+          <tr>
+            <td>⑥</td>
+            <td>【其他阶段作业】</td>
+            <td class="muted">待按课程顺序补充链接</td>
+            <td>⏳ 待补充</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="todo-box reveal">
+      📌 <b>我还需要补的内容：</b>把表里【】标注处替换成老师实际布置的作业名称、周次和顺序；每次作业完成后立刻在本表加一行并挂可打开的链接（持续迭代，不期末突击）。
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 项目成果 ================= -->
+<section class="section" id="works" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-no">03</span>
+      <h2 class="sec-title">项目<span>成果</span></h2>
+      <p class="sec-sub">功能 · 入口 · 关键页 · 技术说明（三件作品完全对应）</p>
+    </div>
+
+    <!-- ===== 作品漂流墙：进入板块先浏览三件作品（悬停抬升 / 点击进入项目） ===== -->
+    <div class="reveal" id="driftWall" style="margin-bottom:36px;border-radius:14px;overflow:hidden;"></div>
+
+    <div class="works-grid">
+      <!-- 项目 1：梦梦消消乐 -->
+      <div class="work reveal" id="work-card-game">
+        <div class="pic"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cute%20match-3%20puzzle%20mobile%20game%20cover%20art%2C%20colorful%20cartoon%20pet%20animals%20cat%20puppy%20panda%20bunny%20on%20candy%20tiles%20grid%2C%20bright%20kawaii%20style%2C%20vibrant%20cheerful%20colors%2C%20high%20quality%20game%20illustration&image_size=landscape_16_9" alt="梦梦消消乐封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>🎮 梦梦消消乐</h3>
+          <ul class="feat-list">
+            <li>7×7 棋盘、7 种宠物图案，交换消除三连</li>
+            <li>账号注册/登录（密码以对象数组存储），进度存 localStorage</li>
+            <li>关卡步数限制（1–3关22步 / 4–6关24步 / 7关起26步）</li>
+            <li>💡提示（每关3次）、🔀洗牌、步数用尽的萌宠安慰页</li>
+            <li>☁️ 云端排行榜：接入 Supabase 云数据库，不同网络、不同设备的玩家共享同一张榜</li>
+            <li>云端数据库函数自动收分（同名玩家合并保留最高分）；三级降级：云端 → Python 本地接口 → 本机缓存，断网照常玩</li>
+            <li>手机触摸适配 + BGM 音效，移动端可玩</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="https://77767.mindock.ai/SQFEmk" target="_blank" rel="noopener">在线试玩 →</a></p>
+          <p class="kv"><b>🧩 关键页：</b>登录页 → 7×7 游戏页 → 步数用尽安慰页 → ☁️云端排行榜</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript、Supabase（PostgreSQL 云数据库 + REST/RPC 数据库函数）、Python http.server 备用接口、localStorage</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">游戏开发</span><span class="tag">Supabase 云数据库</span><span class="tag">移动端适配</span></div>
+          <a class="link" href="#feature-game">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 2：心光谱小屋（与项目1完全对应） -->
+      <div class="work reveal" id="work-card-hut">
+        <div class="pic"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=warm%20cozy%20psychological%20counseling%20room%20with%20soft%20pastel%20lights%2C%20rainbow%20spectrum%20heart%20and%20compass%2C%20cute%20flat%20illustration%2C%20peach%20rose%20lavender%20cream%20colors%2C%20gentle%20kawaii%20style&image_size=landscape_16_9" alt="心光谱小屋封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>🌈 心光谱 · 性向温柔测试与科普小屋</h3>
+          <ul class="feat-list">
+            <li>24 道温柔小题，做完生成六维光谱结果与朋友式解读</li>
+            <li>30 种取向全图鉴，结果类型丰富</li>
+            <li>科普专区：连续光谱、浪漫取向、易混概念辨析</li>
+            <li>四种科学测量模型介绍、FAQ 问答、去病理化小史</li>
+            <li>求助资源与温柔书影推荐，单文件零依赖，打开即用</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="性向测试小屋/index.html" target="_blank">进入小屋 →</a>（本站内页面）</p>
+          <p class="kv"><b>🧩 关键页：</b>开场页 → 24 题测试页 → 六维结果页 → 科普专区</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript 单文件（约 72 KB），无外部依赖</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">互动测评</span><span class="tag">科普内容</span><span class="tag">单页应用</span></div>
+          <a class="link" href="#feature-hut">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 3：跃动·运动技能自学（与前两张完全对应） -->
+      <div class="work reveal" id="work-card-sport">
+        <div class="pic"><img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=energetic%20mobile%20fitness%20app%20cover%20art%2C%20cute%20flat%20illustration%20of%20running%20swimming%20badminton%20basketball%20yoga%20icons%2C%20orange%20sunrise%20gradient%20sky%2C%20sporty%20kawaii%20style%2C%20warm%20vibrant%20colors&image_size=landscape_16_9" alt="跃动运动技能自学封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>🏃 跃动 · 运动技能自学计划</h3>
+          <ul class="feat-list">
+            <li>内置 16 种运动项目库：跑步、游泳（4 种泳姿）、羽毛球、篮球、瑜伽、力量、骑行、足球、跳绳、拉伸、乒乓、网球、排球、舞蹈、攀岩</li>
+            <li>自选天数与每日时长，一键智能生成“热身→主训练→体能→拉伸”三阶段计划</li>
+            <li>每个动作都配时长和动作要点，主训练动作可一键搜教学视频</li>
+            <li>环形计时器跟练：播放/暂停、上一个/下一个、动作自动连播与进度点</li>
+            <li>每日打卡 + 连续天数 + 进度环 + 三阶段结业里程碑，完成有撒花鼓励</li>
+            <li>计划存 localStorage 离线可用，480px 手机端优先、安全区适配</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="运动技能自学/index.html" target="_blank">进入应用 →</a>（本站内页面）</p>
+          <p class="kv"><b>🧩 关键页：</b>首页/定制计划 → 日历打卡与计划总览表 → 环形计时器跟练 → 进度与里程碑</p>
+          <p class="kv"><b>🛠 技术：</b>原生 HTML/CSS/JavaScript 单文件（约 72 KB）、localStorage、SVG 环形计时器、移动端安全区适配</p>
+          <div class="tags"><span class="tag">JavaScript</span><span class="tag">计划生成算法</span><span class="tag">计时器</span><span class="tag">移动端</span></div>
+          <a class="link" href="#feature-sport">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 过程证据 ================= -->
+<section class="section" id="process" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-no">04</span>
+      <h2 class="sec-title">过程<span>证据</span></h2>
+      <p class="sec-sub">需求 · 原型 · 与 AI 交互关键步骤 · 版本 · 问题解决</p>
+    </div>
+    <div class="ev-grid">
+      <div class="ev reveal">
+        <div class="ev-ic">📝</div>
+        <h4>需求（真实约束）</h4>
+        <ul>
+          <li>玩家数据必须是 <code>[{name, pwd}]</code> 对象数组，不能是字符串数组</li>
+          <li>新账号必须先设密码才能登录</li>
+          <li>步数用尽不能自动重开，要显示萌宠安慰页（5个头像+随机鼓励语）</li>
+          <li>排行榜显示全部玩家分数，不截断成前10名</li>
+          <li>图案资源统一放“图案”文件夹，标题/欢迎语统一显示“梦梦消消乐”</li>
+        </ul>
+      </div>
+      <div class="ev reveal">
+        <div class="ev-ic">✏️</div>
+        <h4>原型</h4>
+        <ul>
+          <li>游戏布局一开始就定为 7×7，与 7 种宠物一一对应</li>
+          <li>卡片尺寸在原型基础上放大 14%，用 object-fit 防裁剪</li>
+          <li>作品集先用板块草图确认顺序：简介→作业→项目→证据→迭代→专题→复盘</li>
+        </ul>
+        <div class="todo-box" style="margin-top:10px;">📌 待补：手绘草图 / 线框图照片（后续贴入此处）</div>
+      </div>
+      <div class="ev reveal">
+        <div class="ev-ic">💬</div>
+        <h4>与 AI 交互的关键步骤</h4>
+        <ul>
+          <li><b>① 提需求：</b>说清要做什么（如“做一个有自我介绍和成果展示的个人网站”）</li>
+          <li><b>② 定细节：</b>确认形象风格、显示名称等关键选项后再动手</li>
+          <li><b>③ 看结果验收：</b>浏览器实际打开检查，不对的地方明确指出修改</li>
+          <li><b>④ 纠错澄清：</b>发现理解偏差立即纠正，确保做出来的就是自己真正想要的</li>
+          <li><b>⑤ 迭代收口：</b>一轮轮精简/增删，最终内容由本人拍板</li>
+        </ul>
+      </div>
+      <div class="ev reveal">
+        <div class="ev-ic">🏷️</div>
+        <h4>版本（作品集网站）</h4>
+        <ul>
+          <li><b>v1.0 · 2026-09-10</b>：初版上线（简介+成果+爱好+留言+深色模式）</li>
+          <li><b>v1.1 · 2026-09-10</b>：按本人反馈精简文案、身份改“学生”、作品链接更换</li>
+          <li><b>v1.2 · 2026-09-13</b>：接入“心光谱”小屋项目</li>
+          <li><b>v1.3 · 2026-09-14</b>：按课程考核标准重构为作品集结构</li>
+          <li><b>v1.4 · 2026-09-14</b>：小屋改为与游戏并列的完整项目卡片，专题页精简</li>
+          <li><b>v1.5 · 2026-09-14</b>：为小屋新增与游戏同构的专题复盘（问题/用户/方案/复盘）</li>
+          <li><b>v1.6 · 2026-09-14</b>：第三个项目《跃动·运动技能自学计划》接入，卡片、专题与前两件完全对应</li>
+          <li><b>v1.7 · 2026-09-18</b>：消消乐排行榜升级——接入 Supabase 云端 PostgreSQL，跨网络共享并三级降级</li>
+        </ul>
+      </div>
+      <div class="ev reveal" style="grid-column: 1 / -1;">
+        <div class="ev-ic">🔧</div>
+        <h4>问题解决（真实踩坑与处理）</h4>
+        <ul>
+          <li><b>移动端点不动：</b>手机浏览器对 pointerdown 触发不稳定 → 改用 touchstart 事件监听解决。</li>
+          <li><b>音效不响：</b>浏览器禁止自动播放音频 → 放进触摸事件的同步调用栈里播放并 resume AudioContext。</li>
+          <li><b>无效交换不扣步：</b>发现规则漏洞后修正为——只要进行了交换，无论是否消成都消耗 1 步。</li>
+          <li><b>服务器常掉线：</b>Python HTTP 服务在电脑睡眠/清理后会退出 → 固定用“启动游戏.bat”一键重启。</li>
+          <li><b>公网分享失败：</b>尝试过 serveo 等 SSH 隧道，断连频繁 → 退回局域网 IP 方案，保证同班同学能稳定访问。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 迭代记录 ================= -->
+<section class="section" id="iterations" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-no">05</span>
+      <h2 class="sec-title">迭代<span>记录</span></h2>
+      <p class="sec-sub">改了什么 · 为什么 · 效果 · 下一步</p>
+    </div>
+    <div class="tbl-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>日期</th><th>改了什么</th><th>为什么</th><th>效果</th><th>下一步</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>09-10<br>v1.0</td>
+            <td>从零搭建作品集网站首版</td>
+            <td>需要一个展示自己与作品的主页</td>
+            <td>简介、成果、留言板、深色模式全部可用</td>
+            <td>用真实反馈检验文案与信息密度</td>
+          </tr>
+          <tr>
+            <td>09-10<br>v1.1</td>
+            <td>删两段自我介绍；身份“学生·独立开发者”→“学生”；只留一个作品卡；换外链</td>
+            <td>希望页面更简洁，身份与实际一致，链接要能打开</td>
+            <td>首屏更清爽，信息全部属实</td>
+            <td>等有新项目再增补卡片</td>
+          </tr>
+          <tr>
+            <td>09-13<br>v1.2</td>
+            <td>新增“心光谱·性向测试小屋”项目入口</td>
+            <td>第二个真实项目需要有入口</td>
+            <td>两个项目均可点击使用</td>
+            <td>为项目补功能说明与技术说明</td>
+          </tr>
+          <tr>
+            <td>09-14<br>v1.3</td>
+            <td>按课程考核标准重构：新增阶段作业、过程证据、迭代记录、专题页、复盘、真实性声明</td>
+            <td>对照“内容与合格标准”自查，缺过程性内容</td>
+            <td>7 项必备内容齐全；外链有效；无敏感信息</td>
+            <td>补手绘原型/截图与各作业真实周次</td>
+          </tr>
+          <tr>
+            <td>09-14<br>v1.4</td>
+            <td>小屋改为与梦梦消消乐并列的完整项目卡片；AI 交互只留关键步骤；删掉专题页演示入口；恢复考核板块</td>
+            <td>两件作品展示规格要对应；过程证据要精炼；发现考核板块缺失需补回</td>
+            <td>两卡片完全同构并排；考核 7 项内容齐全</td>
+            <td>补真实截图、作业周次与长期托管网址</td>
+          </tr>
+          <tr>
+            <td>09-14<br>v1.5</td>
+            <td>为心光谱小屋新增与梦梦消消乐同构的专题复盘（横幅+问题/用户/方案/复盘）；两张项目卡底部链接统一指向各自专题</td>
+            <td>两件作品的展示深度要完全对应，不能厚此薄彼</td>
+            <td>两件作品在同一板块内各有一套完整专题</td>
+            <td>补真实截图与作业周次</td>
+          </tr>
+          <tr>
+            <td>09-14<br>v1.6</td>
+            <td>接入第三个项目《跃动·运动技能自学计划》：新增同构项目卡与专题复盘，阶段作业表增加对应行</td>
+            <td>三件作品的展示规格要完全对应，项目数量增加后仍保持统一结构</td>
+            <td>三件作品卡片/专题一一对齐，入口全部可打开</td>
+            <td>补真实截图与作业周次</td>
+          </tr>
+          <tr>
+            <td>09-18<br>v1.7</td>
+            <td>消消乐排行榜从本地 Python 接口升级为 Supabase 云端 PostgreSQL：REST/RPC 收分、同名合并最高分、云端→本地→缓存三级降级；作品集卡片与专题同步更新</td>
+            <td>本地服务器只在局域网共享且易掉线，外网好友无法同榜</td>
+            <td>任何网络的设备共享同一云端排行榜，断网时游戏和本地榜仍可用</td>
+            <td>实测云端连通与降级表现；后续可加战绩详情与历史曲线</td>
+          </tr>
+          <tr>
+            <td colspan="5" class="muted small">游戏本体的迭代（步数用尽改安慰页、移动端触摸适配、云端排行榜升级等）见上方三件作品的专题复盘卡片。</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 06 标志性成果专题页 ================= -->
+<section class="section" id="feature" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-no">06</span>
+      <h2 class="sec-title">标志性成果<span>专题</span></h2>
+      <p class="sec-sub">三件作品：问题 · 用户 · 方案 · 复盘</p>
+    </div>
+    <div class="feature-hero reveal" id="feature-game">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=adorable%20kawaii%20match-3%20game%20screenshot%20style%20illustration%2C%207%20by%207%20grid%20of%20cute%20animal%20faces%2C%20pink%20purple%20candy%20UI%2C%20sparkles%2C%20mobile%20game%20art&image_size=landscape_16_9" alt="梦梦消消乐专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>🎮 梦梦消消乐</h3>
+        <p>一个有账号、有关卡、有排行榜、在手机上也能玩的消除小游戏</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>初学者练手多是“看完就扔”的小 demo，我想做一个<b style="color:var(--text)">功能完整、真的有人玩</b>的作品</li>
+          <li>步数用尽直接弹“失败+自动重开”，体验很挫败</li>
+          <li>想和同学比分数，但各玩各的没有共同排行榜</li>
+          <li>早期本地服务器榜只在同一局域网共享，换网络/关机就断，朋友在外网看不到分数</li>
+          <li>同学多用手机访问，电脑页面在手机上点不准、没声音</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>我自己（验证想法、日常试玩）</li>
+          <li>同班同学 / 朋友：手机浏览器随时打开，跨网络也能上同一张排行榜</li>
+          <li>任何网络环境下的设备：家里、教室、用流量都能看到同一份云端榜单</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>7×7 棋盘 + 7 种宠物，配置集中在 TYPES 数组，图案数量用 TYPES.length 动态读取</li>
+          <li>账号密码 + localStorage 存档，进度跨刷新保留</li>
+          <li>分档步数上限 + 提示/洗牌道具，控制难度曲线</li>
+          <li>步数用尽改为<b style="color:var(--text)">萌宠安慰页</b>（再来一次 / 登出换号），任何时候“重开”都可用</li>
+          <li><b style="color:var(--text)">Supabase 云端排行榜：</b>云数据库建 ranks 表，前端经 REST/RPC 调用数据库函数 submit_score 收分（同名玩家自动合并、保留最高分），任何网络的设备共享同一榜</li>
+          <li><b style="color:var(--text)">三级降级容错：</b>云端 → Python 本地 /api/ranks → localStorage 缓存逐级回退，页面显示实时同步状态；云连不上也不影响游戏</li>
+          <li>安全上只用可公开的 publishable 客户端密钥，写操作只能走数据库函数，service_role 主密钥不下发前端</li>
+          <li>touchstart 事件 + 同步调用栈播放音效，解决移动端问题</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>先定硬约束再写代码（数据格式、步数规则、命名统一），后期少返工</li>
+          <li><b style="color:var(--text)">踩坑的：</b>无效交换不扣步的漏洞、手机端事件差异、本地服务器/隧道易掉线</li>
+          <li><b style="color:var(--text)">升级：</b>把排行榜从本地服务器迁到 Supabase 云数据库，第一次实践“前端直连云库 + RPC 函数 + 多级降级”</li>
+          <li><b style="color:var(--text)">学到的：</b>真机测试不能省；“失败体验”也要设计；云服务要分清可公开密钥与主密钥；任何网络能力都要想好断了怎么办</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 标志成果 2：心光谱小屋（与上一专题结构完全对应） -->
+    <div class="feature-hero reveal" id="feature-hut" style="margin-top:56px;">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cozy%20little%20cottage%20room%20at%20night%20with%20warm%20lamp%20light%2C%20rainbow%20spectrum%20shining%20through%20window%2C%20soft%20bookshelves%20and%20tea%20cup%2C%20cute%20flat%20illustration%2C%20peach%20rose%20lavender%20cream%20colors%2C%20gentle%20kawaii%20style&image_size=landscape_16_9" alt="心光谱小屋专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>🌈 心光谱 · 性向温柔测试与科普小屋</h3>
+        <p>一个不贴标签、温柔讲科学的互动测评与科普网页</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>网上很多同类测试娱乐化、随便给人贴一个单一标签，甚至把取向“病理化”</li>
+          <li>想自我了解的同学，缺少温柔、讲科学、中文且无评判的入口</li>
+          <li>多数测试只给一个结果词，没有解释，更没有后续的科普和求助渠道</li>
+          <li>话题敏感，使用者会担心隐私：做过的题不能被别人看到或上传</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>想认真了解自己的青少年与同班同学</li>
+          <li>对多元性别 / 光谱概念好奇、想找靠谱科普的读者</li>
+          <li>正在自我认同中、需要温柔陪伴与求助资源的人</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>24 道单选题，从性吸引、浪漫渴望、情感联结、性别在心动中的分量、吸引流动性等<b style="color:var(--text)">六个维度</b>勾勒光谱，而非给单一标签</li>
+          <li>结果页输出六维光谱 + 朋友式温柔解读，不评判、不定性</li>
+          <li>30 种取向全图鉴；科普专区讲连续光谱、四种科学测量模型、易混概念与去病理化小史</li>
+          <li>FAQ 折叠问答 + 求助资源（含 24 小时危机干预热线 400-161-9995）</li>
+          <li>约 72 KB 单文件、零外部依赖，<b style="color:var(--text)">纯前端运行、不收集任何数据</b>，离线也能打开</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>把“温柔、不贴标签”定为设计原则，贯穿题目、结果和科普全部文案</li>
+          <li><b style="color:var(--text)">做对的：</b>不只做测试，还配科普与求助渠道，让作品有完整的价值闭环</li>
+          <li><b style="color:var(--text)">学到的：</b>敏感话题的措辞要反复斟酌，科学内容要先查证再落笔</li>
+          <li><b style="color:var(--text)">学到的：</b>“纯本地、不收集数据”本身就是安全感设计，单文件零依赖让任何人都能放心打开</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 标志成果 3：跃动·运动技能自学（与前两个专题结构完全对应） -->
+    <div class="feature-hero reveal" id="feature-sport" style="margin-top:56px;">
+      <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sunrise%20running%20track%20with%20cute%20flat%20illustration%20athlete%20silhouette%2C%20stopwatch%20and%20training%20plan%20calendar%20floating%2C%20orange%20yellow%20teal%20energetic%20colors%2C%20sporty%20kawaii%20style%2C%20soft%20shapes&image_size=landscape_16_9" alt="跃动运动技能自学专题横幅（AI 生成示意图）">
+      <div class="cap">
+        <h3>🏃 跃动 · 运动技能自学计划</h3>
+        <p>选一项运动，自动生成带计时跟练和打卡的从零自学计划</p>
+      </div>
+    </div>
+    <div class="f5">
+      <div class="card reveal">
+        <h4>❗ 问题</h4>
+        <ul>
+          <li>网上运动教程零散，初学者不知道从哪开始、按什么顺序练、每次练多久</li>
+          <li>通用健身 App 给的是通用计划，不是“从零学会某一项运动”的专项路径</li>
+          <li>自学容易跳过热身和拉伸导致受伤；没有阶段目标，练了也说不清进步在哪</li>
+          <li>跟视频练要反复暂停看时间，手机上缺一个能边练边计时的小工具</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>👥 用户</h4>
+        <ul>
+          <li>想利用课余碎片时间自学一项运动的同学（以手机使用为主）</li>
+          <li>没有教练、不去健身房，打算跟着手机从零练的初学者</li>
+          <li>我自己：需要计划、计时和打卡反馈才能坚持下来</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>💡 方案</h4>
+        <ul>
+          <li>内置 <b style="color:var(--text)">16 个项目的动作数据库</b>：每项 3 个阶段、基础+进阶各 5 个动作（含时长与要点），游泳再细分 4 种泳姿</li>
+          <li>输入总天数和每日时长，算法按 <b style="color:var(--text)">热身 15% / 主训练 60% / 体能 15% / 拉伸 10%</b> 自动排课，阶段内由基础到进阶渐进</li>
+          <li>SVG 环形计时器跟练：动作自动连播、上一个/下一个、进度点；主训练动作可一键搜索教学视频</li>
+          <li>每日打卡、连续天数、进度环和三阶段结业里程碑（如“连续慢跑 30 分钟”“连续蛙泳 100 米”）</li>
+          <li>完成打卡撒花 + 随机鼓励语；localStorage 离线保存；480px 手机优先并适配刘海屏安全区</li>
+        </ul>
+      </div>
+      <div class="card reveal">
+        <h4>🪞 复盘</h4>
+        <ul>
+          <li><b style="color:var(--text)">做对的：</b>把“学什么（动作要点）”和“怎么练（计时+打卡）”合成一个闭环，不用在多个 App 间切换</li>
+          <li><b style="color:var(--text)">做对的：</b>计划不是随机凑动作，而是有训练比例分配和基础→进阶的进阶曲线</li>
+          <li><b style="color:var(--text)">学到的：</b>数据结构先行——16 个项目共用一套数据格式，游泳用子类型扩展，以后加新项目只需填数据</li>
+          <li><b style="color:var(--text)">下一步：</b>给动作配示意图、支持训练记录导出、在计划中安排主动恢复日</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 最终学习复盘 ================= -->
+<section class="section" id="review" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-no">07</span>
+      <h2 class="sec-title">最终学习<span>复盘</span></h2>
+      <p class="sec-sub">能力变化 · 方法 · 失败 · 计划</p>
+    </div>
+    <div class="review-grid">
+      <div class="review-card reveal">
+        <h4>📈 能力变化</h4>
+        <ul>
+          <li>从只能照着例子改，到能把“我想要一个游戏/一个测试页”拆成功能点并做出来</li>
+          <li>会用事件、localStorage、简单后端接口完成完整交互闭环</li>
+          <li>开始有“用户体验”意识：失败也要安慰、手机也要能玩</li>
+        </ul>
+      </div>
+      <div class="review-card reveal">
+        <h4>🧭 方法</h4>
+        <ul>
+          <li>小步迭代：先做能跑的最小版本，再按反馈一轮轮改</li>
+          <li>把需求写成“硬约束”清单，避免边写边忘</li>
+          <li>真机/真浏览器验证，不靠想象判断“应该能用”</li>
+          <li>把踩过的坑记下来（如移动端事件差异），下次直接绕开</li>
+        </ul>
+      </div>
+      <div class="review-card reveal">
+        <h4>💥 失败与教训</h4>
+        <ul>
+          <li>公网隧道方案在当前网络下频繁断连，前期投入浪费——选技术方案要先验证环境</li>
+          <li>一次需求没说清楚，接入了不是自己想要的文件，发现后当天删除并换成正确的项目——沟通有歧义要当场澄清</li>
+          <li>只在电脑上测试，导致手机端点击/音频问题很晚才暴露</li>
+        </ul>
+      </div>
+      <div class="review-card reveal">
+        <h4>🚀 下一步计划</h4>
+        <ul>
+          <li>补齐阶段作业表与真实截图、手绘原型证据</li>
+          <li>给作品集找一个长期可访问的托管地址（目前本地/临时链接不够稳定）</li>
+          <li>继续学习响应式布局与一个前端框架，减少纯手写重复代码</li>
+          <li>再做 1 个新项目，保持持续迭代而不是期末突击</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 真实性与安全声明 ================= -->
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="declare reveal">
+      <div class="badge-row">
+        <span class="badge">① 可访问：导航清晰 / 桌面与移动端适配</span>
+        <span class="badge">② 有入口：所有项目链接真实有效</span>
+        <span class="badge">③ 真实：如实说明 AI 协作</span>
+        <span class="badge">④ 安全：无密钥 / 密码 / 隐私泄露</span>
+      </div>
+      <p><b>真实性声明：</b>本作品集所展示的《梦梦消消乐》《心光谱 · 性向温柔测试与科普小屋》《跃动 · 运动技能自学计划》及本网站，均为本人在课程期间真实提出需求、参与设计决策并验收完成的项目。开发过程中使用了 TRAE AI 编程助手辅助生成与调试代码、整理资料；卡通头像与封面示意图由 AI 文生图生成（图中已标注），文案取舍、功能定义与最终判断均由本人完成；未使用付费模板，未把他人作品冒充为自己的成果。</p>
+      <p><b>安全声明：</b>本网站为纯静态页面，不包含服务器密码、数据库主密钥（service_role）或他人隐私信息；游戏排行榜使用 Supabase 提供的<b>可公开 publishable 客户端密钥</b>（该密钥设计上可暴露在前端），写入只能通过数据库函数完成，数据库主密钥仅保存在云服务端、从不下发；游戏账号数据保存在玩家自己浏览器的 localStorage 中。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 留言板 ================= -->
+<section class="section" id="guestbook" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-head reveal">
+      <h2 class="sec-title">留言<span>板</span></h2>
+      <p class="sec-sub">老师/同学如果有建议，欢迎留在这里 💜（仅保存在本机浏览器）</p>
+    </div>
+    <div class="board reveal">
+      <div class="board-input">
+        <input id="msgInput" type="text" maxlength="60" placeholder="留下你的建议吧～（最多60字）" onkeydown="if(event.key==='Enter')addMsg()">
+        <button onclick="addMsg()">发送 💌</button>
+      </div>
+      <div id="msgList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 页脚 ================= -->
+<footer>
+  <p>© 2026 wyx · 《数智编程技术基础及应用》课程作品集 · 用 <span class="heart">❤</span> 持续迭代中</p>
+  <p class="ai-note">卡通形象与封面示意图由 AI 生成，代码在 AI 助手辅助下由本人验收完成</p>
+</footer>
+
+<button id="topBtn" title="回到顶部">🚀</button>
+
+<script>
+/* ===== 日夜模式（两个按钮都能触发） ===== */
+const themeBtns = document.querySelectorAll('#themeBtn, #themeBtn2');
+const savedTheme = localStorage.getItem('wyx-theme');
+if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+themeBtns.forEach(b => b.addEventListener('click', () => {
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('wyx-theme', html.dataset.theme);
+  updateThemeIcon();
+}));
+function updateThemeIcon() {
+  const isDark = document.documentElement.dataset.theme !== 'light';
+  themeBtns.forEach(b => { b.textContent = isDark ? '☼' : '◐'; b.title = isDark ? '切换到亮色' : '切换到赛博朋克'; });
+}
+updateThemeIcon();
+
+/* ===== 3D 方塔旋转（JS 完全接管：默认慢速自转 + pointer 拖拽） ===== */
+(function(){
+  const tower = document.getElementById('navTower');
+  const stage = document.getElementById('towerStage');
+  if (!tower || !stage) return;
+
+  let rotY = -30, rotX = 20;       // 当前角度（与 CSS 初始值一致）
+  let dragging = false;            // 是否拖拽中
+  let autoSpin = true;             // 是否自动旋转
+  let lastX = 0, lastY = 0;        // 上一次 pointer 位置
+  let draggingDist = 0;           // 拖拽距离（区分拖拽 vs 点击）
+  const AUTO_SPEED = 0.15;         // 度/帧
+
+  function applyTransform() {
+    stage.style.transform = `rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+  }
+
+  // 用 requestAnimationFrame 做默认慢速自转
+  function tick() {
+    if (autoSpin && !dragging) {
+      rotY += AUTO_SPEED;
+      if (rotY > 3600000) rotY -= 360; // 防止溢出
+      applyTransform();
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  const startDrag = e => {
+    // 点击链接/按钮时不触发拖拽，让它们正常跳转
+    if (e.target.closest('a') || e.target.closest('button')) return;
+    dragging = true;
+    draggingDist = 0;
+    autoSpin = false; // 拖拽时暂停自转
+    tower.classList.add('dragging');
+    const p = e.touches ? e.touches[0] : e;
+    lastX = p.clientX; lastY = p.clientY;
+  };
+  const moveDrag = e => {
+    if (!dragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    const dx = p.clientX - lastX;
+    const dy = p.clientY - lastY;
+    draggingDist += Math.abs(dx) + Math.abs(dy);
+    rotY += dx * 0.6;
+    rotX = Math.max(-20, Math.min(30, rotX - dy * 0.35));
+    applyTransform();
+    lastX = p.clientX; lastY = p.clientY;
+    e.preventDefault && e.preventDefault();
+  };
+  const endDrag = () => {
+    if (!dragging) return;
+    dragging = false;
+    tower.classList.remove('dragging');
+    // 短拖拽 (<6px) 判定为点击，恢复自转
+    if (draggingDist < 8) {
+      autoSpin = true;
+    } else {
+      // 拖拽较明显：延迟 3s 后恢复自转，让用户停留在感兴趣的角度
+      setTimeout(() => { if (!dragging) autoSpin = true; }, 3000);
+    }
+  };
+
+  tower.addEventListener('pointerdown', startDrag);
+  window.addEventListener('pointermove', moveDrag);
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
+
+  // hover 提示
+  tower.addEventListener('pointerenter', () => {
+    if (!dragging) {
+      // 可以考虑在塔上显示"拖动旋转"提示
+    }
+  });
+})();
+
+/* ===== 打字机效果 ===== */
+const roles = ['小游戏开发者 🎮', '互动网页制作者 🌈', '持续迭代的学习者 📈'];
+const typeText = document.getElementById('typeText');
+let rIdx = 0, cIdx = 0, deleting = false;
+(function type() {
+  const word = roles[rIdx];
+  typeText.textContent = word.slice(0, cIdx);
+  let delay = deleting ? 60 : 160;
+  if (!deleting && cIdx === word.length) { delay = 1400; deleting = true; }
+  else if (deleting && cIdx === 0) { deleting = false; rIdx = (rIdx + 1) % roles.length; delay = 400; }
+  else cIdx += deleting ? -1 : 1;
+  setTimeout(type, delay);
+})();
+
+/* ===== 卡通形象点击彩蛋 ===== */
+const quotes = [
+  '你好呀，我是 wyx！很高兴认识你～',
+  '嘿嘿，被你发现了～',
+  '今天也要元气满满哦！',
+  '往下滑，有完整的项目复盘 →',
+  '《梦梦消消乐》等你来玩！'
+];
+const avatar = document.getElementById('avatar');
+const bubble = document.getElementById('quoteBubble');
+let qi = 0, bubbleTimer;
+avatar.addEventListener('click', () => {
+  avatar.classList.remove('wobble');
+  void avatar.offsetWidth;
+  avatar.classList.add('wobble');
+  bubble.textContent = quotes[qi % quotes.length];
+  qi++;
+  bubble.classList.add('show');
+  clearTimeout(bubbleTimer);
+  bubbleTimer = setTimeout(() => bubble.classList.remove('show'), 2600);
+});
+
+/* ===== 滚动浮现 + 技能条（直接位置检测，不依赖 IntersectionObserver） ===== */
+const reveals = [...document.querySelectorAll('.reveal')];
+function activateReveal(el){
+  if (el.classList.contains('visible')) return;
+  el.classList.add('visible');
+  el.querySelectorAll('.fill').forEach(f => {
+    f.style.width = f.dataset.w + '%';
+    // 兜底：个别环境下百分比未解析时，按轨道实际像素写死，保证条一定出现
+    requestAnimationFrame(() => {
+      if (f.getBoundingClientRect().width < 1 && f.parentElement.clientWidth > 0){
+        f.style.width = Math.round(f.parentElement.clientWidth * f.dataset.w / 100) + 'px';
+      }
+    });
+  });
+}
+function checkReveals(){
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  for (const el of reveals){
+    const r = el.getBoundingClientRect();
+    if (r.top < vh * 0.92 && r.bottom > 0) activateReveal(el);
+  }
+}
+let revealTicking = false;
+window.addEventListener('scroll', () => {
+  if (revealTicking) return;
+  revealTicking =true;
+  requestAnimationFrame(() => { checkReveals(); revealTicking = false; });
+}, { passive: true });
+window.addEventListener('resize', checkReveals);
+checkReveals();
+setTimeout(checkReveals, 300);   // 字体/图片加载后布局可能变化
+setTimeout(checkReveals, 1200);  // 二次兜底
+
+/* ===== 留言板 ===== */
+const KEY = 'wyx-guestbook';
+const msgList = document.getElementById('msgList');
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function getMsgs() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
+function render() {
+  const msgs = getMsgs();
+  if (!msgs.length) {
+    msgList.innerHTML = '<div class="empty-tip">还没有留言，来做第一个留言的人吧～ 🐣</div>';
+    return;
+  }
+  msgList.innerHTML = msgs.map((m, i) =>
+    `<div class="msg"><span>💬 ${esc(m)}</span><button class="del" data-i="${i}" title="删除">✖</button></div>`
+  ).join('');
+}
+function addMsg() {
+  const input = document.getElementById('msgInput');
+  const v = input.value.trim();
+  if (!v) return;
+  const msgs = getMsgs();
+  msgs.unshift(v);
+  localStorage.setItem(KEY, JSON.stringify(msgs));
+  input.value = '';
+  render();
+}
+msgList.addEventListener('click', e => {
+  if (!e.target.classList.contains('del')) return;
+  const msgs = getMsgs();
+  msgs.splice(+e.target.dataset.i, 1);
+  localStorage.setItem(KEY, JSON.stringify(msgs));
+  render();
+});
+render();
+
+/* ===== 返回顶部 ===== */
+const topBtn = document.getElementById('topBtn');
+window.addEventListener('scroll', () => {
+  topBtn.classList.toggle('show', window.scrollY > 400);
+});
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+</script>
+
+<!-- ===== 启动页：FuzzyText 模糊失真文字 + 机械音效 + 朗读 ===== -->
+<script src="fuzzy-text.js?v=9"></script>
+<script>
+(function () {
+  if (window.FuzzyText) {
+    try {
+      window.__fuzzy = new FuzzyText({
+        text: 'Welcome to my world',
+        baseIntensity: 0.2,
+        hoverIntensity: 0.8,
+        enableHover: true,
+        wordsPerGroup: 2,
+        groupDelay: 750,
+      });
+      console.log('[FuzzyText] instance created');
+    } catch (e) {
+      console.error('[FuzzyText] init error:', e);
+    }
+  } else {
+    console.error('[FuzzyText] class not found');
+  }
+})();
+</script>
+
+<!-- ===== 碎片背景：Three.js 全屏漂浮玻璃碎片（AeroShards 风格） ===== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="shards-background.js?v=1"></script>
+<script>
+(function () {
+  if (window.THREE && window.ShardsBackground) {
+    const isDark = document.documentElement.dataset.theme !== 'light';
+    window.__shards = new ShardsBackground({ dark: isDark });
+    window.addEventListener('resize', () => window.__shards.onResize());
+    // 主题切换时更新碎片颜色
+    const themeBtns = document.querySelectorAll('#themeBtn, #themeBtn2');
+    themeBtns.forEach(b => b.addEventListener('click', () => {
+      setTimeout(() => {
+        const dark = document.documentElement.dataset.theme !== 'light';
+        if (window.__shards) window.__shards.setDark(dark);
+      }, 50);
+    }));
+  }
+})();
+</script>
+
+<!-- ===== 作品漂流墙 DriftWall：3D 漂浮照片墙，项目封面 + 名称 ===== -->
+<script src="drift-wall.js?v=1"></script>
+<script>
+(function () {
+  function initDriftWall() {
+    var host = document.getElementById('driftWall');
+    if (!host || !window.DriftWall) return;
+    var IMG = 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=';
+    var items = [
+      {
+        title: '梦梦消消乐',
+        image: IMG + 'cute%20match-3%20puzzle%20mobile%20game%20cover%20art%2C%20colorful%20cartoon%20pet%20animals%20cat%20puppy%20panda%20bunny%20on%20candy%20tiles%20grid%2C%20bright%20kawaii%20style%2C%20vibrant%20cheerful%20colors%2C%20high%20quality%20game%20illustration&image_size=landscape_16_9',
+        href: '#work-card-game',
+      },
+      {
+        title: '心光谱小屋',
+        image: IMG + 'warm%20cozy%20psychological%20counseling%20room%20with%20soft%20pastel%20lights%2C%20rainbow%20spectrum%20heart%20and%20compass%2C%20cute%20flat%20illustration%2C%20peach%20rose%20lavender%20cream%20colors%2C%20gentle%20kawaii%20style&image_size=landscape_16_9',
+        href: '#work-card-hut',
+      },
+      {
+        title: '跃动·运动自学',
+        image: IMG + 'energetic%20mobile%20fitness%20app%20cover%20art%2C%20cute%20flat%20illustration%20of%20running%20swimming%20badminton%20basketball%20yoga%20icons%2C%20orange%20sunrise%20gradient%20sky%2C%20sporty%20kawaii%20style%2C%20warm%20vibrant%20colors&image_size=landscape_16_9',
+        href: '#work-card-sport',
+      },
+    ];
+    window.__driftWall = new DriftWall(host, {
+      items: items,
+      columns: 5,
+      tileWidth: 200,
+      tileHeight: 132,
+      gap: 18,
+      tilt: 16,
+      turn: -14,
+      perspective: 1200,
+      depth: 120,
+      speed: 42,
+      direction: 'up',
+      variance: 0.45,
+      parallax: 0.6,
+      lift: 64,
+      fade: 0.6,
+      dim: 0.55,
+      overlayColor: '#060010',
+      hint: '作品漂流墙 · 悬停查看 · 点击跳转到介绍卡片',
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDriftWall);
+  } else {
+    initDriftWall();
+  }
+})();
+</script>
+</body>
+</html>

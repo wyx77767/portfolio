@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心光谱 · 性向温柔测试与科普小屋</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>🦋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+  :root{
+    /* ===== 赛博朋克主题覆盖 ===== */
+    --cream:#0a1530;
+    --cream-2:#1a2a5a;
+    --peach:#4fc3f7;
+    --coral:#4fc3f7;
+    --rose:#4fc3f7;
+    --rose-deep:#4fc3f7;
+    --wine:#4fc3f7;
+    --lav:#ff4fc3;
+    --lav-soft:rgba(79,195,247,.12);
+    --mint:#4fc3f7;
+    --sky:#4fc3f7;
+    --sun:#4fc3f7;
+    --ink:#e8e8f0;
+    --ink-soft:#5a6a9a;
+    --card:#e8e8f0;
+    --shadow:4px 4px 0 #000;
+    --shadow-soft:2px 2px 0 #000;
+    --radius:0;
+    --primary:#4fc3f7;
+    --accent:#ff4fc3;
+    --grid:rgba(79,195,247,.1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Orbitron",sans-serif;
+    color:var(--ink);
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      #0a0a14;
+    background-size: 60px 60px, 60px 60px, auto;
+    background-attachment: fixed;
+  }
+  ::selection{background:#00f0ff;color:#000}
+
+  /* ---------- 导航 ---------- */
+  nav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(10,10,20,.82);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(0,240,255,.25);
+  }
+  .nav-inner{
+    max-width:1080px;margin:0 auto;padding:12px 22px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;color:var(--wine);cursor:pointer;white-space:nowrap}
+  .logo .heart{
+    width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-size:18px;
+    background:linear-gradient(135deg,#ff9eb3,#c9a7e8);
+    box-shadow:0 4px 12px rgba(239,111,142,.35);
+  }
+  .nav-links{display:flex;gap:6px;flex-wrap:wrap}
+  .nav-links button{
+    border:none;background:transparent;cursor:pointer;
+    font-size:15px;color:var(--ink-soft);font-weight:600;
+    padding:8px 16px;border-radius:999px;transition:.25s;font-family:inherit;
+  }
+  .nav-links button:hover{background:#ffe8df;color:var(--rose-deep)}
+  .nav-links button.active{background:linear-gradient(135deg,#ff9eb3,#e89bb8);color:#fff;box-shadow:0 6px 16px rgba(239,111,142,.3)}
+
+  main{max-width:1080px;margin:0 auto;padding:34px 22px 80px}
+  section{display:none;animation:fadeUp .55s ease both}
+  section.on{display:block}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+  /* ---------- 首页 ---------- */
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;margin-top:18px}
+  .hero h1{font-size:42px;line-height:1.3;font-weight:800;letter-spacing:1px}
+  .hero h1 .rainbow-text{
+    background:linear-gradient(90deg,#f25f5c,#f6a64b,#e8c547,#5fb878,#5089c6,#8b6fb0);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .hero p.lead{margin:18px 0 8px;font-size:17px;color:var(--ink-soft)}
+  .privacy-pill{
+    display:inline-flex;align-items:center;gap:8px;margin:10px 0 24px;
+    background:#fff;border:1.5px dashed #f3b7c4;border-radius:999px;
+    padding:8px 18px;font-size:14px;color:var(--rose-deep);font-weight:600;
+    box-shadow:var(--shadow-soft);
+  }
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;justify-content:center;
+    border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:16px;
+    padding:15px 30px;border-radius:999px;transition:.25s;text-decoration:none;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg,#ff8fa3,#e579a2 55%,#b98ad6);
+    color:#fff;box-shadow:0 12px 26px rgba(229,121,162,.38);
+  }
+  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 32px rgba(229,121,162,.45)}
+  .btn-ghost{background:#fff;color:var(--wine);border:2px solid #f4c6d1}
+  .btn-ghost:hover{background:#fff0f4;transform:translateY(-2px)}
+  .btn-row{display:flex;gap:14px;flex-wrap:wrap}
+
+  .hero-img-wrap{position:relative}
+  .hero-img{
+    width:100%;border-radius:30px;display:block;
+    box-shadow:var(--shadow);border:6px solid #fff;
+  }
+  .float-badge{
+    position:absolute;background:#fff;border-radius:18px;padding:10px 16px;
+    font-size:14px;font-weight:700;box-shadow:var(--shadow);
+    display:flex;align-items:center;gap:8px;animation:bob 4s ease-in-out infinite;
+  }
+  .fb1{top:-14px;left:-14px;color:#e0793b}
+  .fb2{bottom:-16px;right:-10px;color:var(--lav);animation-delay:1.2s}
+  .fb3{bottom:30px;left:-24px;color:var(--mint);animation-delay:2.1s}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+  .hearts span{position:fixed;top:-40px;font-size:20px;opacity:.5;pointer-events:none;z-index:0;animation:fall linear infinite}
+  @keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+
+  .home-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:56px}
+  .home-card{
+    background:var(--card);border-radius:var(--radius);padding:26px 24px;
+    box-shadow:var(--shadow-soft);transition:.3s;border:1px solid #fbeee8;
+  }
+  .home-card:hover{transform:translateY(-6px);box-shadow:var(--shadow)}
+  .home-card .ico{font-size:34px}
+  .home-card h3{margin:12px 0 6px;font-size:19px;color:var(--wine)}
+  .home-card p{font-size:14.5px;color:var(--ink-soft)}
+
+  .warm-banner{
+    margin-top:40px;border-radius:var(--radius);padding:30px 34px;
+    background:linear-gradient(120deg,#fff0e6,#f6e8f7 60%,#e6f4ee);
+    display:flex;gap:22px;align-items:center;box-shadow:var(--shadow-soft);
+  }
+  .warm-banner .big{font-size:44px}
+  .warm-banner h3{color:var(--wine);margin-bottom:4px}
+  .warm-banner p{color:var(--ink-soft);font-size:15px}
+
+  /* ---------- 通用区块标题 ---------- */
+  .sec-head{text-align:center;margin-bottom:36px}
+  .sec-head .kicker{
+    display:inline-block;background:#ffe6ec;color:var(--rose-deep);
+    padding:5px 18px;border-radius:999px;font-size:13.5px;font-weight:700;letter-spacing:2px;margin-bottom:12px;
+  }
+  .sec-head h2{font-size:32px;color:var(--wine);font-weight:800}
+  .sec-head p{color:var(--ink-soft);margin-top:8px;font-size:15.5px}
+
+  /* ---------- 测试 ---------- */
+  .test-card{
+    max-width:760px;margin:10px auto 0;background:var(--card);border-radius:28px;
+    box-shadow:var(--shadow);padding:44px 44px 38px;border:1px solid #fbeee8;position:relative;overflow:hidden;
+  }
+  .test-card::before{
+    content:"";position:absolute;inset:0 0 auto 0;height:8px;
+    background:linear-gradient(90deg,#f25f5c,#f6a64b,#e8c547,#5fb878,#5089c6,#8b6fb0);
+  }
+  .test-intro h2{font-size:28px;color:var(--wine);margin-bottom:14px}
+  .test-intro p{color:var(--ink-soft);margin-bottom:12px}
+  .test-meta{display:flex;gap:14px;flex-wrap:wrap;margin:22px 0 30px}
+  .meta-chip{background:#fff4ee;border-radius:14px;padding:12px 18px;font-size:14px;font-weight:600;color:var(--wine);display:flex;gap:8px;align-items:center}
+  .soft-note{background:#faf4fb;border-left:4px solid var(--lav);border-radius:10px;padding:14px 18px;font-size:14px;color:#6e5a80;margin:18px 0 26px}
+
+  .quiz-top{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+  .progress{flex:1;height:12px;background:#f6e6e2;border-radius:99px;overflow:hidden}
+  .progress i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff9eb3,#c9a7e8,#7aa7d9);transition:width .4s ease}
+  .q-index{font-weight:800;color:var(--rose-deep);white-space:nowrap;font-size:14px;background:#fff0f4;padding:6px 14px;border-radius:99px}
+  .q-dim{font-size:13px;color:var(--lav);font-weight:700;letter-spacing:1px;margin-bottom:8px}
+  .q-text{font-size:21px;font-weight:700;line-height:1.6;margin-bottom:28px;min-height:64px}
+  .answers{display:flex;flex-direction:column;gap:12px}
+  .answers button{
+    border:2px solid #f3e0e4;background:#fffaf7;border-radius:16px;padding:15px 20px;
+    font-size:16px;font-family:inherit;color:var(--ink);cursor:pointer;
+    text-align:left;transition:.2s;display:flex;align-items:center;gap:12px;font-weight:600;
+  }
+  .answers button .dot{width:22px;height:22px;border-radius:50%;border:2.5px solid #e8b9c3;flex:none;display:grid;place-items:center;font-size:12px;color:#fff;transition:.2s}
+  .answers button:hover{border-color:var(--coral);background:#fff4f6;transform:translateX(6px)}
+  .answers button:hover .dot{border-color:var(--coral)}
+  .answers button.picked{border-color:var(--rose);background:linear-gradient(135deg,#fff0f4,#f7eefb)}
+  .answers button.picked .dot{background:var(--coral);border-color:var(--coral)}
+  .quiz-nav{display:flex;justify-content:space-between;margin-top:28px}
+  .quiz-nav .btn{padding:11px 26px;font-size:15px}
+  .btn-back{background:transparent;color:var(--ink-soft);border:2px solid #ead8d3}
+  .btn-back:hover{background:#fdf2ec}
+
+  /* ---------- 结果 ---------- */
+  .result-hero{
+    background:var(--card);border-radius:30px;box-shadow:var(--shadow);padding:40px 40px 34px;
+    text-align:center;position:relative;overflow:hidden;border:1px solid #fbeee8;
+  }
+  .result-hero .ribbon{position:absolute;inset:0 0 auto 0;height:10px;background:var(--rg,linear-gradient(90deg,#ff9eb3,#c9a7e8))}
+  .result-emoji{font-size:66px;display:block;margin:8px 0 6px;animation:bob 4s ease-in-out infinite}
+  .result-en{color:var(--ink-soft);font-size:15px;letter-spacing:1px;font-weight:600}
+  .result-hero h2{font-size:32px;color:var(--wine);margin:4px 0 10px}
+  .result-tagline{font-size:18px;color:var(--rose-deep);font-weight:700;margin-bottom:6px}
+  .result-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;margin-top:24px}
+  .result-block{background:var(--card);border-radius:24px;padding:28px 30px;box-shadow:var(--shadow-soft);border:1px solid #fbeee8}
+  .result-block h3{color:var(--wine);font-size:18px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .result-block p{margin-bottom:12px;color:#6d5a52;font-size:15.5px}
+  .result-block .mis{background:#fff7f1;border-radius:14px;padding:14px 18px;font-size:14.5px;color:#9a6a4f}
+  .result-block .warm-word{
+    background:linear-gradient(120deg,#fff0f4,#f3ecfa);border-radius:14px;padding:18px 20px;
+    font-size:16px;color:var(--wine);font-weight:600;text-align:center;margin-top:6px;
+  }
+  .bar-row{margin-bottom:15px}
+  .bar-row .lab{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;color:var(--ink-soft);margin-bottom:5px}
+  .bar{height:13px;background:#f6e9e5;border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ff9eb3,#d7a5e8);width:0;transition:width 1s cubic-bezier(.22,1,.36,1)}
+  .mini-note{background:#f5f0fb;border-radius:14px;padding:14px 18px;font-size:14px;color:#6e5a80;margin-top:14px}
+  .pill-line{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .pill{background:#fff3ef;border-radius:99px;padding:7px 16px;font-size:13.5px;font-weight:700;color:var(--rose-deep)}
+  .result-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+  .disclaimer{text-align:center;color:var(--ink-soft);font-size:13px;margin-top:18px}
+
+  /* ---------- 科普 ---------- */
+  .sci-intro{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;margin-bottom:46px}
+  .sci-intro img{width:100%;border-radius:26px;box-shadow:var(--shadow);border:6px solid #fff}
+  .sci-intro h2{font-size:27px;color:var(--wine);margin-bottom:12px}
+  .sci-intro p{color:var(--ink-soft);margin-bottom:10px}
+  .anchor-row{display:flex;gap:10px;flex-wrap:wrap;margin:26px 0 6px}
+  .anchor-row button{
+    border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;
+    background:#fff;color:var(--wine);border:2px solid #f4c6d1;border-radius:99px;padding:9px 18px;transition:.25s;
+  }
+  .anchor-row button:hover{background:#fff0f4;transform:translateY(-2px)}
+
+  .sci-group{margin-bottom:48px;scroll-margin-top:90px}
+  .sci-group > h3{
+    font-size:22px;color:var(--wine);margin-bottom:6px;display:flex;align-items:center;gap:10px;
+  }
+  .sci-group > .gdesc{color:var(--ink-soft);font-size:14.5px;margin-bottom:18px}
+  .id-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .id-card{
+    background:#fff;border-radius:20px;padding:0;box-shadow:var(--shadow-soft);
+    border:1px solid #fbeee8;overflow:hidden;transition:.3s;
+  }
+  .id-card:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+  .flag{height:12px;display:flex}
+  .flag i{flex:1;display:block}
+  .id-body{padding:16px 18px 18px}
+  .id-body .nm{font-weight:800;font-size:16.5px;color:var(--wine)}
+  .id-body .en{font-size:12.5px;color:var(--ink-soft);font-weight:600;letter-spacing:.5px}
+  .id-body .tag{display:inline-block;background:#f4ecfa;color:var(--lav);font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:99px;margin:7px 0 8px}
+  .id-body p{font-size:13.8px;color:#7a665e;line-height:1.65}
+
+  .model-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+  .model-card{background:#fff;border-radius:22px;padding:26px;box-shadow:var(--shadow-soft);border:1px solid #fbeee8}
+  .model-card h4{color:var(--wine);font-size:17px;margin-bottom:8px}
+  .model-card p{font-size:14px;color:#7a665e;margin-bottom:12px}
+  .kinsey{display:flex;gap:4px;margin:10px 0}
+  .kinsey div{flex:1;text-align:center;font-size:11px;color:#fff;font-weight:800;border-radius:6px;padding:16px 0}
+  .kinsey-cap{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);font-weight:700}
+
+  .qa{display:flex;flex-direction:column;gap:12px}
+  .qa-item{background:#fff;border-radius:18px;box-shadow:var(--shadow-soft);border:1px solid #fbeee8;overflow:hidden}
+  .qa-q{
+    width:100%;text-align:left;border:none;background:transparent;cursor:pointer;
+    font-family:inherit;font-size:16px;font-weight:700;color:var(--wine);
+    padding:18px 24px;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  }
+  .qa-q .pm{font-size:22px;color:var(--coral);transition:.3s;flex:none}
+  .qa-item.open .pm{transform:rotate(45deg)}
+  .qa-a{max-height:0;overflow:hidden;transition:max-height .4s ease;padding:0 24px}
+  .qa-item.open .qa-a{max-height:600px;padding:0 24px 20px}
+  .qa-a p{font-size:14.8px;color:#6d5a52;margin-bottom:8px}
+
+  .timeline{position:relative;margin-left:14px;padding-left:30px;border-left:3px dashed #f0bdc8}
+  .tl-item{position:relative;margin-bottom:24px}
+  .tl-item::before{
+    content:"";position:absolute;left:-39px;top:6px;width:15px;height:15px;border-radius:50%;
+    background:#fff;border:4px solid var(--coral);
+  }
+  .tl-item .yr{font-weight:800;color:var(--rose-deep);font-size:16px}
+  .tl-item p{font-size:14.5px;color:#6d5a52}
+
+  .resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+  .res-card{background:#fff;border-radius:20px;padding:24px;box-shadow:var(--shadow-soft);border:1px solid #fbeee8}
+  .res-card h4{color:var(--wine);font-size:16.5px;margin-bottom:8px}
+  .res-card p,.res-card li{font-size:14px;color:#7a665e}
+  .res-card ul{padding-left:18px}
+  .res-card li{margin-bottom:5px}
+
+  footer{
+    text-align:center;padding:34px 22px 46px;color:var(--ink-soft);font-size:13px;
+    border-top:1px solid rgba(214,140,140,.15);background:rgba(255,255,255,.5);
+  }
+  footer .rainbow{font-size:18px;letter-spacing:6px;margin-bottom:8px}
+
+  @media(max-width:860px){
+    .hero,.result-grid,.sci-intro{grid-template-columns:1fr}
+    .hero h1{font-size:31px}
+    .home-cards{grid-template-columns:1fr}
+    .test-card{padding:34px 22px 28px}
+    .hero-img-wrap{order:-1}
+    .fb3{left:-8px}
+    .nav-inner{flex-direction:column;padding:10px 14px}
+    .nav-links button{font-size:13.5px;padding:7px 12px}
+    .q-text{font-size:18px;min-height:0}
+    .result-hero{padding:30px 20px}
+  }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo" onclick="go('home')"><span class="heart">🌈</span>心光谱小屋</div>
+    <div class="nav-links">
+      <button data-go="home" class="active" onclick="go('home')">首页</button>
+      <button data-go="test" onclick="go('test')">温柔测试</button>
+      <button data-go="science" onclick="go('science')">科普专区</button>
+      <button data-go="result" id="nav-result" onclick="go('result')" style="display:none">我的结果</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+  <!-- ============ 首页 ============ -->
+  <section id="home" class="on">
+    <div class="hero">
+      <div>
+        <h1>你值得被<br><span class="rainbow-text">温柔地理解</span></h1>
+        <p class="lead">这里是「心光谱」——一个关于性取向、浪漫吸引与自我认同的安全小屋。<br>没有评判，没有标准答案，只有科学、耐心，和一杯永远温热的可可。☕</p>
+        <div class="privacy-pill">🔒 所有回答只保存在你自己的浏览器里，不上传、不记录、不评价</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="go('test')">🌷 开始温柔测试</button>
+          <button class="btn btn-ghost" onclick="go('science')">📚 逛逛科普专区</button>
+        </div>
+      </div>
+      <div class="hero-img-wrap">
+        <img class="hero-img" id="hero-img" alt="温暖的多元群像插画">
+        <div class="float-badge fb1">🧡 30+ 种取向科普</div>
+        <div class="float-badge fb2">🔬 基于金赛量表等模型</div>
+        <div class="float-badge fb3">🤍 结果温柔详细</div>
+      </div>
+    </div>
+
+    <div class="home-cards">
+      <div class="home-card">
+        <div class="ico">🌷</div>
+        <h3>24 道温柔小题</h3>
+        <p>从性吸引、浪漫吸引、情感联结、流动性等 6 个维度轻轻照见你，没有对错，凭直觉作答即可，约 4 分钟。</p>
+      </div>
+      <div class="home-card">
+        <div class="ico">🗂️</div>
+        <h3>世界上很全的分类</h3>
+        <p>异性恋、同性恋、双/泛/多性恋、无性恋光谱、半性恋、性向流动……30 余种身份与旗帜，一次认识清楚。</p>
+      </div>
+      <div class="home-card">
+        <div class="ico">🫂</div>
+        <h3>像朋友一样的结果</h3>
+        <p>每种结果都有详细解读、常见误解澄清、浪漫倾向提示和一段专属于你的温暖寄语，可导出保存。</p>
+      </div>
+    </div>
+
+    <div class="warm-banner">
+      <div class="big">🕯️</div>
+      <div>
+        <h3>在开始之前，想请你记住三句话</h3>
+        <p>一，性取向没有高低对错，它是一道连续的光谱，而不是非黑即白的判断题。<br>
+        二，测试结果只是「此刻的快照」，不是判决书——你永远拥有重新定义自己的权利。<br>
+        三，无论答案是什么，你都值得被爱、被尊重，首先被你自己温柔以待。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 测试 ============ -->
+  <section id="test">
+    <div class="sec-head">
+      <span class="kicker">THE SOFT TEST</span>
+      <h2>心光谱温柔测试</h2>
+      <p>跟着直觉走就好，每一道题都没有“正确答案”</p>
+    </div>
+    <div class="test-card">
+      <div class="test-intro" id="test-intro">
+        <h2>🌷 准备好认识自己了吗？</h2>
+        <p>接下来的 24 道题，会从<b>性吸引、浪漫渴望、情感联结、性别在你心动中的分量、吸引的流动性</b>等角度，轻轻勾勒你的光谱位置。</p>
+        <p>请以「最近这段时间的真实感受」作答，而不是“我应该怎样”。偶尔改变主意也没关系，随时可以返回上一题。</p>
+        <div class="test-meta">
+          <div class="meta-chip">⏱️ 约 4 分钟</div>
+          <div class="meta-chip">📝 24 道单选题</div>
+          <div class="meta-chip">🔒 全程离线、本地计算</div>
+          <div class="meta-chip">🏠 可随时退出，不评价任何人</div>
+        </div>
+        <div class="soft-note">💡 小提示：本测试借鉴了金赛量表（Kinsey Scale）、克莱因性取向网格（Klein Grid）与“分裂吸引模型”的思路，用于自我探索参考，<b>不是心理诊断</b>。如果你正因为身份认同感到强烈痛苦，请一定寻求专业帮助（科普专区末尾有资源）。</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="startQuiz()">好，我们开始 →</button>
+        </div>
+      </div>
+
+      <div id="quiz" style="display:none">
+        <div class="quiz-top">
+          <div class="progress"><i id="progress-bar" style="width:0"></i></div>
+          <div class="q-index" id="q-index">1 / 24</div>
+        </div>
+        <div class="q-dim" id="q-dim"></div>
+        <div class="q-text" id="q-text"></div>
+        <div class="answers" id="answers"></div>
+        <div class="quiz-nav">
+          <button class="btn btn-back" id="btn-back" onclick="prevQ()">← 上一题</button>
+          <button class="btn btn-primary" id="btn-next" onclick="nextQ()" style="visibility:hidden">下一题 →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 科普专区 ============ -->
+  <section id="science">
+    <div class="sec-head">
+      <span class="kicker">KNOWLEDGE GARDEN</span>
+      <h2>科普专区</h2>
+      <p>知识是温柔的底气——先懂世界，再懂自己</p>
+    </div>
+
+    <div class="sci-intro">
+      <img id="sci-img" alt="科普插画">
+      <div>
+        <h2>性取向，是一道连续的彩虹光谱</h2>
+        <p><b>性取向（Sexual Orientation）</b>指一个人在情感、浪漫与性上被哪种（或哪些）性别持久吸引的模式。它和「你是什么性别」是两件事：<b>性别认同</b>回答“我是谁”，<b>性取向</b>回答“我被谁吸引”。</p>
+        <p>现代科学普遍认为，性取向由基因、孕期激素、发育与环境等复杂因素共同塑造，<b>不是个人主动选择，也无法被外力“矫正”</b>。它更像一条流动的光谱：有人站在两端，有人居于中央，有人随时间缓缓移动。</p>
+        <div class="anchor-row">
+          <button onclick="scrollG('g-id')">🧭 30+ 取向全图鉴</button>
+          <button onclick="scrollG('g-rom')">💞 浪漫取向</button>
+          <button onclick="scrollG('g-gender')">⚧️ 性别与取向的区别</button>
+          <button onclick="scrollG('g-model')">📊 四种科学模型</button>
+          <button onclick="scrollG('g-qa')">❓ 常见疑问</button>
+          <button onclick="scrollG('g-time')">📜 去病理化简史</button>
+          <button onclick="scrollG('g-res')">🤝 求助与支持</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 全图鉴 -->
+    <div class="sci-group" id="g-id">
+      <h3>🧭 世界取向全图鉴（30 种）</h3>
+      <p class="gdesc">旗帜配色是社群在历史中自然形成的文化符号，部分新兴身份暂无统一旗帜——颜色只是邀请，真正重要的是每个名字背后那个真实的人。</p>
+      <div class="id-grid" id="id-grid"></div>
+    </div>
+
+    <!-- 浪漫取向 -->
+    <div class="sci-group" id="g-rom">
+      <h3>💞 浪漫取向：爱，和“性”可以是两回事</h3>
+      <p class="gdesc">“分裂吸引模型（Split Attraction Model）”指出：<b>性吸引</b>（想与谁发生亲密关系）与<b>浪漫吸引</b>（想与谁牵手、约会、共度余生）可以指向不同性别，甚至其中一种完全缺席。常见的浪漫取向有：</p>
+      <div class="id-grid" id="rom-grid"></div>
+    </div>
+
+    <!-- 性别 -->
+    <div class="sci-group" id="g-gender">
+      <h3>⚧️ 四个常被混淆的概念</h3>
+      <p class="gdesc">“喜欢男人还是女人”与“我是男人还是女人”是两个完全独立的问题。跨性别者可以是异性恋、同性恋、双性恋……就像顺性别者一样。</p>
+      <div class="id-grid" id="gender-grid"></div>
+    </div>
+
+    <!-- 模型 -->
+    <div class="sci-group" id="g-model">
+      <h3>📊 测量性取向的四种科学模型</h3>
+      <p class="gdesc">本测试的设计思路正来自这些经典研究，它们共同回答了一件事：吸引是多维的，单一标签装不下真实的人。</p>
+      <div class="model-grid">
+        <div class="model-card">
+          <h4>① 金赛量表 Kinsey Scale（1948）</h4>
+          <p>阿尔弗雷德·金赛提出 0–6 的七档连续谱，另设 X 表示“无两性吸引”，首次打破了“非直即同”的二元叙事。</p>
+          <div class="kinsey">
+            <div style="background:#5fb878">0</div>
+            <div style="background:#8fc77a">1</div>
+            <div style="background:#c4d86b">2</div>
+            <div style="background:#e8d547">3</div>
+            <div style="background:#f0a94f">4</div>
+            <div style="background:#ec8454">5</div>
+            <div style="background:#e45c5c">6</div>
+            <div style="background:#9b8cc4">X</div>
+          </div>
+          <div class="kinsey-cap"><span>0：仅异性</span><span>3：双性皆可</span><span>6：仅同性 · X：无性吸引</span></div>
+        </div>
+        <div class="model-card">
+          <h4>② 克莱因性取向网格（1978）</h4>
+          <p>Fritz Klein 认为一个数字远远不够。他把取向拆成 7 个变量，并分别考察“过去、现在、理想”三个时段：</p>
+          <p>性吸引 · 性行为 · 性幻想 · 情感偏好 · 社交偏好 · 自我认同 · 异性/同性化的生活方式。这解释了为什么“行为、心动、自认身份”有时并不一致。</p>
+        </div>
+        <div class="model-card">
+          <h4>③ Storm 双轴模型（1980）</h4>
+          <p>把“同性吸引强度”和“异性吸引强度”设为两条独立坐标轴：两轴都高是双性恋，都低是无性恋，一高一低分别是同性恋与异性恋——证明“对同性的吸引”并不会抵消“对异性的吸引”。</p>
+        </div>
+        <div class="model-card">
+          <h4>④ 分裂吸引模型（SAM）</h4>
+          <p>源自无性恋社群：性取向与浪漫取向分开描述，例如「无性恋 + 异性浪漫」「半性恋 + 同性浪漫」。它帮助无数人第一次准确地说出了自己的感受。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q&A -->
+    <div class="sci-group" id="g-qa">
+      <h3>❓ 那些不好意思问出口的问题</h3>
+      <p class="gdesc">点开看看，答案也许比你想象中温柔。</p>
+      <div class="qa" id="qa-box"></div>
+    </div>
+
+    <!-- 时间线 -->
+    <div class="sci-group" id="g-time">
+      <h3>📜 “这不是病”——去病理化小史</h3>
+      <p class="gdesc">科学与文明花了很久，才追上一个朴素的事实：爱谁，从来不是病。</p>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <!-- 支持 -->
+    <div class="sci-group" id="g-res">
+      <h3>🤝 当你需要一双伸出的手</h3>
+      <p class="gdesc">如果你正因为自我认同、家庭压力或出柜议题感到痛苦，请不要一个人扛。</p>
+      <div class="resource-grid">
+        <div class="res-card">
+          <h4>🧡 出柜前，先确保安全</h4>
+          <p>出柜不是义务，更没有“正确时间表”。在经济与人身安全尚未独立前，<b>不说</b>也是一种成熟的选择。可以先向一位你判断“大概率会接住你”的人试水。</p>
+        </div>
+        <div class="res-card">
+          <h4>💬 心理咨询与热线</h4>
+          <ul>
+            <li>优先选择受过 SOGIE（性倾向、性别认同与表达）相关培训、明确宣称“不做扭转治疗”的咨询师。</li>
+            <li>全国青少年心理咨询热线：<b>12355</b></li>
+            <li>北京心理危机研究与干预中心：<b>010-82951332</b></li>
+            <li>希望 24 小时危机干预热线：<b>400-161-9995</b></li>
+          </ul>
+          <p style="margin-top:8px;font-size:12.5px">* 热线号码可能调整，拨打前请以官方最新公布为准。</p>
+        </div>
+        <div class="res-card">
+          <h4>🌈 友善的社群与组织</h4>
+          <ul>
+            <li>出色伙伴（原同性恋亲友会 PFLAG China）：面向性少数及其父母的支持网络。</li>
+            <li>各地 LGBT 中心与高校性别社团（如北京同志中心等，活动信息以其官方渠道为准）。</li>
+            <li>AVEN：国际无性恋社群（asexuality.org），无性恋光谱的百科与论坛。</li>
+          </ul>
+        </div>
+        <div class="res-card">
+          <h3 style="font-size:16.5px">📖 温柔的书与影像</h3>
+          <ul>
+            <li>李银河《同性恋亚文化》《酷儿理论》</li>
+            <li>金赛《人类男性性行为》（性光谱研究的起点）</li>
+            <li>剧集《心跳漏一拍 Heartstopper》：青春、友谊与初恋的柔软范本</li>
+            <li>电影《请以你的名字呼唤我》</li>
+            <li>纪录片《日常谈》：看见中国同志父母的真实模样</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 结果 ============ -->
+  <section id="result">
+    <div id="result-content"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="rainbow">❤️ 🧡 💛 💚 💙 💜</div>
+  <p>心光谱小屋 · 本页所有计算均在你的浏览器本地完成，刷新或关闭后数据不会离开这台设备</p>
+  <p style="margin-top:6px">内容仅供自我探索与科普参考，不构成医学或心理学诊断。爱没有错，你也没有。</p>
+</footer>
+
+<script>
+/* ================= 图片（按规范生成） ================= */
+(function(){
+  var base='https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=';
+  var h=document.getElementById('hero-img');
+  var s=document.getElementById('sci-img');
+  if(h) h.src=base+encodeURIComponent('温暖治愈系扁平插画，柔和蜜桃粉奶油色与淡紫色调，一群多元化的年轻人在开满花朵的草地上微笑相处，空中漂浮着彩虹爱心与气球，金色阳光，梦幻柔光，细腻唯美，无文字无水印')+'&image_size=landscape_16_9';
+  if(s) s.src=base+encodeURIComponent('温暖治愈系扁平插画，一本在书桌上发光的打开的书，书页中飘出彩虹色的星星和爱心，旁边有绿植、冒着热气的茶杯和暖光台灯，奶油色背景，柔和梦幻，无文字无水印')+'&image_size=landscape_4_3';
+})();
+
+/* ================= 背景漂浮爱心 ================= */
+(function(){
+  var emojis=['🤍','💛','💗','🩷','💜','🫧','🌸'];
+  for(var i=0;i<10;i++){
+    var s=document.createElement('span');
+    s.textContent=emojis[i%emojis.length];
+    s.style.left=Math.random()*100+'vw';
+    s.style.fontSize=(14+Math.random()*16)+'px';
+    s.style.animationDuration=(11+Math.random()*12)+'s';
+    s.style.animationDelay=(-Math.random()*14)+'s';
+    document.body.appendChild(s);
+  }
+})();
+
+/* ================= 路由 ================= */
+function go(id){
+  document.querySelectorAll('main section').forEach(function(s){s.classList.remove('on')});
+  var el=document.getElementById(id);
+  el.classList.add('on');
+  document.querySelectorAll('.nav-links button').forEach(function(b){b.classList.remove('active')});
+  var nb=document.querySelector('.nav-links button[data-go="'+id+'"]');
+  if(nb) nb.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function scrollG(id){var e=document.getElementById(id);if(e)e.scrollIntoView({behavior:'smooth',block:'start'})}
+
+/* ================= 测试题 ================= */
+var DIMS={
+  H:'异性吸引',S:'同性吸引',P:'超越性别',D:'情感联结',A:'性吸引缺席',F:'流动变化',Q:'自我探索',
+  R:'浪漫渴望',O:'自我接纳',X:'综合感受'
+};
+var QUESTIONS=[
+  {t:'想到或看到异性时，我会感到明显的心动或性吸引。',d:'H',dim:'H'},
+  {t:'想到或看到同性时，我会感到明显的心动或性吸引。',d:'S',dim:'S'},
+  {t:'与同性发生亲密行为的想象，让我觉得自然、可以接受。',d:'S',dim:'S'},
+  {t:'与异性发生亲密行为的想象，让我觉得自然、可以接受。',d:'H',dim:'H'},
+  {t:'我渴望浪漫关系：牵手、约会、怦然心动的暧昧。',d:'R',dim:'R'},
+  {t:'哪怕没有性，只要彼此懂得、深深联结，我也会很满足。',d:'D',dim:'D'},
+  {t:'我只有在深深信任、建立情感纽带之后，才可能产生性吸引。',d:'D',dim:'D'},
+  {t:'我几乎从不会对任何人产生性方面的冲动。',d:'A',dim:'A'},
+  {t:'对我来说，灵魂与性格远比对方是男是女重要。',d:'P',dim:'P'},
+  {t:'我能被不止一种性别的人吸引。',d:'P',dim:'P'},
+  {t:'我只对异性产生过爱情或性的吸引。',d:'H',dim:'H'},
+  {t:'我只对同性产生过爱情或性的吸引。',d:'S',dim:'S'},
+  {t:'不同时期，我心动对象的性别倾向会发生变化。',d:'F',dim:'F'},
+  {t:'我常因一个人的气质、才华或声音，而忽略其性别。',d:'P',dim:'P'},
+  {t:'在我理想的亲密关系里，性并不是必需品。',d:'A',dim:'A'},
+  {t:'我很确定自己被什么样的人吸引。',d:'C',dim:'X'},
+  {t:'我的好感总是先从精神共鸣开始，而非外貌。',d:'D',dim:'D'},
+  {t:'我愿意真实地面对并接纳自己的感受。',d:'O',dim:'O'},
+  {t:'如果对方是跨性别者或非二元性别者，我仍可能被其吸引。',d:'P',dim:'P'},
+  {t:'我相信爱可以超越性别。',d:'P',dim:'P'},
+  {t:'我偶尔会对“意料之外”的性别产生短暂好感。',d:'F',dim:'F'},
+  {t:'我希望更深入地探索与理解自己。',d:'Q',dim:'Q'},
+  {t:'即使一生没有性生活，我也能活得完整而幸福。',d:'A',dim:'A'},
+  {t:'无论爱谁，每个人都值得被尊重与祝福。',d:'O',dim:'O'}
+];
+var OPTIONS=['完全不像我','有点不像我','中立 / 说不好','有点像我','完全就是我'];
+var answers=new Array(QUESTIONS.length).fill(null);
+var cur=0;
+
+function startQuiz(){
+  document.getElementById('test-intro').style.display='none';
+  document.getElementById('quiz').style.display='block';
+  cur=0;renderQ();
+}
+function renderQ(){
+  var q=QUESTIONS[cur];
+  document.getElementById('q-index').textContent=(cur+1)+' / '+QUESTIONS.length;
+  document.getElementById('q-dim').textContent='✦ 关于「'+DIMS[q.dim]+'」';
+  document.getElementById('q-text').textContent=q.t;
+  document.getElementById('progress-bar').style.width=((cur+1)/(QUESTIONS.length))*100+'%';
+  var box=document.getElementById('answers');box.innerHTML='';
+  OPTIONS.forEach(function(o,i){
+    var b=document.createElement('button');
+    if(answers[cur]===i+1) b.className='picked';
+    b.innerHTML='<span class="dot">✓</span><span>'+o+'</span>';
+    b.onclick=function(){pick(i)};
+    box.appendChild(b);
+  });
+  document.getElementById('btn-back').style.visibility=cur===0?'hidden':'visible';
+  var nx=document.getElementById('btn-next');
+  nx.style.visibility=answers[cur]===null?'hidden':'visible';
+  nx.textContent=(cur===QUESTIONS.length-1)?'查看我的结果 🌷':'下一题 →';
+}
+function pick(i){
+  answers[cur]=i+1;
+  renderQ();
+  /* 不自动翻页：只勾选当前选项，由用户主动点“下一题”，避免快速点击/触屏延迟使勾选落到下一题 */
+}
+function nextQ(){
+  if(answers[cur]===null)return;
+  if(cur<QUESTIONS.length-1){cur++;renderQ()}
+  else{
+    var miss=answers.indexOf(null);
+    if(miss!==-1){cur=miss;renderQ();return}
+    finish();
+  }
+}
+function prevQ(){if(cur>0){cur--;renderQ()}}
+
+function avg(idx){var s=0;idx.forEach(function(i){s+=answers[i-1]});return s/idx.length}
+
+/* ================= 结果文案 ================= */
+var RESULTS={
+  hetero:{
+    name:'异性恋',en:'Heterosexual / Straight',emoji:'🍁',
+    colors:['#ffb088','#ff8fa3','#c98bd6'],
+    tagline:'你像傍晚温柔的晚霞——明朗、安定，自带暖意。',
+    paras:[
+      '你的心意，大多会飞向与自己性别不同的人。在金赛量表（0–6 分）中，你大致靠近 0 的一端：被异性吸引、与异性建立亲密关系，对你来说自然而顺畅。',
+      '不过请记得：异性恋只是“常见”，并不是“唯一正确”。一个健康的世界，是每一种真诚的爱都能得到同等祝福的世界。如果你偶尔对同性有过心动的瞬间，也完全不必惊慌——金赛的研究早已发现，纯粹绝对的吸引反而是少数，光谱上的每个人都独一无二。'
+    ],
+    mis:'“喜欢看同性好看的人、追同性偶像，就说明我不正常。”——欣赏美、感到亲近、产生心动，本就是丰富而多层次的人类体验，不需要急着用一个标签审判自己。',
+    warm:'愿你被理解，也愿你理解他人。你的爱很珍贵，别人的爱，也是。'
+  },
+  gay:{
+    name:'同性恋',en:'Gay / Lesbian',emoji:'🌈',
+    colors:['#f25f5c','#f6a64b','#5fb878','#5089c6'],
+    tagline:'你像清晨穿过云层的第一缕光——勇敢、真实，值得所有晴朗。',
+    paras:[
+      '你的心意，主要飞向与自己性别相同的人。在金赛量表上，你大致位于 6 的一端。这不是你的选择，更不是你的错——它像左撇子、像眼睛的颜色，是你本来的样子。',
+      '1990 年，世界卫生组织（WHO）正式将同性恋从疾病名册中删除；2001 年，中国《中国精神障碍分类与诊断标准（第三版）》（CCMD-3）也完成了同样的去病理化。科学早已给出答案：你没有病，也不需要被“治疗”或“扭转”。'
+    ],
+    mis:'“同性恋可以被掰直。”——全球所有主流医学与心理学机构均确认，所谓“扭转治疗”没有任何科学依据，反而会显著增加抑郁、焦虑与自我伤害风险。2014 年，中国法院也在判例中认定“同性恋扭转治疗”违法。',
+    warm:'你不需要为真实的自己道歉。慢慢来，你值得被爱——包括被你自己，深深地爱着。'
+  },
+  bi:{
+    name:'双性恋',en:'Bisexual',emoji:'💗💜💙',
+    colors:['#d60270','#9b4f96','#0038a8'],
+    tagline:'你像一片装得下两种月色的海——潮汐自有方向，深情从不将就。',
+    paras:[
+      '你可以被同性吸引，也可以被异性吸引。这两种吸引不必同时发生，也不必势均力敌：也许这段时间你更欣赏温柔的她，另一段日子又为明亮的他心跳，这都很正常。',
+      '双性恋是一种完整而独立的性取向，而不是“还没想清楚”的过渡状态，更不是“花心”的代名词。关系中的忠诚是一种选择，与“能被谁吸引”无关。'
+    ],
+    mis:'“没谈恋爱时看不出来，一旦谈了异性恋，就等于变直了。”——这叫“双性恋隐形”：身份不会因为伴侣的性别而改变，就像你不会因为吃了苹果，就从此不再喜欢橘子。',
+    warm:'你的喜欢不需要向任何人证明。承认两种美好都能打动你，本身就是一种诚实与勇敢。'
+  },
+  pan:{
+    name:'泛性恋',en:'Pansexual',emoji:'💛',
+    colors:['#ff218c','#ffd800','#21b1ff'],
+    tagline:'对你而言，灵魂没有性别——你爱上的是整个人，而不是某个标签。',
+    paras:[
+      '你的吸引可以跨越性别：男性、女性、跨性别者、非二元性别者……真正打动你的，往往是对方的性格、才华、气味，以及灵魂共振的某个瞬间。对现在的你来说，“对方是男是女”可能根本不在心动的考量清单上。',
+      '泛性恋与双性恋有重叠但并不相同：双性恋承认“性别”是吸引的变量之一（两种或多种性别都可能吸引我）；泛性恋更强调“性别”在吸引中几乎不构成门槛。两者同样真实，没有高下之分。'
+    ],
+    mis:'“泛性恋就是什么都喜欢、来者不拒。”——不。你只是把筛选条件从“性别”换成了更本质的东西。挑灵魂，可比挑性别挑剔多了。',
+    warm:'当一个人认真爱着另一个具体的灵魂，世界都会变宽。愿你遇见那个看见全部的你、也珍惜全部的你的人。'
+  },
+  ace:{
+    name:'无性恋',en:'Asexual',emoji:'🖤💜',
+    colors:['#3a3a3a','#a3a3a3','#ffffff','#800080'],
+    tagline:'你是安静盛开在自己季节里的花——不必为谁绽放，也依然完整。',
+    paras:[
+      '你很少，或几乎不会对他人感受到性的吸引。这不是禁欲，不是“没有遇到对的人”，不是荷尔蒙失调，也不代表你没有爱的能力——许多无性恋者同样渴望牵手、陪伴、浪漫与深情。',
+      '无性恋（Asexual）是一种性取向，就像异性恋、同性恋一样自然。它更接近一种“天生如此”的吸引模式，而非主动选择的独身主义。国际无性恋社群 AVEN 自 2001 年起持续推动公众理解，黑色、灰色、白色与紫色的旗帜正是这个社群的标志。'
+    ],
+    mis:'“无性恋就是性冷淡，是病，得治。”——医学上的“性欲低下障碍”有一个关键前提：本人因此感到痛苦。如果你安然自洽，那就不是疾病。无性恋者也可能享受亲密、可能恋爱成家，个体差异非常大。',
+    warm:'世界太习惯用“有没有欲望”来衡量一个人，但爱与被爱的方式从来不止一种。你的节奏，就是最好的节奏。'
+  },
+  gray:{
+    name:'灰色性恋',en:'Graysexual / Gray-A',emoji:'🌫️',
+    colors:['#740294','#a3a3a3','#ffffff','#a3a3a3','#740294'],
+    tagline:'你的心动像偶尔放晴的天空——不常出现，但每一次阳光都真实。',
+    paras:[
+      '你处在“有”与“无”之间的过渡地带：可能极少感受到性吸引，可能只在非常特定的条件下心动，也可能吸引的强度很弱、频率很低。它位于无性恋光谱与有性恋之间，因此被温柔地称为“灰色地带”。',
+      '灰色性恋是一把舒服的“中间椅子”：你不必在“有”和“没有”之间勉强二选一。很多时候，“说不太清”本身就是最诚实的答案，而命名它，是为了让自己被理解——包括被自己。'
+    ],
+    mis:'“你只是欲望低而已，搞那么复杂。”——命名不是为了制造复杂，而是为了安放感受。当一个人终于找到一个词描述自己，往往就是与自己和解的开始。',
+    warm:'允许自己不那么典型。偶尔心动，或很少心动，都是大自然写下的正常注脚。'
+  },
+  demi:{
+    name:'半性恋',en:'Demisexual',emoji:'🤍💜',
+    colors:['#d8d8d8','#ffffff','#800080'],
+    tagline:'你的心动总是从心开始——先要懂得，才会悸动。',
+    paras:[
+      '对你来说，性吸引有一个前置开关：深厚的信任与情感联结。没有这层联结时，别人口中的“帅哥美女”很难让你产生冲动；可一旦真正懂了一个人，吸引才可能悄然生长。',
+      '半性恋（Demisexual）属于无性恋光谱的一部分。它不是“保守”“慢热”或“传统”——慢热是节奏，而半性恋是吸引的生成机制：你不是在压抑欲望，你的欲望本来就长在情感的土壤里。'
+    ],
+    mis:'“这不就是正常人谈恋爱的样子吗？”——区别在于：多数人可以先因外貌气质产生吸引、再发展感情；而对半性恋者而言，这个顺序很难颠倒。没有联结，吸引几乎无从发生。',
+    warm:'以“懂得”开始的喜欢，往往走得很远。愿你慢慢来的深情，被一个同样认真的人稳稳接住。'
+  },
+  abro:{
+    name:'性向流动',en:'Abrosexual / Fluid',emoji:'🌊',
+    colors:['#7dd4a9','#cce8c2','#ffffff','#c9b3e8','#734fa0'],
+    tagline:'你是潮汐，自有节律——变化不等于迷茫，流动也是一种方向。',
+    paras:[
+      '你的吸引对象会随时间改变：一段时间主要被异性吸引，过几个月或几年，又可能偏向同性，或者谁都不特别吸引。这种变化可以有规律，也可以很随机，但都同样正常。',
+      '“性取向是流动的”本就是现代性科学的共识之一。心理学家丽莎·戴尔蒙德（Lisa Diamond）对女性长达十年的追踪研究发现：一个人的吸引、行为与身份标签在一生中发生变化，并不罕见。'
+    ],
+    mis:'“变来变去，说明你根本不知道自己想要什么。”——流动与混乱不同：你可以很清楚地知道“此刻我被谁吸引”，同时诚实地承认“它未来也许会变”。',
+    warm:'河流不会因为转弯而失去名字。你不必把自己钉在某个标签上，今天的你和明天的你，都值得被认真对待。'
+  },
+  flex:{
+    name:'灵活倾向',en:'Heteroflexible / Homoflexible',emoji:'🌸',
+    colors:['#ffd6e0','#ff9eb3','#c9a7e8'],
+    tagline:'大部分日子晴朗安稳，偶尔也有不同方向的风吹过——这很可爱。',
+    paras:[
+      '你的心动有一个主要的方向，但并非密不透风：绝大多数时候它符合某一种取向的轮廓，只是偶尔，你会对“另一个方向”的人产生一闪而过的好感、好奇或心动。',
+      '“异性灵活（Heteroflexible，以异性吸引为主、偶发同性吸引）”与“同性灵活（Homoflexible）”描述的正是这种“主调明确、边界柔软”的状态。它不是双性恋的打折版，而是一个精确而温柔的自我描述。'
+    ],
+    mis:'“有一次例外，就说明你其实是双性恋/同性恋。”——光谱存在的意义，就是允许中间地带存在。你可以使用任何让自己舒服的词，也可以什么词都不用。',
+    warm:'心动不是考试，不必每道题都答得斩钉截铁。给柔软留一点空间，你会更喜欢这样的自己。'
+  },
+  questioning:{
+    name:'探索中',en:'Questioning / Queer',emoji:'🌱',
+    colors:['#caffbf','#9bf6ff','#bdb2ff'],
+    tagline:'你是正在发芽的春天——不必着急开花，答案会在你的节奏里长大。',
+    paras:[
+      '此刻的你，也许还说不清自己被谁吸引，或者对现有的任何标签都觉得“不太对”。这太正常了。“Questioning（存疑/探索中）”本身就是社群认可的状态；“Queer（酷儿）”也被许多人用来表达“我不想被任何一个框定义”。',
+      '金赛博士说过：“这世界上的事情，并非非黑即白。”我们对自己的认识，往往需要好几年。你不需要在今天交卷，也不需要向任何人解释“为什么还没想好”。'
+    ],
+    mis:'“不确定，就是不成熟。”——恰恰相反：愿意诚实地审视内心、拒绝让外界的声音替自己作答，是一种很有力量的成熟。',
+    warm:'慢一点没关系。请先记住这句话：无论答案是什么，你都值得被爱、被尊重、被温柔以待。如果愿意，可以去科普专区逛逛，或者过一段时间再测一次——我一直都在。'
+  }
+};
+
+/* ================= 计分与判定 ================= */
+function compute(){
+  var H=avg([1,4,11]);
+  var S=avg([2,3,12]);
+  var P=avg([9,10,14,19,20]);
+  var A=avg([8,15,23]);
+  var D=avg([6,7,17]);
+  var F=avg([13,21]);
+  var Q=((6-answers[15])+answers[21])/2; // 确定度反向 + 探索意愿
+  var R=answers[4];
+  var C=answers[15];
+  var O=(answers[17]+answers[23])/2;
+  var key,dom=null;
+  if(A>=3.9){ key = D>=3.8 ? 'demi' : 'ace'; }
+  else if(A>=3.1 && D>=3.8){ key='demi'; }
+  else if(A>=3.1){ key='gray'; }
+  else if(H>=3.5 && S<=2.6){ key=(F>=3.6||P>=4.2)?'flex':'hetero'; dom='hetero'; }
+  else if(S>=3.5 && H<=2.6){ key=(F>=3.6)?'flex':'gay'; dom='homo'; }
+  else if(H>=2.9 && S>=2.9){ key= P>=4 ? 'pan' : (F>=4?'abro':'bi'); }
+  else if(F>=4){ key='abro'; }
+  else if(P>=4){ key='pan'; }
+  else if(P>=3.4){ key='bi'; }
+  else if(Q>=3.7){ key='questioning'; }
+  else { key='questioning'; }
+  return {H:H,S:S,P:P,A:A,D:D,F:F,Q:Q,R:R,C:C,O:O,SX:6-A,key:key,dom:dom};
+}
+
+function finish(){
+  var r=compute();
+  localStorage.setItem('xinguangpu_result',JSON.stringify({at:new Date().toLocaleString('zh-CN'),r:r}));
+  document.getElementById('nav-result').style.display='';
+  renderResult(r);
+  go('result');
+}
+
+function pct(v){return Math.round((v-1)/4*100)}
+function bar(lab,v){
+  return '<div class="bar-row"><div class="lab"><span>'+lab+'</span><span>'+Math.round(v*10)/10+' / 5</span></div>'+
+         '<div class="bar"><i data-w="'+pct(v)+'"></i></div></div>';
+}
+function renderResult(r){
+  var info=RESULTS[r.key];
+  var title=info.name;
+  if(r.key==='flex') title = r.dom==='homo' ? '同性灵活倾向 Homoflexible' : '异性灵活倾向 Heteroflexible';
+  var rg='linear-gradient(90deg,'+info.colors.join(',')+')';
+  var rom='';
+  if(r.A>=3.1 && r.R<=2.5){
+    rom='你的浪漫渴望分数也偏低——你在浪漫吸引上可能同样位于<b>无浪漫倾向光谱（Aromantic spectrum）</b>：不太向往恋爱关系，但友谊、陪伴与热爱生活的能力一样可以丰盈。';
+  }else if(r.D>=3.8){
+    rom='你的心动高度依赖情感联结——你可能带有<b>半浪漫（Demiromantic）</b>特质：浪漫的心动，也常常以深厚的友谊或信任为前提。';
+  }else{
+    rom='你的<b>浪漫取向</b>可能与性取向一致，也可能并不相同（例如“对女生有性吸引、却只想和男生谈恋爱”）——这正是科普专区中「分裂吸引模型」讨论的话题，值得继续探索。';
+  }
+  var paras=info.paras.map(function(p){return '<p>'+p+'</p>'}).join('');
+  var html=''+
+  '<div class="result-hero" style="--rg:'+rg+'"><div class="ribbon"></div>'+
+    '<span class="result-emoji">'+info.emoji+'</span>'+
+    '<div class="result-en">'+info.en+'</div>'+
+    '<h2>'+title+'</h2>'+
+    '<div class="result-tagline">'+info.tagline+'</div>'+
+    '<div class="pill-line" style="justify-content:center">'+
+      '<span class="pill">🕯️ 此刻的快照，而非判决书</span>'+
+      '<span class="pill">🔬 六维光谱分析</span>'+
+      '<span class="pill">🤍 你永远可以重新定义自己</span>'+
+    '</div>'+
+  '</div>'+
+  '<div class="result-grid">'+
+    '<div class="result-block">'+
+      '<h3>📖 关于这个结果，想和你多说几句</h3>'+
+      paras+
+      '<div class="mis">🫣 <b>常见误解：</b>'+info.mis+'</div>'+
+      '<div class="warm-word">🤍 '+info.warm+'</div>'+
+    '</div>'+
+    '<div class="result-block">'+
+      '<h3>📊 你的六维光谱</h3>'+
+      bar('异性吸引',r.H)+
+      bar('同性吸引',r.S)+
+      bar('超越性别（泛/多吸引）',r.P)+
+      bar('情感联结依赖',r.D)+
+      bar('流动与变化',r.F)+
+      bar('性吸引强度',r.SX)+
+      '<div class="pill-line">'+
+        '<span class="pill">🌱 自我确定度 '+Math.round(r.C)+' / 5</span>'+
+        '<span class="pill">🫶 自我接纳度 '+Math.round(r.O)+' / 5</span>'+
+      '</div>'+
+      '<div class="mini-note">💞 <b>关于浪漫吸引：</b>'+rom+'</div>'+
+    '</div>'+
+  '</div>'+
+  '<div class="result-actions">'+
+    '<button class="btn btn-ghost" onclick="restart()">🔁 再测一次</button>'+
+    '<button class="btn btn-ghost" onclick="go(\'science\')">📚 去科普专区深入了解</button>'+
+    '<button class="btn btn-primary" onclick="exportResult()">💌 导出我的结果</button>'+
+  '</div>'+
+  '<p class="disclaimer">本结果基于你当下的自我报告生成，仅供自我探索参考，不构成任何医学或心理学诊断。性取向是流动的，未来的你也许会给出不同答案——那也很好。</p>';
+  document.getElementById('result-content').innerHTML=html;
+  setTimeout(function(){document.querySelectorAll('.bar i').forEach(function(i){i.style.width=i.dataset.w+'%'})},120);
+  window.__lastResult={r:r,info:info,title:title};
+}
+function restart(){answers=new Array(QUESTIONS.length).fill(null);cur=0;go('test');startQuiz()}
+function exportResult(){
+  var L=window.__lastResult;if(!L)return;
+  var t='心光谱小屋 · 我的温柔测试结果\n'+'生成时间：'+new Date().toLocaleString('zh-CN')+'\n'+
+    '────────────────────\n'+
+    '结果：'+L.title+'（'+L.info.en+'）\n'+L.info.tagline+'\n\n'+
+    L.info.paras.join('\n\n')+'\n\n常见误解：'+L.info.mis+'\n\n温柔寄语：'+L.info.warm+'\n'+
+    '────────────────────\n'+
+    '异性吸引 '+L.r.H.toFixed(1)+' / 同性吸引 '+L.r.S.toFixed(1)+' / 超越性别 '+L.r.P.toFixed(1)+
+    ' / 情感联结 '+L.r.D.toFixed(1)+' / 流动变化 '+L.r.F.toFixed(1)+' / 性吸引强度 '+L.r.SX.toFixed(1)+
+    '\n自我确定度 '+L.r.C+' / 自我接纳度 '+L.r.O+
+    '\n────────────────────\n本结果仅供自我探索参考，不是医学诊断。爱没有错，你也没有。';
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([t],{type:'text/plain;charset=utf-8'}));
+  a.download='我的心光谱结果.txt';a.click();
+}
+
+/* ================= 科普数据：30 种取向 ================= */
+var ID_GROUPS=[
+ {key:'classic',title:'一、经典与常见取向',desc:'被讨论最多、研究最久的几种坐标，构成光谱最清晰的主干道。'},
+ {key:'multi',title:'二、多元吸引：性别之外的宇宙',desc:'当吸引不再只围绕“同性/异性”展开，这些词提供了更精细的地图。'},
+ {key:'ace',title:'三、无性恋光谱（A-spec）',desc:'从“完全没有”到“偶尔有、有条件”，这把紫色的大伞下有丰富的层次。'},
+ {key:'fluid',title:'四、流动、探索与态度',desc:'关于变化、好奇、拒绝标签，以及诚实地说“我还在路上”。'}
+];
+var IDS=[
+ /* classic */
+ {g:'classic',n:'异性恋',e:'Heterosexual / Straight',tag:'经典',c:['#8fb4e8','#c4d9f5','#f6e8d9'],d:'主要或只被异性吸引，是社会中最常见的取向。但“常见”从不等于“唯一正常”。'},
+ {g:'classic',n:'男同性恋',e:'Gay',tag:'经典',c:['#e40303','#ff8c00','#ffed00','#008026','#004dff','#750787'],d:'男性对男性产生持久的浪漫与性吸引。英文 Gay 在日常语境中也常泛指同性恋者。'},
+ {g:'classic',n:'女同性恋',e:'Lesbian',tag:'经典',c:['#d52d00','#ff9a56','#ffffff','#d162a4','#a30262'],d:'女性对女性产生持久的浪漫与性吸引。中文社群常用“拉子（Les 的音译）”作为亲昵称呼。'},
+ {g:'classic',n:'双性恋',e:'Bisexual',tag:'经典',c:['#d60270','#9b4f96','#0038a8'],d:'可被同性与异性吸引，两种吸引不必同等强烈，也不必同时出现。'},
+ {g:'classic',n:'泛性恋',e:'Pansexual',tag:'经典',c:['#ff218c','#ffd800','#21b1ff'],d:'吸引可以跨越任何性别——性别在心动中几乎不构成门槛，“爱上的是人”。'},
+ /* multi */
+ {g:'multi',n:'全性恋',e:'Omnisexual',tag:'多元吸引',c:['#ff9cef','#ff53bf','#7d59df','#7e99ff'],d:'可被所有性别的人吸引。与泛性恋的细微差别是：全性恋者仍会“看见”性别，只是它不构成限制。'},
+ {g:'multi',n:'多性恋',e:'Polysexual',tag:'多元吸引',c:['#f714ba','#01d66a','#1c92f6'],d:'被多种（但不必是全部）性别的人吸引。是位于双性恋与泛性恋之间的一种自我描述。'},
+ {g:'multi',n:'光谱性恋',e:'Spectrasexual',tag:'多元吸引',c:['#ff9a9e','#fecfef','#a18cd1'],d:'被性别光谱上多元的气质与身份所吸引，强调“光谱式”的吸引范围，而非一份具体性别清单。'},
+ {g:'multi',n:'男性恋',e:'Androsexual',tag:'多元吸引',c:['#4a90e2','#8fb4f0','#e8f1ff'],d:'被“男性化的人/男性气质”吸引，无论对方的生理性别或身份是男性、跨性别者还是非二元者。'},
+ {g:'multi',n:'女性恋',e:'Gynesexual',tag:'多元吸引',c:['#f76b8a','#ffa8c5','#ffe3ee'],d:'被“女性化的人/女性气质”吸引，同样不以对方的生理性别为前提。'},
+ {g:'multi',n:'非二元恋',e:'Ceterosexual',tag:'多元吸引',c:['#ffd166','#ffe8a3','#c8b6ff'],d:'主要被跨性别或非二元性别者吸引。旧称 Skoliosexual，因词源争议正逐渐被 Ceterosexual 取代。'},
+ {g:'multi',n:'智性恋',e:'Sapiosexual',tag:'吸引偏好',c:['#54a0a0','#8fd1c1','#f6d365'],d:'把心智、思想与才华视为首要吸引力。它更常被当作一种“吸引偏好”，而非严格意义上的性取向。'},
+ /* ace */
+ {g:'ace',n:'无性恋',e:'Asexual',tag:'A-spec',c:['#3a3a3a','#a3a3a3','#ffffff','#800080'],d:'很少或不感受到性吸引。可以恋爱、可以享受亲密、也可以都不想要——个体差异极大，约占人口 1% 左右。'},
+ {g:'ace',n:'灰色性恋',e:'Graysexual',tag:'A-spec',c:['#740294','#bdbdbd','#ffffff','#bdbdbd','#740294'],d:'极少、极弱或仅在特定条件下感受到性吸引，处于无性恋与有性恋之间的灰色地带。'},
+ {g:'ace',n:'半性恋',e:'Demisexual',tag:'A-spec',c:['#d8d8d8','#ffffff','#800080'],d:'只有在建立深厚情感联结之后才可能产生性吸引。吸引的开关，长在信任的土壤里。'},
+ {g:'ace',n:'易碎型',e:'Fraysexual',tag:'A-spec',c:['#b5deff','#d7e7ff','#f6c6dd'],d:'半性恋的“反面”：容易被尚不熟悉的人吸引，一旦情感联结加深，吸引反而可能消散。'},
+ {g:'ace',n:'渴望型',e:'Cupiosexual',tag:'A-spec',c:['#ffb7c5','#ffd6e0','#e7c6ff'],d:'自己感受不到性吸引，却仍然渴望拥有性关系或性的亲密体验——吸引与行为可以分开。'},
+ {g:'ace',n:'无感型',e:'Lithosexual / Akoisexual',tag:'A-spec',c:['#a0c4ff','#bdb2ff','#ffc6ff'],d:'会产生吸引，但并不希望得到对方回应；一旦被回应，吸引可能减弱或消失。'},
+ {g:'ace',n:'互惠型',e:'Reciprosexual',tag:'A-spec',c:['#90dbf4','#8eecf5','#cfbaf0'],d:'只有在感觉到“对方先被我吸引”之后，自己才会随之产生吸引，像一种情感的回声。'},
+ {g:'ace',n:'自爱恋',e:'Autosexual',tag:'A-spec',c:['#f1c0e8','#fbf8cc','#cfbaf0'],d:'主要被自己吸引，或从自身获得远多于他人的性唤起与性愉悦。'},
+ {g:'ace',n:'付出型',e:'Placiosexual',tag:'A-spec',c:['#ffd8a8','#ffe8cc','#b5ead7'],d:'乐于给予对方性的愉悦，但自己不太希望成为接受的一方——吸引里有明确的方向偏好。'},
+ /* fluid */
+ {g:'fluid',n:'性向流动',e:'Abrosexual',tag:'流动',c:['#7dd4a9','#cce8c2','#ffffff','#c9b3e8','#734fa0'],d:'吸引对象随时间推移而变化，周期可长可短。流动不是摇摆不定，而是一种稳定的“变化模式”。'},
+ {g:'fluid',n:'新奇型',e:'Novosexual',tag:'流动',c:['#7bdff2','#b2f7ef','#f7d6e0'],d:'吸引会随着自己当下的性别身份或所处情境而显著改变，与自身性别体验紧密联动。'},
+ {g:'fluid',n:'存疑 / 探索中',e:'Questioning',tag:'探索',c:['#caffbf','#9bf6ff','#bdb2ff'],d:'尚不确定自己的取向，仍在探索。这本身就是一种被尊重的状态，没有“必须尽快想明白”的期限。'},
+ {g:'fluid',n:'酷儿',e:'Queer',tag:'态度',c:['#b57edc','#d5b3ea','#f0e4f8'],d:'原是贬义，后被社群夺回，成为“不愿被现有标签定义”的伞状身份词；学术界亦有“酷儿理论”。'},
+ {g:'fluid',n:'两好奇',e:'Bi-curious',tag:'探索',c:['#ffafcc','#cdb4db','#a2d2ff'],d:'以某一取向为主，但对与另一性别建立亲密关系感到好奇、想试试看，是探索期常见的自我描述。'},
+ {g:'fluid',n:'异性灵活',e:'Heteroflexible',tag:'灵活',c:['#ffd6e0','#ff9eb3','#c9a7e8'],d:'以异性吸引为主，偶尔对同性产生吸引或好奇。“主调明确，边界柔软”。'},
+ {g:'fluid',n:'同性灵活',e:'Homoflexible',tag:'灵活',c:['#c9b3e8','#ff9eb3','#ffd6e0'],d:'以同性吸引为主，偶尔对异性产生吸引或好奇，与异性灵活互为镜像。'},
+ {g:'fluid',n:'后性恋',e:'Pomosexual',tag:'态度',c:['#b0c4de','#e6e6fa','#f4c2c2'],d:'由 postmodern（后现代）与 homosexual 拼合：认为现有的一切分类词汇都无法安放自己，拒绝被标签收编。'},
+ {g:'fluid',n:'不贴标签',e:'Unlabeled',tag:'态度',c:['#e0f4c8','#fff5d6','#ffd6e0'],d:'清楚自己是谁、感受为何，但主动选择不使用任何标签——“我知道我是谁，名字不重要”。'}
+];
+var ROMANTIC=[
+ {n:'无浪漫倾向',e:'Aromantic（Aro）',tag:'浪漫取向',c:['#3da542','#a7d379','#ffffff','#a9a9a9','#2e2e2e'],d:'很少或不感受到浪漫吸引、不向往恋爱关系，但同样可以拥有深厚的友谊、亲情与陪伴需求。'},
+ {n:'灰色浪漫',e:'Grayromantic',tag:'浪漫取向',c:['#740294','#bdbdbd','#ffffff','#bdbdbd','#740294'],d:'极少、极弱或仅在特定条件下感受到浪漫吸引，是浪漫光谱上的灰色地带。'},
+ {n:'半浪漫',e:'Demiromantic',tag:'浪漫取向',c:['#d8d8d8','#ffffff','#800080'],d:'只有在建立深厚的情感联结之后，才可能产生浪漫的心动与恋爱的渴望。'},
+ {n:'异性/同性浪漫',e:'Heteroromantic / Homoromantic',tag:'浪漫取向',c:['#8fb4e8','#ffd6e0','#f4c6d1'],d:'浪漫心动只指向异性或同性。它可以与性取向不同步，例如“无性恋＋异性浪漫”。'},
+ {n:'双性/泛性浪漫',e:'Biromantic / Panromantic',tag:'浪漫取向',c:['#d60270','#9b4f96','#0038a8','#ffd800'],d:'浪漫心动可指向两种性别（双）或跨越一切性别（泛），与是否有性吸引无关。'},
+ {n:'易碎/互惠/渴望浪漫',e:'Fray-/Recipror-/Cupioromantic',tag:'浪漫取向',c:['#b5deff','#90dbf4','#ffb7c5'],d:'分别对应浪漫版的“亲近后消散”“对方先心动我才心动”“自己不心动却渴望恋爱”，是 A-spec 浪漫光谱上的细分位置。'}
+];
+var GENDERS=[
+ {n:'生理性别',e:'Sex assigned at birth',tag:'身体',c:['#b5ead7','#c7ceea','#fce1e4'],d:'出生时依据生殖系统、染色体等被指派的性别。它与性别认同、性取向是三个独立变量。'},
+ {n:'顺性别',e:'Cisgender',tag:'性别认同',c:['#89c7ff','#d7e9ff','#ffffff'],d:'性别认同与出生指派性别一致的人。前缀 Cis- 意为“同侧”，是中性的描述词，而非“默认正常人”。'},
+ {n:'跨性别',e:'Transgender',tag:'性别认同',c:['#55cdfc','#f7a8b8','#ffffff','#f7a8b8','#55cdfc'],d:'性别认同与出生指派性别不一致的人。跨性别是性别身份，不是性取向——跨性别者可以是任何取向。'},
+ {n:'非二元性别',e:'Non-binary',tag:'性别认同',c:['#fcf434','#ffffff','#9c59d1','#2d2d2d'],d:'不认为自己完全属于“男”或“女”的人，例如介于两者之间、两者皆有或两者皆无。'},
+ {n:'性别流动',e:'Genderfluid',tag:'性别认同',c:['#ff75a0','#ffffff','#be8dff','#000000'],d:'性别认同会随时间或情境在男性、女性或其他位置之间流动，与“性向流动”描述的是两件事。'},
+ {n:'无性别 / 双性别',e:'Agender / Bigender',tag:'性别认同',c:['#cccccc','#ffffff','#b7f0c2','#fff0b8'],d:'无性别者不认同任何性别；双性别者同时或交替体验到两种性别身份。'}
+];
+
+function flagHtml(colors){return '<div class="flag">'+colors.map(function(c){return '<i style="background:'+c+'"></i>'}).join('')+'</div>'}
+function idCard(o){return '<div class="id-card">'+flagHtml(o.c)+'<div class="id-body"><span class="nm">'+o.n+'</span> <span class="en">'+o.e+'</span><br><span class="tag">'+o.tag+'</span><p>'+o.d+'</p></div></div>'}
+
+(function renderIds(){
+  var grid=document.getElementById('id-grid');
+  ID_GROUPS.forEach(function(g){
+    var h='<h4 style="color:var(--lav);font-size:15px;margin:18px 0 10px">'+g.title+' <span style="font-weight:400;color:var(--ink-soft);font-size:13px">'+g.desc+'</span></h4>';
+    var cards='<div class="id-grid" style="margin-bottom:6px">'+IDS.filter(function(i){return i.g===g.key}).map(idCard).join('')+'</div>';
+    grid.insertAdjacentHTML('beforeend',h+cards);
+  });
+  document.getElementById('rom-grid').insertAdjacentHTML('beforeend',ROMANTIC.map(idCard).join(''));
+  document.getElementById('gender-grid').insertAdjacentHTML('beforeend',GENDERS.map(idCard).join(''));
+})();
+
+/* ================= Q&A ================= */
+var QA=[
+ {q:'性取向是一种选择吗？是不是后天“学坏”的？',
+  a:['目前没有证据表明性取向是个人有意识选择的结果。双胞胎研究、基因研究、孕期激素与大脑结构研究都指向：它由遗传、产前发育与环境等多重因素共同塑造，在很早的阶段就已成形。','“和同性恋爱过”并不会“变成”同性恋，正如和异性恋爱不会把人“变直”——经历可以帮助你发现自己，却不能决定你是谁。']},
+ {q:'所谓“扭转治疗”“掰直治疗”有用吗？',
+  a:['没有用，而且有害。美国心理学会（APA）、世界卫生组织（WHO）、中国精神卫生界均不认可“性倾向可以被改变”的说法。研究显示，接受过扭转治疗的人，抑郁与自杀尝试的比例显著升高。','2014 年，北京海淀法院在“重庆心语飘香同性恋矫正案”中判决该类治疗违法，成为中国“同性恋扭转治疗第一案”。任何以电击、药物、催眠、忏悔为名要求你“变回正常”的机构，都不值得信任。']},
+ {q:'这个测试准吗？结果会不会变？',
+  a:['它是一个温柔的“自我访谈工具”，不是精密仪器，也不是诊断。它能帮助你把模糊的感受语言化，但最了解你的人永远是你自己。','吸引在一生中发生变化是常见现象，尤其是在青春期与青年期。建议把结果当作“此刻的快照”——过半年再测，如果答案不同，也只是说明你在生长，像树木换了一圈年轮。']},
+ {q:'无性恋是不是“性冷淡”？是不是有病？需不需要治？',
+  a:['“性冷淡”在医学上接近“性欲低下障碍（HSDD）”，诊断有一个核心条件：这种状态让<b>你本人</b>感到显著痛苦，并影响你的生活。','如果你只是“不感兴趣”，但生活自洽、关系满意，那不是疾病，而是无性恋光谱上的自然位置。但如果低欲望伴随痛苦、激素问题或药物副作用，找正规医院的内分泌或心理科看看，是对自己的照顾——两种情况可以同时被尊重。']},
+ {q:'双性恋是不是“还没决定好”？会不会很花心？',
+  a:['双性恋是一种稳定的取向，不是“直与同之间的候车厅”。一个人能被两种性别吸引，不代表他需要同时拥有两个伴侣，正如异性恋男性不会想同时拥有所有女性。','忠诚是价值观与关系契约，与吸引范围无关。双性恋者在长期关系中的守约率，与其他取向的人没有差异。']},
+ {q:'我对同性有过一次心动（或做过相关的梦），就是同性恋吗？',
+  a:['都不是。金赛发现，相当比例的人在一生中都有过某种程度的同性吸引体验或行为，但这与“以同性为主要、持久的吸引对象”不是一回事。','性吸引、性行为、浪漫吸引、自我认同是四个不同维度（见克莱因网格）。一次心动、一个梦、一段打闹，都是光谱上的小光斑，而不是需要立刻盖章的判决书。']},
+ {q:'人群中到底有多少人是 LGBTQ+？',
+  a:['数字取决于定义与调查方法：仅统计“完全同性吸引”，比例约 1%–5%；把“主要异性但偶有同性吸引”的人也纳入光谱，比例可达约 7%–10% 甚至更高；无性恋者约占 1%。近年多个国家的大样本调查中，年轻世代报告非绝对异性恋的比例明显更高——未必是取向变了，更可能是人们终于敢诚实回答。']},
+ {q:'动物界也有同性性行为吗？',
+  a:['有。科学家已在 1000 多种动物中记录到同性性行为，包括企鹅、海豚、长颈鹿、天鹅、绵羊与多种灵长类。它在自然界中并非“反常”，而是反复出现的自然现象。','当然，动物行为不能直接等同于人类的爱与身份，但它至少说明：多样性是大自然的手笔，不是谁的“错误”。']},
+ {q:'我一定要“出柜”吗？该怎么告诉父母？',
+  a:['不必须。出柜是你的权利，不是义务；选择何时、何地、告诉谁，节奏完全由你掌握。安全优先：在经济与人身尚未独立时，等待本身就是一种策略。','准备出柜时，可以先从一位最可能接纳你的人开始；给父母时间，他们可能也需要“补课”（出色伙伴等组织有许多同志父母的互助经验）。如果一次没有被理解，那不是你的失败，只是他们还需要更多时间。']},
+ {q:'跨性别和同性恋是一回事吗？',
+  a:['不是。一个是“性别认同”问题——我内心认为自己是谁；一个是“性取向”问题——我被谁吸引。跨性别女性是女性，她若喜欢女性，就是女同性恋；若喜欢男性，就是异性恋。','常见的四个独立概念是：生理性别（身体）、性别认同（我是谁）、性别表达（我如何打扮与举止）、性取向（我爱谁）。它们自由组合，才构成真实而丰富的人。']},
+ {q:'我有宗教信仰 / 家庭压力很大，感到很自责怎么办？',
+  a:['信仰、家庭与真实感受之间的拉扯，是真实而沉重的痛苦，不需要假装轻松。越来越多的宗教传统内部出现了接纳性少数的诠释与社群；而几乎所有主流信仰中，“爱邻人、不伤害”都比戒律的字面解释更接近核心。','你不必一夜之间解决所有冲突。先照顾好自己的安全与健康，找专业咨询师或友善社群谈一谈。你没有伤害任何人，认真地活着、真诚地爱着，本身就不是罪过。']}
+];
+(function renderQA(){
+  document.getElementById('qa-box').innerHTML=QA.map(function(x,i){
+    return '<div class="qa-item"><button class="qa-q" onclick="toggleQA(this)"><span>'+x.q+'</span><span class="pm">+</span></button>'+
+      '<div class="qa-a">'+x.a.map(function(p){return '<p>'+p+'</p>'}).join('')+'</div></div>';
+  }).join('')
+})();
+function toggleQA(btn){btn.parentElement.classList.toggle('open')}
+
+/* ================= 时间线 ================= */
+var TL=[
+ {y:'1869 年',t:'奥地利作家科尔特本尼（Karl-Maria Kertbeny）创造出“homosexual（同性恋）”一词，身份开始拥有名字。'},
+ {y:'1948 / 1953 年',t:'金赛《人类男性性行为》《人类女性性行为》出版，0–6 级量表第一次告诉世界：大多数人都不在光谱的绝对两端。'},
+ {y:'1973 年',t:'美国精神医学会将同性恋从《精神障碍诊断与统计手册（DSM）》中删除——这是现代去病理化的起点。'},
+ {y:'1978 年',t:'克莱因提出“性取向网格”，用 7 个变量 × 3 个时段描绘一个人，多维模型登场；同年彩虹旗首次在旧金山飘扬。'},
+ {y:'1990 年',t:'世界卫生组织（WHO）在《国际疾病分类（ICD）》中将同性恋除名。5 月 17 日由此成为“国际不再恐同日（IDAHOT）”。'},
+ {y:'2001 年',t:'中国《中国精神障碍分类与诊断标准（第三版）》（CCMD-3）将同性恋从精神疾病中删除。'},
+ {y:'2001 年起',t:'AVEN 等无性恋社群建立，无性恋、半性恋、灰色性恋等身份进入公众视野，光谱继续延伸。'},
+ {y:'2006 年',t:'《日惹原则》在联合国框架下提出：性倾向与性别认同相关权利是普世人权。'},
+ {y:'2014 年',t:'中国“同性恋扭转治疗第一案”在京判决：相关“治疗”违法，院方公开道歉。'},
+ {y:'今天',t:'越来越多的人明白：爱没有标准形态，科学负责证明，文明负责接纳，而你只需要负责做自己。'}
+];
+document.getElementById('timeline').innerHTML=TL.map(function(x){
+  return '<div class="tl-item"><div class="yr">'+x.y+'</div><p>'+x.t+'</p></div>'
+}).join('');
+
+/* ================= 恢复上次结果 ================= */
+(function(){
+  try{
+    var saved=JSON.parse(localStorage.getItem('xinguangpu_result')||'null');
+    if(saved&&saved.r){
+      document.getElementById('nav-result').style.display='';
+      renderResult(saved.r);
+    }
+  }catch(e){}
+})();
+</script>
+</body>
+</html>

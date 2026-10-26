@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>天气查询 · 实时气象</title>
+<style>
+:root{--bg:#0c1445;--panel:#1a237e;--card:#283593;--text:#e8eaf6;--muted:#9fa8da;--accent:#ff6f00;--accent2:#ffab00;--sun:#ffd54f;--rain:#4fc3f7;--cloud:#b0bec5;--snow:#e1f5fe}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:linear-gradient(135deg,#0c1445,#1a237e,#283593);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px;overflow-x:hidden}
+/* 搜索区 */
+.search-section{width:100%;max-width:600px;margin-bottom:30px}
+.search-box{display:flex;gap:12px;background:rgba(255,255,255,.08);backdrop-filter:blur(10px);border-radius:20px;padding:8px;border:1px solid rgba(255,255,255,.1)}
+.search-box input{flex:1;padding:16px 20px;background:transparent;border:none;color:var(--text);font-size:16px;outline:none;font-family:inherit}
+.search-box input::placeholder{color:var(--muted)}
+.search-box button{padding:16px 32px;background:var(--accent);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:600;cursor:pointer;transition:.2s;font-family:inherit}
+.search-box button:hover{background:var(--accent2);transform:translateY(-1px)}
+.quick-cities{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;justify-content:center}
+.city-chip{padding:10px 20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:20px;color:var(--muted);font-size:14px;cursor:pointer;transition:.2s}
+.city-chip:hover,.city-chip.active{background:rgba(255,255,255,.15);color:var(--text);border-color:var(--accent)}
+/* 主天气卡片 */
+.weather-card{width:100%;max-width:600px;background:rgba(255,255,255,.08);backdrop-filter:blur(16px);border-radius:28px;padding:32px;border:1px solid rgba(255,255,255,.12);margin-bottom:24px;text-align:center;position:relative;overflow:hidden}
+.weather-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,.05) 0%,transparent 70%);animation:shimmer 8s infinite}
+@keyframes shimmer{0%,100%{transform:rotate(0deg)}50%{transform:rotate(180deg)}}
+.city-name{font-size:28px;font-weight:600;margin-bottom:4px}
+.city-time{font-size:14px;color:var(--muted);margin-bottom:24px}
+.temp-main{font-size:96px;font-weight:200;line-height:1;margin-bottom:8px;text-shadow:0 4px 30px rgba(255,213,79,.3)}
+.temp-main .unit{font-size:48px;vertical-align:top}
+.weather-desc{font-size:20px;color:var(--muted);margin-bottom:24px}
+.weather-icon{font-size:72px;margin-bottom:16px;display:inline-block;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.temp-range{display:flex;justify-content:center;gap:24px;font-size:16px;color:var(--muted)}
+.temp-range .high{color:var(--sun)}.temp-range .low{color:var(--rain)}
+/* 详情网格 */
+.details-grid{width:100%;max-width:600px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px}
+.detail-card{background:rgba(255,255,255,.06);backdrop-filter:blur(8px);border-radius:20px;padding:20px;text-align:center;border:1px solid rgba(255,255,255,.08);transition:.2s}
+.detail-card:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+.detail-icon{font-size:32px;margin-bottom:8px}
+.detail-value{font-size:24px;font-weight:600;margin-bottom:4px}
+.detail-label{font-size:13px;color:var(--muted)}
+/* 24小时预报 */
+.hourly-section{width:100%;max-width:600px;margin-bottom:24px}
+.section-title{font-size:16px;color:var(--muted);margin-bottom:12px;padding-left:8px}
+.hourly-scroll{display:flex;gap:12px;overflow-x:auto;padding:4px 4px 12px;scrollbar-width:thin;scrollbar-color:var(--muted) transparent}
+.hourly-scroll::-webkit-scrollbar{height:4px}
+.hourly-scroll::-webkit-scrollbar-track{background:transparent}
+.hourly-scroll::-webkit-scrollbar-thumb{background:var(--muted);border-radius:2px}
+.hourly-item{flex-shrink:0;background:rgba(255,255,255,.06);border-radius:16px;padding:16px;text-align:center;min-width:72px;border:1px solid rgba(255,255,255,.06)}
+.hourly-item .time{font-size:12px;color:var(--muted);margin-bottom:8px}
+.hourly-item .icon{font-size:24px;margin-bottom:8px}
+.hourly-item .temp{font-size:16px;font-weight:600}
+/* 7天预报 */
+.daily-section{width:100%;max-width:600px;margin-bottom:24px}
+.daily-list{display:flex;flex-direction:column;gap:8px}
+.daily-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.06);border-radius:14px;padding:14px 20px;border:1px solid rgba(255,255,255,.06)}
+.daily-item .day{font-size:14px;width:48px}
+.daily-item .icon{font-size:20px}
+.daily-item .desc{font-size:13px;color:var(--muted);flex:1;margin-left:12px}
+.daily-item .temps{display:flex;gap:12px;font-size:14px}
+.daily-item .temps .high{color:var(--sun)}.daily-item .temps .low{color:var(--rain)}
+/* 生活指数 */
+.life-section{width:100%;max-width:600px}
+.life-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.life-item{background:rgba(255,255,255,.06);border-radius:14px;padding:16px;text-align:center;border:1px solid rgba(255,255,255,.06)}
+.life-item .icon{font-size:24px;margin-bottom:6px}
+.life-item .name{font-size:12px;color:var(--muted);margin-bottom:4px}
+.life-item .value{font-size:13px;font-weight:600}
+/* 错误提示 */
+.error-msg{background:rgba(248,81,73,.15);border:1px solid rgba(248,81,73,.3);border-radius:14px;padding:16px 20px;color:#ef9a9a;font-size:14px;margin-bottom:20px;display:none;width:100%;max-width:600px;text-align:center}
+.error-msg.show{display:block}
+/* 加载动画 */
+.loading{display:none;width:48px;height:48px;border:4px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin:20px auto}
+.loading.show{display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:480px){.temp-main{font-size:72px}.temp-main .unit{font-size:36px}.search-box{flex-direction:column}.search-box button{width:100%}}
+</style>
+</head>
+<body>
+<div class="search-section">
+  <div class="search-box">
+    <input type="text" id="cityInput" placeholder="输入城市名，如：北京、上海、广州..." onkeydown="if(event.key==='Enter')searchWeather()">
+    <button onclick="searchWeather()">🔍 查询</button>
+  </div>
+  <div class="quick-cities">
+    <div class="city-chip active" onclick="quickSearch('北京')">北京</div>
+    <div class="city-chip" onclick="quickSearch('上海')">上海</div>
+    <div class="city-chip" onclick="quickSearch('广州')">广州</div>
+    <div class="city-chip" onclick="quickSearch('深圳')">深圳</div>
+    <div class="city-chip" onclick="quickSearch('杭州')">杭州</div>
+    <div class="city-chip" onclick="quickSearch('成都')">成都</div>
+  </div>
+</div>
+
+<div class="error-msg" id="errorMsg"></div>
+<div class="loading" id="loading"></div>
+
+<div id="weatherContent">
+  <div class="weather-card">
+    <div class="city-name" id="cityName">北京</div>
+    <div class="city-time" id="cityTime"></div>
+    <div class="weather-icon" id="weatherIcon">☀️</div>
+    <div class="temp-main"><span id="tempNow">22</span><span class="unit">°C</span></div>
+    <div class="weather-desc" id="weatherDesc">晴</div>
+    <div class="temp-range"><span class="high">最高 <span id="tempHigh">28</span>°</span><span class="low">最低 <span id="tempLow">16</span>°</span></div>
+  </div>
+
+  <div class="details-grid">
+    <div class="detail-card"><div class="detail-icon">💧</div><div class="detail-value" id="humidity">45%</div><div class="detail-label">湿度</div></div>
+    <div class="detail-card"><div class="detail-icon">💨</div><div class="detail-value" id="windSpeed">3级</div><div class="detail-label">风力</div></div>
+    <div class="detail-card"><div class="detail-icon">🌡</div><div class="detail-value" id="feelsLike">24°</div><div class="detail-label">体感温度</div></div>
+    <div class="detail-card"><div class="detail-icon">👁</div><div class="detail-value" id="visibility">10km</div><div class="detail-label">能见度</div></div>
+    <div class="detail-card"><div class="detail-icon">🧭</div><div class="detail-value" id="windDir">东南风</div><div class="detail-label">风向</div></div>
+    <div class="detail-card"><div class="detail-icon">☀️</div><div class="detail-value" id="uvIndex">中等</div><div class="detail-label">紫外线</div></div>
+  </div>
+
+  <div class="hourly-section">
+    <div class="section-title">24小时预报</div>
+    <div class="hourly-scroll" id="hourlyList"></div>
+  </div>
+
+  <div class="daily-section">
+    <div class="section-title">7天预报</div>
+    <div class="daily-list" id="dailyList"></div>
+  </div>
+
+  <div class="life-section">
+    <div class="section-title">生活指数</div>
+    <div class="life-grid">
+      <div class="life-item"><div class="icon">👕</div><div class="name">穿衣</div><div class="value" id="lifeDress">舒适</div></div>
+      <div class="life-item"><div class="icon">🏃</div><div class="name">运动</div><div class="value" id="lifeSport">适宜</div></div>
+      <div class="life-item"><div class="icon">🚗</div><div class="name">洗车</div><div class="value" id="lifeCar">适宜</div></div>
+      <div class="life-item"><div class="icon">🤧</div><div class="name">感冒</div><div class="value" id="lifeCold">少发</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 模拟天气数据（实际项目可替换为 API）
+const weatherDB={
+'北京':{temp:22,high:28,low:16,desc:'晴',icon:'☀️',humidity:45,wind:'3级',windDir:'东南风',feels:24,visibility:10,uv:'中等',hourly:[{t:'现在',i:'☀️',temp:22},{t:'14时',i:'☀️',temp:25},{t:'15时',i:'⛅',temp:27},{t:'16时',i:'⛅',temp:28},{t:'17时',i:'⛅',temp:26},{t:'18时',i:'🌤',temp:24},{t:'19时',i:'🌙',temp:22},{t:'20时',i:'🌙',temp:20}],daily:[{d:'今天',i:'☀️',desc:'晴',h:28,l:16},{d:'明天',i:'⛅',desc:'多云',h:27,l:17},{d:'周三',i:'🌧',desc:'小雨',h:24,l:15},{d:'周四',i:'🌧',desc:'中雨',h:22,l:14},{d:'周五',i:'⛅',desc:'多云',h:25,l:16},{d:'周六',i:'☀️',desc:'晴',h:27,l:17},{d:'周日',i:'☀️',desc:'晴',h:28,l:18}],life:{dress:'舒适',sport:'适宜',car:'适宜',cold:'少发'}},
+'上海':{temp:26,high:30,low:22,desc:'多云',icon:'⛅',humidity:65,wind:'2级',windDir:'东风',feels:28,visibility:8,uv:'强',hourly:[{t:'现在',i:'⛅',temp:26},{t:'14时',i:'⛅',temp:28},{t:'15时',i:'☀️',temp:29},{t:'16时',i:'☀️',temp:30},{t:'17时',i:'⛅',temp:28},{t:'18时',i:'⛅',temp:27},{t:'19时',i:'🌙',temp:26},{t:'20时',i:'🌙',temp:25}],daily:[{d:'今天',i:'⛅',desc:'多云',h:30,l:22},{d:'明天',i:'☀️',desc:'晴',h:31,l:23},{d:'周三',i:'☀️',desc:'晴',h:32,l:24},{d:'周四',i:'⛅',desc:'多云',h:30,l:23},{d:'周五',i:'🌧',desc:'阵雨',h:28,l:22},{d:'周六',i:'🌧',desc:'小雨',h:26,l:21},{d:'周日',i:'⛅',desc:'多云',h:28,l:22}],life:{dress:'短袖',sport:'较适宜',car:'不宜',cold:'少发'}},
+'广州':{temp:30,high:34,low:26,desc:'雷阵雨',icon:'⛈',humidity:80,wind:'2级',windDir:'南风',feels:35,visibility:6,uv:'很强',hourly:[{t:'现在',i:'⛈',temp:30},{t:'14时',i:'⛈',temp:31},{t:'15时',i:'🌧',temp:32},{t:'16时',i:'🌧',temp:33},{t:'17时',i:'⛅',temp:32},{t:'18时',i:'⛅',temp:31},{t:'19时',i:'🌙',temp:30},{t:'20时',i:'🌙',temp:29}],daily:[{d:'今天',i:'⛈',desc:'雷阵雨',h:34,l:26},{d:'明天',i:'🌧',desc:'中雨',h:32,l:25},{d:'周三',i:'🌧',desc:'小雨',h:31,l:25},{d:'周四',i:'⛅',desc:'多云',h:33,l:26},{d:'周五',i:'☀️',desc:'晴',h:34,l:27},{d:'周六',i:'☀️',desc:'晴',h:35,l:27},{d:'周日',i:'⛅',desc:'多云',h:34,l:26}],life:{dress:'短袖',sport:'不适宜',car:'不宜',cold:'少发'}},
+'深圳':{temp:29,high:33,low:25,desc:'多云',icon:'⛅',humidity:75,wind:'3级',windDir:'南风',feels:33,visibility:9,uv:'强',hourly:[{t:'现在',i:'⛅',temp:29},{t:'14时',i:'☀️',temp:31},{t:'15时',i:'☀️',temp:32},{t:'16时',i:'☀️',temp:33},{t:'17时',i:'⛅',temp:32},{t:'18时',i:'⛅',temp:30},{t:'19时',i:'🌙',temp:29},{t:'20时',i:'🌙',temp:28}],daily:[{d:'今天',i:'⛅',desc:'多云',h:33,l:25},{d:'明天',i:'☀️',desc:'晴',h:34,l:26},{d:'周三',i:'☀️',desc:'晴',h:34,l:26},{d:'周四',i:'⛅',desc:'多云',h:33,l:26},{d:'周五',i:'⛅',desc:'多云',h:32,l:25},{d:'周六',i:'🌧',desc:'阵雨',h:30,l:24},{d:'周日',i:'🌧',desc:'小雨',h:29,l:24}],life:{dress:'短袖',sport:'较适宜',car:'较适宜',cold:'少发'}},
+'杭州':{temp:24,high:29,low:19,desc:'阴',icon:'☁️',humidity:70,wind:'2级',windDir:'北风',feels:26,visibility:7,uv:'弱',hourly:[{t:'现在',i:'☁️',temp:24},{t:'14时',i:'☁️',temp:26},{t:'15时',i:'⛅',temp:28},{t:'16时',i:'⛅',temp:29},{t:'17时',i:'☁️',temp:27},{t:'18时',i:'☁️',temp:25},{t:'19时',i:'🌙',temp:23},{t:'20时',i:'🌙',temp:22}],daily:[{d:'今天',i:'☁️',desc:'阴',h:29,l:19},{d:'明天',i:'⛅',desc:'多云',h:30,l:20},{d:'周三',i:'☀️',desc:'晴',h:31,l:21},{d:'周四',i:'☀️',desc:'晴',h:32,l:22},{d:'周五',i:'⛅',desc:'多云',h:30,l:21},{d:'周六',i:'🌧',desc:'小雨',h:27,l:19},{d:'周日',i:'🌧',desc:'中雨',h:25,l:18}],life:{dress:'长袖',sport:'适宜',car:'适宜',cold:'较易发'}},
+'成都':{temp:20,high:24,low:16,desc:'小雨',icon:'🌧',humidity:85,wind:'1级',windDir:'北风',feels:21,visibility:5,uv:'最弱',hourly:[{t:'现在',i:'🌧',temp:20},{t:'14时',i:'🌧',temp:21},{t:'15时',i:'🌧',temp:22},{t:'16时',i:'🌧',temp:23},{t:'17时',i:'🌧',temp:22},{t:'18时',i:'🌧',temp:21},{t:'19时',i:'🌧',temp:20},{t:'20时',i:'🌧',temp:19}],daily:[{d:'今天',i:'🌧',desc:'小雨',h:24,l:16},{d:'明天',i:'🌧',desc:'中雨',h:22,l:15},{d:'周三',i:'🌧',desc:'小雨',h:21,l:14},{d:'周四',i:'☁️',desc:'阴',h:23,l:15},{d:'周五',i:'⛅',desc:'多云',h:25,l:16},{d:'周六',i:'☀️',desc:'晴',h:26,l:17},{d:'周日',i:'☀️',desc:'晴',h:27,l:18}],life:{dress:'外套',sport:'不适宜',car:'不宜',cold:'易发'}}
+};
+function init(){updateTime();setInterval(updateTime,1000);renderHourly();renderDaily();}
+function updateTime(){const d=new Date();document.getElementById('cityTime').textContent=d.toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'})+' '+d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});}
+function searchWeather(){const city=document.getElementById('cityInput').value.trim();if(!city)return;const data=weatherDB[city];if(!data){showError('未找到 "'+city+'" 的天气数据，试试北京、上海、广州、深圳、杭州、成都');return;}hideError();updateWeather(city,data);document.querySelectorAll('.city-chip').forEach(c=>c.classList.toggle('active',c.textContent===city));}
+function quickSearch(city){document.getElementById('cityInput').value=city;searchWeather();}
+function showError(msg){document.getElementById('errorMsg').textContent=msg;document.getElementById('errorMsg').classList.add('show');}
+function hideError(){document.getElementById('errorMsg').classList.remove('show');}
+function updateWeather(city,data){
+document.getElementById('cityName').textContent=city;document.getElementById('weatherIcon').textContent=data.icon;document.getElementById('tempNow').textContent=data.temp;document.getElementById('tempHigh').textContent=data.high;document.getElementById('tempLow').textContent=data.low;document.getElementById('weatherDesc').textContent=data.desc;document.getElementById('humidity').textContent=data.humidity+'%';document.getElementById('windSpeed').textContent=data.wind;document.getElementById('windDir').textContent=data.windDir;document.getElementById('feelsLike').textContent=data.feels+'°';document.getElementById('visibility').textContent=data.visibility+'km';document.getElementById('uvIndex').textContent=data.uv;
+document.getElementById('lifeDress').textContent=data.life.dress;document.getElementById('lifeSport').textContent=data.life.sport;document.getElementById('lifeCar').textContent=data.life.car;document.getElementById('lifeCold').textContent=data.life.cold;
+window._currentData=data;renderHourly();renderDaily();}
+function renderHourly(){const data=window._currentData||weatherDB['北京'];document.getElementById('hourlyList').innerHTML=data.hourly.map(h=>`<div class="hourly-item"><div class="time">${h.t}</div><div class="icon">${h.i}</div><div class="temp">${h.temp}°</div></div>`).join('');}
+function renderDaily(){const data=window._currentData||weatherDB['北京'];document.getElementById('dailyList').innerHTML=data.daily.map(d=>`<div class="daily-item"><span class="day">${d.d}</span><span class="icon">${d.i}</span><span class="desc">${d.desc}</span><div class="temps"><span class="high">${d.h}°</span><span class="low">${d.l}°</span></div></div>`).join('');}
+init();
+</script>
+</body>
+</html>

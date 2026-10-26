@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 穿搭推荐 · 虚拟形象试衣</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink: '#0A0A0A',
+          paper: '#FAFAF8',
+          grayline: '#E5E5E0',
+          midgray: '#8A8A8A',
+          klein: '#002FA7',
+          kleinsoft: '#E8ECF7',
+        },
+        fontFamily: {
+          display: ['"Playfair Display"', 'serif'],
+          sans: ['"Noto Sans SC"', 'sans-serif'],
+        }
+      }
+    }
+  }
+</script>
+<style>
+  * { -webkit-tap-highlight-color: transparent; }
+  body { background: #FAFAF8; color: #0A0A0A; font-family: 'Noto Sans SC', sans-serif; }
+  .font-display { font-family: 'Playfair Display', serif; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  @keyframes fadeUp { from { opacity:0; transform: translateY(16px);} to {opacity:1; transform: translateY(0);} }
+  .fade-up { animation: fadeUp .5s ease both; }
+  @keyframes scaleIn { from {opacity:0; transform: scale(.92);} to {opacity:1; transform: scale(1);} }
+  .scale-in { animation: scaleIn .4s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  .shimmer { background: linear-gradient(90deg, #f0f0ee 25%, #e0e0dc 50%, #f0f0ee 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+  input[type=range] { -webkit-appearance: none; height: 4px; background: #E5E5E0; border-radius: 2px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #002FA7; cursor: pointer; border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+  .grain { position: fixed; inset: 0; pointer-events: none; opacity: .025; z-index: 100; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+</style>
+
+<!-- 2D SVG 参数化形象：无外部模型依赖 -->
+</head>
+<body>
+<div id="root"></div>
+<div class="grain"></div>
+
+<script type="text/babel">
+const { useState, useReducer, useMemo, useEffect, useContext, createContext, useRef } = React;
+
+/* ============================================================
+   DATA LAYER
+============================================================ */
+
+const STYLES = [
+  { id:'japanese', name:'日系街头', desc:'宽松叠穿 · 少年感', icon:'🎌' },
+  { id:'korean',   name:'韩系简约', desc:'干净剪裁 · 温柔色系', icon:'🌿' },
+  { id:'french',   name:'法式慵懒', desc:'随性优雅 · 针织条纹', icon:'🥐' },
+  { id:'american', name:'美式复古', desc:'工装牛仔 · 做旧质感', icon:'🤠' },
+  { id:'techwear', name:'机能风',   desc:'多口袋 · 未来感',     icon:'🦾' },
+  { id:'cleanfit', name:'Clean Fit',desc:'极简合身 · 高级基础', icon:'⬜' },
+  { id:'oldmoney', name:'老钱风',   desc:'低调奢华 · 经典剪裁', icon:'🎩' },
+  { id:'y2k',      name:'Y2K',      desc:'千禧辣妹 · 金属亮片', icon:'✨' },
+];
+
+const COLOR_PALETTE = [
+  '#0A0A0A','#FFFFFF','#8B7355','#C9A98A','#A67B5B',
+  '#5C4033','#4A5568','#2D3748','#718096','#A0AEC0',
+  '#002FA7','#1A4B8C','#2E6DB4','#5B8DB8','#B8C9DD',
+  '#7B3F3F','#A04242','#C45C5C','#D4A5A5','#F0D5D5',
+  '#2D5016','#4A7C2E','#7BA05B','#A8C79C','#D4E5C8',
+  '#6B2D5C','#8E3A7A','#B05C9A','#D4A5C7','#EFD5E5',
+  '#B8860B','#DAA520','#E8C547','#F0D97A','#F7E9A8',
+];
+
+const TECHNIQUES = [
+  { id:'oversize',   name:'Oversize',     desc:'上宽下宽 松弛感' },
+  { id:'layering',   name:'叠穿',         desc:'层次丰富 有深度' },
+  { id:'tightloose', name:'上松下紧',     desc:'显腿长 比例佳' },
+  { id:'monochrome', name:'同色系',       desc:'高级统一 不出错' },
+  { id:'contrast',   name:'撞色',         desc:'视觉冲击 个性足' },
+];
+
+const OCCASIONS = [
+  { id:'commute', name:'通勤', icon:'💼' },
+  { id:'date',    name:'约会', icon:'💖' },
+  { id:'sport',   name:'运动', icon:'🏃' },
+  { id:'party',   name:'聚会', icon:'🎉' },
+  { id:'interview', name:'面试', icon:'📋' },
+  { id:'travel',  name:'旅行', icon:'✈️' },
+  { id:'casual',  name:'日常', icon:'☕' },
+  { id:'formal',  name:'正式', icon:'🤵' },
+];
+
+// 服装单品库：每件带标签用于推荐打分
+const TOPS = [
+  { id:'t1', name:'基础纯棉白T', color:'#FFFFFF', shape:'tshirt', styles:['cleanfit','korean','japanese'], occasions:['commute','casual','travel'], techniques:['oversize','monochrome'], bodyFit:['all'], keyword:'纯棉白色短袖T恤 基础款' },
+  { id:'t2', name:'法式条纹针织衫', color:'#E8ECF7', shape:'sweater', styles:['french','cleanfit'], occasions:['commute','date','casual'], techniques:['monochrome','layering'], bodyFit:['all'], keyword:'法式条纹针织衫 女' },
+  { id:'t3', name:'黑色修身衬衫', color:'#0A0A0A', shape:'shirt', styles:['cleanfit','oldmoney'], occasions:['commute','interview','formal'], techniques:['monochrome','tightloose'], bodyFit:['all'], keyword:'黑色修身衬衫 职业' },
+  { id:'t4', name:'燕麦色oversize卫衣', color:'#C9A98A', shape:'sweater', styles:['japanese','korean','american'], occasions:['casual','travel','sport'], techniques:['oversize','layering'], bodyFit:['all'], keyword:'燕麦色oversize卫衣 女' },
+  { id:'t5', name:'真丝缎面吊带', color:'#B05C9A', shape:'tank', styles:['french','y2k'], occasions:['date','party'], techniques:['contrast','tightloose'], bodyFit:['slim','normal'], keyword:'真丝缎面吊带背心 女' },
+  { id:'t6', name:'牛仔蓝工装衬衫', color:'#4A7C9E', shape:'shirt', styles:['american','techwear','japanese'], occasions:['casual','travel'], techniques:['layering','contrast'], bodyFit:['all'], keyword:'牛仔工装衬衫 女' },
+  { id:'t7', name:'焦糖色高领打底', color:'#A04242', shape:'tshirt', styles:['french','oldmoney'], occasions:['commute','date','formal'], techniques:['monochrome','layering'], bodyFit:['all'], keyword:'焦糖色高领打底衫' },
+  { id:'t8', name:'机能多口袋马甲', color:'#2D3748', shape:'tank', styles:['techwear','japanese'], occasions:['casual','travel','sport'], techniques:['contrast','layering'], bodyFit:['all'], keyword:'机能多口袋马甲 女' },
+];
+
+const BOTTOMS = [
+  { id:'b1', name:'高腰直筒牛仔裤', color:'#5C6B8A', shape:'jeans', styles:['cleanfit','american','japanese'], occasions:['commute','casual','travel'], techniques:['oversize','monochrome'], bodyFit:['all'], keyword:'高腰直筒牛仔裤 女' },
+  { id:'b2', name:'黑色西装阔腿裤', color:'#0A0A0A', shape:'trousers', styles:['cleanfit','oldmoney','korean'], occasions:['commute','interview','formal'], techniques:['tightloose','monochrome'], bodyFit:['all'], keyword:'黑色西装阔腿裤 女' },
+  { id:'b3', name:'卡其色A字半裙', color:'#C9A98A', shape:'skirt', styles:['french','korean'], occasions:['date','commute','casual'], techniques:['monochrome','tightloose'], bodyFit:['all'], keyword:'卡其色A字半身裙 女' },
+  { id:'b4', name:'格纹百褶短裙', color:'#7B3F3F', shape:'skirt', styles:['y2k','japanese'], occasions:['date','party','casual'], techniques:['contrast','layering'], bodyFit:['slim','normal'], keyword:'格纹百褶短裙 学院风' },
+  { id:'b5', name:'灰色运动卫裤', color:'#8A8A8A', shape:'trousers', styles:['japanese','techwear'], occasions:['sport','casual','travel'], techniques:['oversize','monochrome'], bodyFit:['all'], keyword:'灰色运动卫裤 女' },
+  { id:'b6', name:'奶油白西装短裤', color:'#F0EBE3', shape:'shorts', styles:['cleanfit','oldmoney'], occasions:['commute','casual'], techniques:['tightloose','monochrome'], bodyFit:['slim','normal'], keyword:'奶油白西装短裤 女' },
+  { id:'b7', name:'深咖灯芯绒直筒裤', color:'#5C4033', shape:'trousers', styles:['american','french'], occasions:['casual','date','travel'], techniques:['monochrome','layering'], bodyFit:['all'], keyword:'深咖色灯芯绒直筒裤' },
+  { id:'b8', name:'机能束脚工装裤', color:'#2D3748', shape:'trousers', styles:['techwear','american'], occasions:['sport','casual','travel'], techniques:['oversize','contrast'], bodyFit:['all'], keyword:'机能束脚工装裤 女' },
+];
+
+const OUTERWEARS = [
+  { id:'o1', name:'黑色oversize西装', color:'#0A0A0A', shape:'blazer', styles:['cleanfit','oldmoney','korean'], occasions:['commute','interview','date'], techniques:['oversize','tightloose'], bodyFit:['all'], keyword:'黑色oversize西装外套' },
+  { id:'o2', name:'燕麦色长款风衣', color:'#C9A98A', shape:'coat', styles:['french','cleanfit','oldmoney'], occasions:['commute','travel','formal'], techniques:['monochrome','layering'], bodyFit:['all'], keyword:'燕麦色长款风衣 女' },
+  { id:'o3', name:'军绿色工装夹克', color:'#4A5568', shape:'jacket', styles:['american','techwear','japanese'], occasions:['casual','travel','sport'], techniques:['contrast','layering'], bodyFit:['all'], keyword:'军绿色工装夹克 女' },
+  { id:'o4', name:'克莱因蓝针织开衫', color:'#002FA7', shape:'cardigan', styles:['french','korean','cleanfit'], occasions:['date','commute','casual'], techniques:['contrast','layering'], bodyFit:['all'], keyword:'克莱因蓝针织开衫 女' },
+  { id:'o5', name:'牛仔复古外套', color:'#6B8BAE', shape:'jacket', styles:['american','japanese'], occasions:['casual','travel','date'], techniques:['layering','contrast'], bodyFit:['all'], keyword:'复古牛仔外套 女' },
+  { id:'o6', name:'驼色双面呢大衣', color:'#A67B5B', shape:'coat', styles:['oldmoney','cleanfit'], occasions:['commute','formal','date'], techniques:['monochrome','tightloose'], bodyFit:['all'], keyword:'驼色双面呢大衣 女' },
+];
+
+const SHOES = [
+  { id:'s1', name:'白色帆布鞋', color:'#FFFFFF', shape:'sneakers', styles:['japanese','korean','cleanfit'], occasions:['casual','travel','sport'], techniques:['monochrome'], bodyFit:['all'], keyword:'白色帆布鞋 女' },
+  { id:'s2', name:'黑色乐福鞋', color:'#0A0A0A', shape:'loafers', styles:['cleanfit','oldmoney','french'], occasions:['commute','interview','formal'], techniques:['monochrome'], bodyFit:['all'], keyword:'黑色乐福鞋 女' },
+  { id:'s3', name:'棕色切尔西靴', color:'#5C4033', shape:'boots', styles:['american','french'], occasions:['casual','date','travel'], techniques:['monochrome'], bodyFit:['all'], keyword:'棕色切尔西靴 女' },
+  { id:'s4', name:'裸色尖头高跟鞋', color:'#E8C4A0', shape:'heels', styles:['oldmoney','cleanfit'], occasions:['commute','formal','date'], techniques:['monochrome'], bodyFit:['all'], keyword:'裸色尖头高跟鞋 女' },
+  { id:'s5', name:'老爹运动鞋', color:'#D4D4D4', shape:'sneakers', styles:['techwear','japanese','y2k'], occasions:['sport','casual','travel'], techniques:['contrast'], bodyFit:['all'], keyword:'老爹运动鞋 女' },
+  { id:'s6', name:'黑色马丁靴', color:'#0A0A0A', shape:'boots', styles:['american','techwear'], occasions:['casual','party','travel'], techniques:['contrast'], bodyFit:['all'], keyword:'黑色马丁靴 女' },
+];
+
+const ACCESSORIES = [
+  { id:'a1', name:'金属链条项链', color:'#DAA520', shape:'necklace', styles:['y2k','french'], occasions:['date','party'], techniques:['contrast'], bodyFit:['all'], keyword:'金属链条项链 女' },
+  { id:'a2', name:'皮质托特包', color:'#5C4033', shape:'bag', styles:['cleanfit','oldmoney','french'], occasions:['commute','travel','casual'], techniques:['monochrome'], bodyFit:['all'], keyword:'皮质托特包 女' },
+  { id:'a3', name:'棒球帽', color:'#0A0A0A', shape:'hat', styles:['japanese','american','techwear'], occasions:['sport','casual','travel'], techniques:['contrast'], bodyFit:['all'], keyword:'黑色棒球帽 女' },
+  { id:'a4', name:'丝巾', color:'#7B3F3F', shape:'scarf', styles:['french','oldmoney'], occasions:['commute','date','formal'], techniques:['contrast','layering'], bodyFit:['all'], keyword:'法式丝巾 女' },
+];
+
+/* ============================================================
+   AVATAR 2D SVG SYSTEM
+============================================================ */
+
+// 根据身体数据计算体型参数（空值用默认值兜底，避免输入过程中 NaN/Infinity）
+function calcBodyShape(body) {
+  const h = Number(body.height) || 165;
+  const w = Number(body.weight) || 52;
+  const bust = Number(body.bust) || 86, waist = Number(body.waist) || 68;
+  const shoulder = Number(body.shoulder) || 38, hip = Number(body.hip) || 92;
+  const bmi = w / Math.pow(h/100, 2);
+  // slim: <20, normal: 20-24, curvy: 24-28, plus: >28
+  let type = 'normal';
+  if (bmi < 20) type = 'slim';
+  else if (bmi < 24) type = 'normal';
+  else if (bmi < 28) type = 'curvy';
+  else type = 'plus';
+  // 肩宽指数
+  const shoulderRatio = shoulder / hip;
+  // 腰臀比
+  const whr = waist / hip;
+  return { type, bmi, shoulderRatio, whr, legRatio: Number(body.legRatio) || 0.5 };
+}
+
+/* ============================================================
+   Canvas 2D 形象渲染器：OOP + 锚点数据驱动
+   身材参数 → 关节锚点，衣服始终读取最新锚点绘制 → 实时贴合
+============================================================ */
+class AvatarRenderer {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.LW = 400; this.LH = 600; // 逻辑坐标系
+    this.profile = {}; this.outfit = null; this.view = 'front';
+    this._raf = 0;
+    this._onResize = this._onResize.bind(this);
+    this._ro = new ResizeObserver(this._onResize);
+    this._ro.observe(canvas);
+    this._onResize();
+  }
+
+  update(opts) {
+    this.profile = opts.profile || {};
+    this.outfit = opts.showClothes === false ? null : (opts.outfit || null);
+    this.view = opts.view || 'front';
+    // 同步重绘：不依赖 rAF（后台标签页 / 部分无头环境会冻结 rAF）
+    this._draw();
+  }
+
+  destroy() { cancelAnimationFrame(this._raf); this._ro.disconnect(); }
+
+  _onResize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const rect = this.canvas.getBoundingClientRect();
+    const w = rect.width || this.LW, h = rect.height || this.LH;
+    this.canvas.width = Math.round(w * dpr);
+    this.canvas.height = Math.round(h * dpr);
+    this._dpr = dpr; this._cssW = w; this._cssH = h;
+    this._draw();
+  }
+
+  // ---------- 锚点：身材数据（身高/体重/三围/腿长 + 微调系数）→ 关节坐标 ----------
+  _computeAnchors() {
+    const b = this.profile?.body || {}, a = this.profile?.avatar || {};
+    const n = (v, d) => { const x = Number(v); return Number.isFinite(x) && x > 0 ? x : d; };
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+    const height = n(b.height, 165), weight = n(b.weight, 52);
+    const bmi = weight / Math.pow(height / 100, 2);
+    const wf = clamp(0.82 + (bmi - 19) * 0.05, 0.78, 1.35);          // 胖瘦
+    const s = (height / 165) * n(a.heightScale, 1);                // 身高比例
+    const legRatio = clamp(n(b.legRatio, 0.5), 0.4, 0.6);
+
+    const cx = this.LW / 2;
+    const headR = 30 * n(a.faceWidth, 1);
+    const headCY = 26 + headR;
+    const neckY = headCY + headR * 0.95;
+    const shoulderY = neckY + 18 * s + 4;
+    const bustY = shoulderY + 32 * s;
+    const waistY = shoulderY + 76 * s;
+    const hipY = shoulderY + 116 * s;
+    const crotchY = hipY + 8 * s;
+    const legLen = 168 * s * (0.88 + legRatio * 0.24);
+    const kneeY = crotchY + legLen * 0.52;
+    const feetY = crotchY + legLen;
+    const elbowY = shoulderY + 62 * s;
+    const wristY = shoulderY + 118 * s;
+
+    const sh = 58 * (n(b.shoulder, 38) / 38) * wf * n(a.shoulderScale, 1);
+    const bu = 44 * (n(b.bust, 86) / 86) * wf;
+    const wa = 32 * (n(b.waist, 68) / 68) * wf * n(a.waistScale, 1);
+    const hp = 45 * (n(b.hip, 92) / 92) * wf;
+
+    return {
+      cx, s, wf, headR, headCY, neckY, shoulderY, bustY, waistY, hipY,
+      crotchY, kneeY, feetY, elbowY, wristY,
+      sh, bu, wa, hp,
+      thigh: 14.5 * wf, calf: 9.5 * wf, ankle: 7 * wf,
+      armTop: 9.5 * wf, armBot: 6.5 * wf,
+      eyeSize: n(a.eyeSize, 1), mouthWidth: n(a.mouthWidth, 1),
+      skin: b.skinTone || '#E8C4A0',
+      skinDark: shadeColor(b.skinTone || '#E8C4A0', -22),
+      hair: a.hairColor || '#2C1810',
+    };
+  }
+
+  _draw() {
+    const ctx = this.ctx;
+    if (!this._dpr || !this.profile) return;
+    try {
+    // 等比缩放并居中，容器比例变化时人物不变形
+    const scale = Math.min(this._cssW / this.LW, this._cssH / this.LH);
+    const offX = (this._cssW - this.LW * scale) / 2;
+    const offY = (this._cssH - this.LH * scale) / 2;
+    ctx.setTransform(this._dpr * scale, 0, 0, this._dpr * scale, this._dpr * offX, this._dpr * offY);
+    ctx.clearRect(-offX / scale, -offY / scale, this._cssW / scale, this._cssH / scale);
+
+    const a = this.profile?.avatar || {};
+    const A = this._computeAnchors();
+    this.A = A;
+    this.sideView = this.view === 'side';
+    this.backView = this.view === 'back';
+
+    ctx.save();
+    if (this.sideView) { ctx.translate(A.cx, 0); ctx.scale(0.42, 1); ctx.translate(-A.cx, 0); }
+
+    // 地面阴影
+    ctx.fillStyle = 'rgba(0,0,0,0.07)';
+    ctx.beginPath(); ctx.ellipse(A.cx, A.feetY + 10, 62, 8, 0, 0, Math.PI * 2); ctx.fill();
+
+    // 后层头发（垂在背后）
+    this._drawBackHair(ctx, A, a);
+    // 腿 / 下装
+    if (this.outfit?.bottom && ['jeans','trousers'].includes(this.outfit.bottom.shape)) this._drawPants(ctx, A, this.outfit.bottom);
+    else this._drawLegs(ctx, A);
+    if (this.outfit?.bottom && this.outfit.bottom.shape === 'shorts') this._drawShorts(ctx, A, this.outfit.bottom);
+    if (this.outfit?.bottom && this.outfit.bottom.shape === 'skirt') this._drawSkirt(ctx, A, this.outfit.bottom);
+    // 鞋
+    if (this.outfit?.shoes) this._drawShoes(ctx, A, this.outfit.shoes);
+    else this._drawFeet(ctx, A);
+    // 躯干
+    this._drawTorso(ctx, A);
+    // 上衣
+    if (this.outfit?.top) this._drawTop(ctx, A, this.outfit.top);
+    // 手臂（先画，领口/外套可压住肩部）
+    this._drawArms(ctx, A, this.outfit);
+    // 外套
+    if (this.outfit?.outerwear) this._drawOuterwear(ctx, A, this.outfit.outerwear);
+    // 脖子 + 头
+    this._drawNeck(ctx, A);
+    this._drawHead(ctx, A, a);
+    if (!this.backView) this._drawFace(ctx, A, a);
+    this._drawFrontHair(ctx, A, a);
+    // 配饰
+    (this.outfit?.accessories || []).forEach((acc) => this._drawAccessory(ctx, A, acc));
+
+    ctx.restore();
+    } catch (err) { if (ctx) { ctx.restore?.(); } }
+  }
+
+  // ---------- 身体 ----------
+  _legPath(ctx, A, side) {
+    const { cx, crotchY, kneeY, feetY, thigh, calf, ankle } = A;
+    ctx.beginPath();
+    ctx.moveTo(cx + side * 7, crotchY - 2);
+    ctx.quadraticCurveTo(cx + side * thigh, kneeY - 2, cx + side * (ankle + 2), feetY - 6);
+    ctx.lineTo(cx + side * 2, feetY - 6);
+    ctx.quadraticCurveTo(cx + side * 5, kneeY, cx + side * 3, crotchY - 2);
+    ctx.closePath();
+  }
+
+  _drawLegs(ctx, A) {
+    ctx.fillStyle = A.skin;
+    this._legPath(ctx, A, -1); ctx.fill();
+    this._legPath(ctx, A, 1); ctx.fill();
+  }
+
+  _drawFeet(ctx, A) {
+    ctx.fillStyle = A.skinDark;
+    [-1, 1].forEach((s) => {
+      ctx.beginPath();
+      ctx.ellipse(A.cx + s * 9, A.feetY - 2, 11, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  _drawTorso(ctx, A) {
+    const { cx, sh, bu, wa, hp, shoulderY, bustY, waistY, hipY } = A;
+    ctx.fillStyle = A.skin;
+    ctx.beginPath();
+    ctx.moveTo(cx - sh, shoulderY);
+    ctx.bezierCurveTo(cx - sh - 2, shoulderY + 22, cx - bu - 2, bustY + 2, cx - bu, bustY);
+    ctx.quadraticCurveTo(cx - wa - 2, (bustY + waistY) / 2, cx - wa, waistY);
+    ctx.quadraticCurveTo(cx - hp, waistY + 20, cx - hp, hipY);
+    ctx.lineTo(cx + hp, hipY);
+    ctx.quadraticCurveTo(cx + hp, waistY + 20, cx + wa, waistY);
+    ctx.quadraticCurveTo(cx + bu + 2, (bustY + waistY) / 2, cx + bu, bustY);
+    ctx.bezierCurveTo(cx + bu + 2, bustY + 2, cx + sh + 2, shoulderY + 22, cx + sh, shoulderY);
+    ctx.quadraticCurveTo(cx, shoulderY - 10, cx - sh, shoulderY);
+    ctx.closePath();
+    ctx.fill();
+    // 身体侧影（柔和暗面）
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.beginPath();
+    ctx.moveTo(cx - sh, shoulderY);
+    ctx.bezierCurveTo(cx - sh - 2, shoulderY + 22, cx - bu - 2, bustY + 2, cx - bu, bustY);
+    ctx.quadraticCurveTo(cx - wa - 2, (bustY + waistY) / 2, cx - wa, waistY);
+    ctx.quadraticCurveTo(cx - hp, waistY + 20, cx - hp, hipY);
+    ctx.lineTo(cx - hp + 8, hipY);
+    ctx.quadraticCurveTo(cx - wa + 4, waistY + 16, cx - wa + 5, waistY);
+    ctx.quadraticCurveTo(cx - bu + 3, (bustY + waistY) / 2, cx - bu + 6, bustY);
+    ctx.bezierCurveTo(cx - sh + 8, shoulderY + 20, cx - sh + 6, shoulderY + 6, cx - sh, shoulderY);
+    ctx.closePath(); ctx.fill();
+  }
+
+  _armPath(ctx, A, side) {
+    const { cx, sh, shoulderY, elbowY, wristY, armTop, armBot } = A;
+    ctx.beginPath();
+    ctx.moveTo(cx + side * (sh - 2), shoulderY + 2);
+    ctx.bezierCurveTo(cx + side * (sh + 7), shoulderY + 26, cx + side * (sh + 4), elbowY, cx + side * (sh - 1), wristY);
+    ctx.lineTo(cx + side * (sh - armBot * 2 - 1), wristY);
+    ctx.bezierCurveTo(cx + side * (sh - armTop * 1.6), elbowY, cx + side * (sh - armTop * 1.4), shoulderY + 16, cx + side * (sh - 12), shoulderY + 10);
+    ctx.closePath();
+  }
+
+  _drawArms(ctx, A, outfit) {
+    const top = outfit?.top, outer = outfit?.outerwear;
+    const longSleeve = outer || top?.shape === 'sweater';
+    const sleeveColor = outer ? outer.color : top?.color;
+    [-1, 1].forEach((side) => {
+      // 整条手臂（肤色或长袖）
+      ctx.fillStyle = longSleeve ? sleeveColor : A.skin;
+      this._armPath(ctx, A, side); ctx.fill();
+      // 短袖袖管
+      if (!longSleeve && top && (top.shape === 'tshirt' || top.shape === 'shirt')) {
+        const { cx, sh, shoulderY } = A;
+        ctx.fillStyle = top.color;
+        ctx.beginPath();
+        ctx.moveTo(cx + side * (sh - 6), shoulderY);
+        ctx.lineTo(cx + side * (sh + 11), shoulderY + 6);
+        ctx.lineTo(cx + side * (sh + 9), shoulderY + 30);
+        ctx.lineTo(cx + side * (sh - 4), shoulderY + 26);
+        ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = shadeColor(top.color, -18); ctx.lineWidth = 1.2; ctx.stroke();
+      }
+      // 手
+      ctx.fillStyle = A.skin;
+      ctx.beginPath();
+      ctx.ellipse(A.cx + side * (A.sh - 4), A.wristY + 4, 7.5, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  _drawNeck(ctx, A) {
+    ctx.fillStyle = A.skin;
+    ctx.beginPath();
+    ctx.moveTo(A.cx - 8, A.neckY - 4);
+    ctx.lineTo(A.cx - 9, A.shoulderY + 6);
+    ctx.quadraticCurveTo(A.cx, A.shoulderY + 12, A.cx + 9, A.shoulderY + 6);
+    ctx.lineTo(A.cx + 8, A.neckY - 4);
+    ctx.closePath(); ctx.fill();
+  }
+
+  // ---------- 头部 ----------
+  _drawHead(ctx, A, a) {
+    const { cx, headCY: cy, headR: R } = A;
+    const fs = a.faceShape || 'oval';
+    const rx = R * (fs === 'round' ? 0.9 : fs === 'square' ? 0.82 : 0.8);
+    const ry = R * (fs === 'round' ? 0.92 : fs === 'long' ? 1.16 : fs === 'square' ? 0.96 : 1.04);
+    // 耳朵
+    ctx.fillStyle = A.skinDark;
+    [-1, 1].forEach((s) => {
+      ctx.beginPath(); ctx.ellipse(cx + s * rx * 0.98, cy - 2, 3.6, 7, 0, 0, Math.PI * 2); ctx.fill();
+    });
+    // 脸
+    ctx.fillStyle = A.skin;
+    ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.fill();
+    if (fs === 'square') {
+      ctx.fillRect(cx - rx * 0.92, cy + ry * 0.55, rx * 1.84, ry * 0.4);
+    }
+  }
+
+  _drawFace(ctx, A, a) {
+    const { cx, headCY: cy, headR: R, eyeSize: es, mouthWidth: mw } = A;
+    const side = this.sideView;
+    const eyeY = cy - 3, offX = side ? 0 : R * 0.36;
+    const eyeR = 4.4 * es;
+    const eyeColor = a.eyeColor || '#3D2314';
+
+    const drawEye = (x) => {
+      const shape = a.eyeShape || 'almond';
+      ctx.fillStyle = eyeColor;
+      ctx.beginPath();
+      if (shape === 'round') { ctx.arc(x, eyeY, eyeR, 0, Math.PI * 2); ctx.fill(); }
+      else if (shape === 'wide') { ctx.ellipse(x, eyeY, eyeR * 1.25, eyeR * 0.85, 0, 0, Math.PI * 2); ctx.fill(); }
+      else if (shape === 'cat') {
+        ctx.moveTo(x - eyeR * 1.4, eyeY + 1.5);
+        ctx.lineTo(x + eyeR * 1.3, eyeY - 2); ctx.lineTo(x - eyeR * 1.4, eyeY - 2);
+        ctx.closePath(); ctx.fill();
+      } else {
+        ctx.ellipse(x, eyeY, eyeR * 1.25, eyeR * 0.8, 0, 0, Math.PI * 2); ctx.fill();
+      }
+      // 高光
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(x + eyeR * 0.4, eyeY - eyeR * 0.35, eyeR * 0.28, 0, Math.PI * 2); ctx.fill();
+    };
+    if (side) drawEye(cx + 2); else { drawEye(cx - offX); drawEye(cx + offX); }
+
+    // 眉毛
+    ctx.strokeStyle = A.hair; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+    if (side) {
+      ctx.beginPath(); ctx.moveTo(cx - 5, eyeY - 9); ctx.quadraticCurveTo(cx + 2, eyeY - 11, cx + 7, eyeY - 9); ctx.stroke();
+    } else {
+      [-1, 1].forEach((s) => {
+        const tilt = a.eyeShape === 'cat' ? s * 2 : 0;
+        ctx.beginPath();
+        ctx.moveTo(cx + s * offX - 6, eyeY - 8 + tilt);
+        ctx.quadraticCurveTo(cx + s * offX, eyeY - 11, cx + s * offX + 6, eyeY - 8 - tilt);
+        ctx.stroke();
+      });
+    }
+
+    // 鼻
+    ctx.strokeStyle = A.skinDark; ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    if (side) { ctx.moveTo(cx + 6, eyeY + 3); ctx.quadraticCurveTo(cx + 9, eyeY + 9, cx + 5, eyeY + 12); }
+    else { ctx.moveTo(cx, eyeY + 4); ctx.quadraticCurveTo(cx - 2, eyeY + 10, cx + 1, eyeY + 13); }
+    ctx.stroke();
+
+    // 嘴
+    const mouthY = cy + R * 0.42, w = 9 * mw;
+    ctx.strokeStyle = '#B05750'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    if (side) { ctx.moveTo(cx - 2, mouthY); ctx.quadraticCurveTo(cx + 5, mouthY + 3, cx + 9, mouthY); }
+    else { ctx.moveTo(cx - w, mouthY); ctx.quadraticCurveTo(cx, mouthY + 4, cx + w, mouthY); }
+    ctx.stroke();
+
+    // 腮红
+    if (!side) {
+      ctx.fillStyle = 'rgba(240,150,150,0.35)';
+      [-1, 1].forEach((s) => {
+        ctx.beginPath(); ctx.ellipse(cx + s * R * 0.55, mouthY - 6, 6, 4, 0, 0, Math.PI * 2); ctx.fill();
+      });
+    }
+  }
+
+  // ---------- 头发 ----------
+  _hairCapPath(ctx, A) {
+    const { cx, headCY: cy, headR: R } = A;
+    ctx.beginPath();
+    ctx.moveTo(cx - R * 0.85, cy - R * 0.1);
+    ctx.bezierCurveTo(cx - R * 0.9, cy - R * 1.25, cx + R * 0.9, cy - R * 1.25, cx + R * 0.85, cy - R * 0.1);
+    ctx.quadraticCurveTo(cx, cy - R * 0.55, cx - R * 0.85, cy - R * 0.1);
+    ctx.closePath();
+  }
+
+  _drawBackHair(ctx, A, a) {
+    const style = a.hairStyle || 'long';
+    if (!['long','bob','curly','ponytail'].includes(style)) return;
+    const { cx, headCY: cy, headR: R } = A;
+    ctx.fillStyle = A.hair;
+    if (style === 'long') {
+      ctx.beginPath();
+      ctx.moveTo(cx - R * 0.8, cy - R * 0.2);
+      ctx.bezierCurveTo(cx - R * 1.15, cy + R * 1.2, cx - R * 1.05, A.shoulderY + 30, cx - R * 0.7, A.shoulderY + 34);
+      ctx.quadraticCurveTo(cx, A.shoulderY + 20, cx + R * 0.7, A.shoulderY + 34);
+      ctx.bezierCurveTo(cx + R * 1.05, A.shoulderY + 30, cx + R * 1.15, cy + R * 1.2, cx + R * 0.8, cy - R * 0.2);
+      ctx.quadraticCurveTo(cx, cy - R * 1.1, cx - R * 0.8, cy - R * 0.2);
+      ctx.closePath(); ctx.fill();
+    } else if (style === 'bob') {
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + R * 0.1, R * 1.02, R * 1.25, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (style === 'curly') {
+      for (let i = 0; i < 10; i++) {
+        const ang = Math.PI * (0.15 + i * 0.078);
+        const bx = cx + Math.cos(ang) * R * 0.95 * (i < 5 ? -1 : 1);
+        const by = cy + R * 0.2 + (i % 3) * R * 0.22;
+        ctx.beginPath(); ctx.arc(bx, by, R * 0.26, 0, Math.PI * 2); ctx.fill();
+      }
+    } else if (style === 'ponytail') {
+      ctx.beginPath();
+      ctx.moveTo(cx + R * 0.4, cy - R * 0.7);
+      ctx.bezierCurveTo(cx + R * 1.5, cy, cx + R * 1.35, cy + R * 1.5, cx + R * 0.9, cy + R * 1.9);
+      ctx.quadraticCurveTo(cx + R * 0.6, cy + R * 1.2, cx + R * 0.5, cy - R * 0.2);
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  _drawFrontHair(ctx, A, a) {
+    const style = a.hairStyle || 'long';
+    const { cx, headCY: cy, headR: R } = A;
+    ctx.fillStyle = A.hair;
+    this._hairCapPath(ctx, A); ctx.fill();
+    // 刘海侧鬓
+    if (['long','bob','short'].includes(style)) {
+      ctx.beginPath();
+      ctx.moveTo(cx - R * 0.85, cy - R * 0.05);
+      ctx.quadraticCurveTo(cx - R * 0.95, cy + R * 0.5, cx - R * 0.72, cy + R * (style === 'short' ? 0.35 : 0.75));
+      ctx.quadraticCurveTo(cx - R * 0.55, cy + R * 0.2, cx - R * 0.6, cy - R * 0.3);
+      ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(cx + R * 0.85, cy - R * 0.05);
+      ctx.quadraticCurveTo(cx + R * 0.95, cy + R * 0.5, cx + R * 0.72, cy + R * (style === 'short' ? 0.35 : 0.75));
+      ctx.quadraticCurveTo(cx + R * 0.55, cy + R * 0.2, cx + R * 0.6, cy - R * 0.3);
+      ctx.closePath(); ctx.fill();
+    }
+    if (style === 'curly') {
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.arc(cx - R * 0.75 + i * R * 0.3, cy - R * 0.85 + (i % 2) * 3, R * 0.24, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  // ---------- 服装（全部读取锚点坐标绘制）----------
+  _fillStroke(ctx, color, dark = true) {
+    ctx.fillStyle = color; ctx.fill();
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = dark ? shadeColor(color, -20) : 'rgba(0,0,0,0.15)';
+    ctx.stroke();
+  }
+
+  _drawTop(ctx, A, item) {
+    const { cx, sh, bu, wa, shoulderY, bustY, waistY, hipY } = A;
+    const c = item.color, dk = shadeColor(c, -20);
+    ctx.save();
+    ctx.beginPath();
+    if (item.shape === 'tank') {
+      // 吊带背心：窄肩带 + 合身衣身
+      ctx.moveTo(cx - bu + 4, shoulderY + 4);
+      ctx.lineTo(cx - wa, waistY + 8);
+      ctx.quadraticCurveTo(cx, waistY + 12, cx + wa, waistY + 8);
+      ctx.lineTo(cx + bu - 4, shoulderY + 4);
+      ctx.quadraticCurveTo(cx, shoulderY - 2, cx - bu + 4, shoulderY + 4);
+      this._fillStroke(ctx, c);
+      ctx.strokeStyle = dk; ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx - bu + 8, shoulderY + 2); ctx.lineTo(cx - bu + 14, shoulderY - 6);
+      ctx.moveTo(cx + bu - 8, shoulderY + 2); ctx.lineTo(cx + bu - 14, shoulderY - 6);
+      ctx.stroke();
+    } else if (item.shape === 'sweater') {
+      // 毛衣：长袖 + 宽松衣身到臀
+      const hem = hipY - 6;
+      ctx.moveTo(cx - 14, shoulderY - 2);
+      ctx.lineTo(cx - sh - 4, shoulderY + 2);
+      ctx.lineTo(cx - sh - 7, A.wristY + 2);
+      ctx.lineTo(cx - sh + 7, A.wristY + 2);
+      ctx.lineTo(cx - sh + 4, shoulderY + 18);
+      ctx.lineTo(cx - wa - 4, hem);
+      ctx.quadraticCurveTo(cx, hem + 5, cx + wa + 4, hem);
+      ctx.lineTo(cx + sh - 4, shoulderY + 18);
+      ctx.lineTo(cx + sh - 7, A.wristY + 2);
+      ctx.lineTo(cx + sh + 7, A.wristY + 2);
+      ctx.lineTo(cx + sh + 4, shoulderY + 2);
+      ctx.lineTo(cx + 14, shoulderY - 2);
+      ctx.quadraticCurveTo(cx, shoulderY + 10, cx - 14, shoulderY - 2);
+      this._fillStroke(ctx, c);
+      // 罗纹
+      ctx.strokeStyle = dk; ctx.lineWidth = 1;
+      for (let i = -2; i <= 2; i++) {
+        ctx.beginPath(); ctx.moveTo(cx + i * 6, hem - 8); ctx.lineTo(cx + i * 6, hem); ctx.stroke();
+      }
+    } else {
+      // tshirt / shirt：短袖 + 衣身到腰下
+      const hem = waistY + (item.shape === 'shirt' ? 10 : 6);
+      ctx.moveTo(cx - 13, shoulderY - 2);
+      ctx.lineTo(cx - sh, shoulderY);
+      ctx.lineTo(cx - sh - 12, shoulderY + 26);
+      ctx.lineTo(cx - sh - 3, shoulderY + 29);
+      ctx.lineTo(cx - bu, bustY + 2);
+      ctx.lineTo(cx - wa, hem);
+      ctx.quadraticCurveTo(cx, hem + 4, cx + wa, hem);
+      ctx.lineTo(cx + bu, bustY + 2);
+      ctx.lineTo(cx + sh - 3, shoulderY + 29);
+      ctx.lineTo(cx + sh + 12, shoulderY + 26);
+      ctx.lineTo(cx + sh, shoulderY);
+      ctx.lineTo(cx + 13, shoulderY - 2);
+      ctx.quadraticCurveTo(cx, shoulderY + 8, cx - 13, shoulderY - 2);
+      this._fillStroke(ctx, c);
+      // 衬衫领
+      if (item.shape === 'shirt') {
+        ctx.strokeStyle = dk; ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(cx - 13, shoulderY - 1); ctx.lineTo(cx, shoulderY + 14); ctx.lineTo(cx + 13, shoulderY - 1);
+        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx, shoulderY + 14); ctx.lineTo(cx, hem - 10); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  _drawOuterwear(ctx, A, item) {
+    const { cx, sh, wa, shoulderY, waistY, hipY, kneeY, wristY } = A;
+    const lenMap = { blazer: hipY + 6, coat: kneeY + 14, jacket: hipY - 14, cardigan: hipY + 2 };
+    const hem = lenMap[item.shape] || hipY;
+    const pad = item.shape === 'coat' ? 8 : 5;
+    const c = item.color, dk = shadeColor(c, -22);
+    ctx.save();
+    ctx.globalAlpha = item.shape === 'cardigan' ? 0.92 : 0.97;
+    // 长袖外套主体（开襟 V 领）
+    ctx.beginPath();
+    ctx.moveTo(cx - sh - pad, shoulderY);
+    ctx.lineTo(cx - sh - pad - 5, wristY);
+    ctx.lineTo(cx - sh - pad + 8, wristY);
+    ctx.lineTo(cx - sh + 2, shoulderY + 20);
+    ctx.lineTo(cx - 6, hem);
+    ctx.lineTo(cx + 6, hem);
+    ctx.lineTo(cx + sh - 2, shoulderY + 20);
+    ctx.lineTo(cx + sh + pad - 8, wristY);
+    ctx.lineTo(cx + sh + pad + 5, wristY);
+    ctx.lineTo(cx + sh + pad, shoulderY);
+    ctx.quadraticCurveTo(cx, shoulderY - 8, cx - sh - pad, shoulderY);
+    this._fillStroke(ctx, c);
+    // 翻领 / 开襟线
+    ctx.strokeStyle = dk; ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(cx - 12, shoulderY); ctx.lineTo(cx, shoulderY + 26); ctx.lineTo(cx - 5, shoulderY + 52);
+    ctx.moveTo(cx + 12, shoulderY); ctx.lineTo(cx, shoulderY + 26); ctx.lineTo(cx + 5, shoulderY + 52);
+    ctx.moveTo(cx, shoulderY + 26); ctx.lineTo(cx, hem - 4);
+    ctx.stroke();
+    if (item.shape === 'jacket') {
+      ctx.fillStyle = dk;
+      ctx.fillRect(cx - wa - 4, hem - 7, wa * 2 + 8, 5);
+    }
+    ctx.restore();
+  }
+
+  _drawPants(ctx, A, item) {
+    const { cx, wa, hp, waistY, crotchY, kneeY, feetY, thigh, calf, ankle } = A;
+    const c = item.color, dk = shadeColor(c, -20);
+    const long = item.shape !== 'shorts';
+    const endY = long ? feetY - 4 : crotchY + (kneeY - crotchY) * 0.62;
+    const bottomHalf = long ? ankle + 2 : calf + 1;
+    [-1, 1].forEach((s) => {
+      ctx.beginPath();
+      ctx.moveTo(cx + s * 5, waistY - 2);
+      ctx.lineTo(cx + s * (hp - 3), waistY + 6);
+      ctx.quadraticCurveTo(cx + s * (thigh + 1), kneeY, cx + s * (bottomHalf + 3), endY);
+      ctx.lineTo(cx + s * 3, endY);
+      ctx.quadraticCurveTo(cx + s * 6, kneeY, cx + s * 4, crotchY);
+      ctx.lineTo(cx + s * 2, waistY - 2);
+      ctx.closePath();
+      this._fillStroke(ctx, c);
+      // 裤线
+      ctx.strokeStyle = dk; ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx + s * (hp - 12), waistY + 12);
+      ctx.quadraticCurveTo(cx + s * (thigh - 2), kneeY, cx + s * (bottomHalf + 1), endY - 4);
+      ctx.stroke();
+    });
+    // 腰头
+    ctx.fillStyle = c;
+    ctx.fillRect(cx - hp + 2, waistY - 4, (hp - 2) * 2, 9);
+    ctx.strokeStyle = dk; ctx.lineWidth = 1.2;
+    ctx.strokeRect(cx - hp + 2, waistY - 4, (hp - 2) * 2, 9);
+  }
+
+  _drawShorts(ctx, A, item) { this._drawPants(ctx, A, item); }
+
+  _drawSkirt(ctx, A, item) {
+    const { cx, hp, waistY, hipY, crotchY, kneeY } = A;
+    const c = item.color, dk = shadeColor(c, -20);
+    const pleated = item.color === '#7B3F3F';
+    const hemY = pleated ? crotchY + 22 : kneeY - 6;
+    const flare = pleated ? 20 : 14;
+    ctx.beginPath();
+    ctx.moveTo(cx - hp + 2, waistY - 2);
+    ctx.lineTo(cx - hp - flare, hemY);
+    ctx.quadraticCurveTo(cx, hemY + 6, cx + hp + flare, hemY);
+    ctx.lineTo(cx + hp - 2, waistY - 2);
+    ctx.quadraticCurveTo(cx, waistY + 4, cx - hp + 2, waistY - 2);
+    this._fillStroke(ctx, c);
+    // 百褶线
+    if (pleated) {
+      ctx.strokeStyle = dk; ctx.lineWidth = 1;
+      for (let i = -2; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.moveTo(cx + i * (hp / 2.5), waistY + 4);
+        ctx.lineTo(cx + i * ((hp + flare) / 2.5), hemY - 2);
+        ctx.stroke();
+      }
+    }
+  }
+
+  _drawShoes(ctx, A, item) {
+    const { cx, feetY } = A;
+    const c = item.color, dk = shadeColor(c, -25);
+    [-1, 1].forEach((s) => {
+      const x = cx + s * 9;
+      ctx.fillStyle = c; ctx.strokeStyle = dk; ctx.lineWidth = 1.2;
+      if (item.shape === 'sneakers') {
+        ctx.beginPath(); ctx.ellipse(x, feetY + 2, 14, 7, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = dk; ctx.fillRect(x - 14, feetY + 5, 28, 3);
+      } else if (item.shape === 'boots') {
+        ctx.beginPath();
+        ctx.moveTo(x - 9, feetY - 38); ctx.lineTo(x + 8, feetY - 38);
+        ctx.lineTo(x + 9, feetY + 2); ctx.ellipse(x, feetY + 2, 12, 6, 0, 0, Math.PI); ctx.closePath();
+        ctx.fill(); ctx.stroke();
+      } else if (item.shape === 'heels') {
+        ctx.beginPath();
+        ctx.moveTo(x - 11, feetY); ctx.lineTo(x + 12, feetY); ctx.lineTo(x + 9, feetY + 8);
+        ctx.lineTo(x - 9, feetY + 8); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.fillRect(x - 8, feetY + 8, 4, 9);
+      } else { // loafers
+        ctx.beginPath();
+        ctx.ellipse(x, feetY + 2, 13, 6.5, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(x - 1, feetY - 2, 6, 4, 0, 0, Math.PI); ctx.stroke();
+      }
+    });
+  }
+
+  _drawAccessory(ctx, A, acc) {
+    const { cx, neckY, shoulderY, bustY, headCY: cy, headR: R } = A;
+    const c = acc.color, dk = shadeColor(c, -25);
+    ctx.strokeStyle = c; ctx.fillStyle = c;
+    if (acc.shape === 'necklace') {
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx - 13, shoulderY + 4);
+      ctx.quadraticCurveTo(cx, bustY - 6, cx + 13, shoulderY + 4);
+      ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, bustY - 8, 3, 0, Math.PI * 2); ctx.fill();
+    } else if (acc.shape === 'scarf') {
+      ctx.lineWidth = 8; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(cx - 12, neckY + 6); ctx.quadraticCurveTo(cx, neckY + 14, cx + 12, neckY + 6); ctx.stroke();
+      ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.moveTo(cx + 8, neckY + 10); ctx.lineTo(cx + 14, bustY - 6); ctx.stroke();
+    } else if (acc.shape === 'hat') {
+      ctx.beginPath(); ctx.ellipse(cx, cy - R * 0.55, R * 1.25, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(cx - R * 0.7, cy - R * 0.55);
+      ctx.quadraticCurveTo(cx, cy - R * 1.5, cx + R * 0.7, cy - R * 0.55);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = dk; ctx.fillRect(cx - R * 0.7, cy - R * 0.62, R * 1.4, 4);
+    } else if (acc.shape === 'bag') {
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx + A.sh - 4, shoulderY + 6);
+      ctx.quadraticCurveTo(cx + A.sh + 30, shoulderY + 30, cx + A.hp + 16, A.hipY + 4);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.roundRect?.(cx + A.hp + 4, A.hipY, 26, 34, 5);
+      if (ctx.roundRect) ctx.fill(); else { ctx.fillRect(cx + A.hp + 4, A.hipY, 26, 34); }
+    }
+  }
+}
+
+// React 包装组件
+function Avatar2D({ profile, outfit, view='front', showClothes=true }) {
+  const canvasRef = useRef(null);
+  const rendererRef = useRef(null);
+  useEffect(() => {
+    rendererRef.current = new AvatarRenderer(canvasRef.current);
+    return () => rendererRef.current.destroy();
+  }, []);
+  useEffect(() => {
+    rendererRef.current?.update({ profile, outfit, view, showClothes });
+  }, [profile, outfit, view, showClothes]);
+  return <canvas ref={canvasRef} className="w-full h-full" style={{maxHeight:'640px'}}/>;
+}
+
+// 颜色加深/变浅
+function shadeColor(hex, percent) {
+  const num = parseInt(hex.replace('#',''), 16);
+  let r = (num >> 16) + percent;
+  let g = ((num >> 8) & 0x00FF) + percent;
+  let b = (num & 0x0000FF) + percent;
+  r = Math.max(0, Math.min(255, r));
+  g = Math.max(0, Math.min(255, g));
+  b = Math.max(0, Math.min(255, b));
+  return '#' + ((r<<16) | (g<<8) | b).toString(16).padStart(6,'0');
+}
+
+/* ============================================================
+   RECOMMENDATION ENGINE
+============================================================ */
+
+function recommendOutfit(profile, lockedItems={}, excludeOutfit=null) {
+  const pref = profile.preferences;
+  const body = profile.body;
+  const shape = calcBodyShape(body);
+
+  const scoreItem = (item) => {
+    let score = 0;
+    // 风格匹配
+    pref.likedStyles.forEach(s => { if (item.styles.includes(s)) score += 25; });
+    pref.dislikedStyles.forEach(s => { if (item.styles.includes(s)) score -= 30; });
+    // 颜色匹配
+    if (pref.colors.length) {
+      const colorMatch = pref.colors.some(c => colorDistance(c, item.color) < 60);
+      if (colorMatch) score += 20;
+    }
+    // 场合匹配
+    const allOcc = [profile.occasions.primary, ...profile.occasions.secondary];
+    allOcc.forEach(o => { if (item.occasions.includes(o)) score += 15; });
+    // 技巧匹配
+    pref.techniques.forEach(t => { if (item.techniques.includes(t)) score += 10; });
+    // 体型匹配
+    if (item.bodyFit.includes(shape.type) || item.bodyFit.includes('all')) score += 10;
+    return score + Math.random() * 5;
+  };
+
+  // 未锁定的槽位：换一身时排除当前已穿单品，保证结果真的变化
+  const pick = (arr, slot) => {
+    let pool = arr;
+    if (!lockedItems[slot] && excludeOutfit?.[slot]) {
+      const cur = excludeOutfit[slot];
+      const curIds = Array.isArray(cur) ? cur.map(i => i.id) : [cur.id];
+      const filtered = arr.filter(it => !curIds.includes(it.id));
+      if (filtered.length) pool = filtered;
+    }
+    return [...pool].sort((a,b) => scoreItem(b) - scoreItem(a))[0];
+  };
+
+  const outfit = {
+    top: lockedItems.top || pick(TOPS, 'top'),
+    bottom: lockedItems.bottom || pick(BOTTOMS, 'bottom'),
+    outerwear: lockedItems.outerwear || pick(OUTERWEARS, 'outerwear'),
+    shoes: lockedItems.shoes || pick(SHOES, 'shoes'),
+    accessories: lockedItems.accessories || [pick(ACCESSORIES, 'accessories')],
+  };
+
+  // 生成穿搭文案
+  const desc = generateDescription(profile, outfit, shape);
+  return { outfit, description: desc };
+}
+
+function colorDistance(c1, c2) {
+  const r1 = parseInt(c1.slice(1,3),16), g1 = parseInt(c1.slice(3,5),16), b1 = parseInt(c1.slice(5,7),16);
+  const r2 = parseInt(c2.slice(1,3),16), g2 = parseInt(c2.slice(3,5),16), b2 = parseInt(c2.slice(5,7),16);
+  return Math.sqrt((r1-r2)**2 + (g1-g2)**2 + (b1-b2)**2);
+}
+
+function generateDescription(profile, outfit, shape) {
+  const styleName = profile.preferences.likedStyles[0] ? STYLES.find(s=>s.id===profile.preferences.likedStyles[0])?.name : '百搭';
+  const occName = OCCASIONS.find(o=>o.id===profile.occasions.primary)?.name || '日常';
+  const tips = [];
+  if (shape.type === 'curvy' || shape.type === 'plus') tips.push('选择高腰下装拉长腿部比例，视觉上收窄腰线');
+  if (shape.whr > 0.85) tips.push('A字版型修饰胯宽，上装选择V领或开领拉长颈部线条');
+  if (profile.body.legRatio < 0.48) tips.push('短款上衣 + 高腰下装 = 黄金比例，显高 5cm');
+  if (profile.body.legRatio > 0.55) tips.push('你的腿长比例优越，可大胆尝试长款外套或过膝靴');
+  if (profile.body.height < 160) tips.push('同色系穿搭 + 尖头鞋，从脚踝到头顶一条直线最显高');
+  if (tips.length === 0) tips.push('标准身材可驾驭多种风格，重点突出个人气质与场合适配');
+
+  return {
+    concept: `以「${styleName}」为基调，为「${occName}」场合量身打造。整体配色${profile.preferences.colors.length ? '呼应你偏好的色系' : '以经典黑白灰为骨架'}，${profile.preferences.techniques.includes('oversize') ? '用 oversize 廓形营造松弛感' : profile.preferences.techniques.includes('contrast') ? '用撞色制造视觉焦点' : '用合身剪裁展现利落线条'}。`,
+    items: [
+      `${outfit.top.name} —— 作为内搭奠定整体调性`,
+      `${outfit.bottom.name} —— 修饰腿型，平衡上下比例`,
+      outfit.outerwear ? `${outfit.outerwear.name} —— 提升层次感与气场` : null,
+      `${outfit.shoes.name} —— 点睛之笔，决定风格走向`,
+      ...outfit.accessories.map(a => `${a.name} —— 细节处见品味`),
+    ].filter(Boolean),
+    tips,
+    logic: `上装与下装在${profile.preferences.techniques.includes('monochrome') ? '同色系' : '色彩明度'}上形成呼应，外套作为过渡层增加节奏，鞋包配饰统一色调完成闭环。`,
+    fitReason: `根据你的身材数据（BMI ${shape.bmi.toFixed(1)}，腰臀比 ${shape.whr.toFixed(2)}），${tips[0].split('，')[0]}，让这套穿搭既好看又显瘦。`,
+  };
+}
+
+// 店铺链接生成
+function shopLinks(keyword) {
+  const q = encodeURIComponent(keyword);
+  return [
+    { name:'淘宝', url:`https://s.taobao.com/search?q=${q}`, color:'#FF6A00' },
+    { name:'天猫', url:`https://list.tmall.com/search_product.htm?q=${q}`, color:'#FF0036' },
+    { name:'京东', url:`https://search.jd.com/Search?keyword=${q}`, color:'#E1251B' },
+    { name:'得物', url:`https://www.dewu.com/search?keyword=${q}`, color:'#00A1FF' },
+  ];
+}
+
+/* ============================================================
+   INITIAL STATE
+============================================================ */
+
+const initialProfile = {
+  body: { height:165, weight:52, shoulder:38, bust:84, waist:66, hip:90, legRatio:0.5, skinTone:'#E8C4A0', size:'M' },
+  avatar: { faceShape:'oval', hairStyle:'long', hairColor:'#2C1810', eyeShape:'almond', eyeColor:'#3D2314',
+            faceWidth:1, eyeSize:1, mouthWidth:1, heightScale:1, shoulderScale:1, waistScale:1 },
+  preferences: { likedStyles:[], dislikedStyles:[], colors:[], techniques:[] },
+  occasions: { primary:'', secondary:[] },
+  currentOutfit: null,
+};
+
+const SIZE_MAP = {
+  S:  { shoulder:36, bust:82, waist:64, hip:88 },
+  M:  { shoulder:38, bust:86, waist:68, hip:92 },
+  L:  { shoulder:40, bust:90, waist:72, hip:96 },
+  XL: { shoulder:42, bust:94, waist:76, hip:100 },
+};
+
+/* ============================================================
+   UI COMPONENTS
+============================================================ */
+
+function StepProgress({ step, total, onBack }) {
+  return (
+    <div className="sticky top-0 z-40 bg-paper/90 backdrop-blur border-b border-grayline">
+      <div className="max-w-5xl mx-auto px-4 h-16 flex items-center gap-4">
+        {onBack && <button onClick={onBack} className="w-9 h-9 rounded-full border border-grayline hover:bg-ink hover:text-white transition flex items-center justify-center">←</button>}
+        <div className="flex-1 flex items-center gap-1">
+          {Array.from({length: total}).map((_, i) => (
+            <div key={i} className="flex-1 h-1 rounded-full overflow-hidden bg-grayline">
+              <div className={`h-full transition-all duration-500 ${i < step ? 'bg-klein' : i === step ? 'bg-klein w-1/2' : 'w-0'}`}/>
+            </div>
+          ))}
+        </div>
+        <span className="text-xs text-midgray font-display">{step+1} / {total}</span>
+      </div>
+    </div>
+  );
+}
+
+function Card({ children, className='', onClick, active, disabled }) {
+  return (
+    <div onClick={disabled ? null : onClick}
+      className={`cursor-pointer transition-all duration-200 rounded-2xl border p-4 ${active ? 'border-klein bg-kleinsoft' : 'border-grayline bg-white hover:border-ink/30 hover:-translate-y-0.5'} ${disabled ? 'opacity-40 cursor-not-allowed' : ''} ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+/* ============================================================
+   SCREEN 1: HOME
+============================================================ */
+
+function HomeScreen({ onStart }) {
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* 背景装饰 */}
+      <div className="absolute top-0 right-0 w-1/2 h-screen bg-klein/5 -skew-x-12 translate-x-1/4"/>
+      <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-klein/5 blur-3xl"/>
+
+      <div className="relative max-w-6xl mx-auto px-6 pt-20 pb-32">
+        {/* 顶部 */}
+        <div className="flex items-center justify-between mb-20">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-klein rounded-sm"/>
+            <span className="font-display text-xl font-bold">STYLE·AI</span>
+          </div>
+          <div className="hidden md:flex gap-8 text-sm text-midgray">
+            <span>关于</span><span>功能</span><span>试穿</span>
+          </div>
+        </div>
+
+        {/* Hero */}
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="fade-up">
+            <div className="inline-block px-3 py-1 bg-klein text-white text-xs rounded-full mb-6 tracking-wider">AI · 穿搭顾问</div>
+            <h1 className="font-display text-5xl md:text-7xl font-bold leading-[1.05] mb-6">
+              你的专属<br/>
+              <span className="italic text-klein">虚拟试衣间</span>
+            </h1>
+            <p className="text-midgray text-lg mb-8 leading-relaxed">
+              录入身材数据 · 捏出专属形象 · AI 多轮对话懂你风格<br/>
+              一键生成完整穿搭，实时试穿，满意直达店铺购买
+            </p>
+            <button onClick={onStart} className="group relative px-10 py-4 bg-ink text-white rounded-full text-lg font-medium overflow-hidden">
+              <span className="relative z-10">开始我的穿搭之旅 →</span>
+              <div className="absolute inset-0 bg-klein translate-y-full group-hover:translate-y-0 transition-transform duration-300"/>
+            </button>
+          </div>
+
+          {/* 形象展示 */}
+          <div className="relative scale-in">
+            <div className="absolute -inset-4 bg-gradient-to-br from-klein/10 to-transparent rounded-3xl blur-2xl"/>
+            <div className="relative bg-white rounded-3xl shadow-2xl p-4 border border-grayline">
+              <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-gradient-to-b from-grayline/40 to-grayline/10 flex items-center justify-center">
+                <Avatar2D profile={initialProfile} outfit={{
+                  top: TOPS[1], bottom: BOTTOMS[1], outerwear: OUTERWEARS[0],
+                  shoes: SHOES[1], accessories: [ACCESSORIES[1]]
+                }}/>
+              </div>
+              <div className="flex justify-around mt-4 text-xs">
+                <span className="text-midgray">👤 捏脸</span>
+                <span className="text-klein">👗 试穿</span>
+                <span className="text-midgray">🛒 购买</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 价值点 */}
+        <div className="grid md:grid-cols-3 gap-6 mt-32">
+          {[
+            { num:'01', title:'精准到身材', desc:'基于真实身高体重三围，推荐显瘦显高方案' },
+            { num:'02', title:'AI 懂你风格', desc:'多轮卡片对话，比你更懂怎么穿好看' },
+            { num:'03', title:'试穿即购买', desc:'满意一键跳转淘宝/得物，平替也安排' },
+          ].map((f,i) => (
+            <div key={i} className="fade-up border-t-2 border-ink pt-6" style={{animationDelay:`${i*0.1}s`}}>
+              <div className="font-display text-4xl text-klein/30 mb-3">{f.num}</div>
+              <h3 className="font-display text-2xl font-bold mb-2">{f.title}</h3>
+              <p className="text-midgray text-sm">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   SCREEN 2: BODY DATA
+============================================================ */
+
+function BodyDataScreen({ profile, update, next, back }) {
+  const b = profile.body;
+  const [useSize, setUseSize] = useState(false);
+  const _h = Number(b.height), _w = Number(b.weight);
+  const bmiNum = _h > 0 ? _w / Math.pow(_h/100, 2) : NaN;
+  const bmi = isNaN(bmiNum) ? '—' : bmiNum.toFixed(1);
+  const bmiLabel = isNaN(bmiNum) ? '待输入' : bmiNum < 18.5 ? '偏瘦' : bmiNum < 24 ? '标准' : bmiNum < 28 ? '微胖' : '丰满';
+
+  const setBody = (k, v) => update({ body: { ...b, [k]: v }});
+  const applySize = (s) => {
+    const m = SIZE_MAP[s];
+    update({ body: { ...b, size: s, ...m }});
+  };
+
+  return (
+    <div>
+      <StepProgress step={1} total={6} onBack={back}/>
+      <div className="max-w-5xl mx-auto px-4 py-10">
+        <div className="mb-8 fade-up">
+          <div className="text-klein text-sm font-medium mb-2">STEP 01</div>
+          <h2 className="font-display text-4xl font-bold mb-2">身体数据</h2>
+          <p className="text-midgray">越精准，推荐越合身。不确定可用标准尺码简化</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-10">
+          {/* 表单 */}
+          <div className="space-y-6 fade-up">
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="身高" value={b.height} unit="cm" onChange={v=>setBody('height', v)}/>
+              <Field label="体重" value={b.weight} unit="kg" onChange={v=>setBody('weight', v)}/>
+            </div>
+
+            {/* 标准尺码 */}
+            <div className="flex items-center gap-3 p-4 bg-kleinsoft rounded-xl">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={useSize} onChange={e=>setUseSize(e.target.checked)} className="w-4 h-4 accent-klein"/>
+                <span className="text-sm font-medium">使用标准尺码快速录入</span>
+              </label>
+              {useSize && (
+                <div className="flex gap-2 ml-auto">
+                  {['S','M','L','XL'].map(s => (
+                    <button key={s} onClick={()=>applySize(s)}
+                      className={`px-3 py-1 rounded-lg text-sm font-medium transition ${b.size===s ? 'bg-klein text-white' : 'bg-white border border-grayline'}`}>{s}</button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="肩宽" value={b.shoulder} unit="cm" onChange={v=>setBody('shoulder', v)} disabled={useSize}/>
+              <Field label="胸围" value={b.bust} unit="cm" onChange={v=>setBody('bust', v)} disabled={useSize}/>
+              <Field label="腰围" value={b.waist} unit="cm" onChange={v=>setBody('waist', v)} disabled={useSize}/>
+              <Field label="臀围" value={b.hip} unit="cm" onChange={v=>setBody('hip', v)} disabled={useSize}/>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">腿长比例 <span className="text-midgray font-normal">（{Math.round(b.legRatio*100)}%）</span></label>
+              <input type="range" min="0.4" max="0.6" step="0.01" value={b.legRatio}
+                onChange={e=>setBody('legRatio', +e.target.value)} className="w-full"/>
+              <div className="flex justify-between text-xs text-midgray mt-1"><span>偏短</span><span>标准</span><span>偏长</span></div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-3 block">肤色</label>
+              <div className="flex flex-wrap gap-2">
+                {['#F5DEB3','#E8C4A0','#D4A574','#B8865A','#8B5A3C','#5C3317'].map(c => (
+                  <button key={c} onClick={()=>setBody('skinTone', c)}
+                    className={`w-10 h-10 rounded-full border-2 transition ${b.skinTone===c ? 'border-klein scale-110' : 'border-white shadow'}`}
+                    style={{background:c}}/>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 预览 */}
+          <div className="fade-up">
+            <div className="sticky top-24 bg-white rounded-2xl border border-grayline p-4">
+              <div className="aspect-[3/4] rounded-xl overflow-hidden">
+                <Avatar2D profile={profile} outfit={null} showClothes={false}/>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="p-2 bg-paper rounded-lg">
+                  <div className="text-midgray">BMI</div>
+                  <div className="font-bold text-lg">{bmi}</div>
+                  <div className="text-klein">{bmiLabel}</div>
+                </div>
+                <div className="p-2 bg-paper rounded-lg">
+                  <div className="text-midgray">身材</div>
+                  <div className="font-bold text-lg">{calcBodyShape(b).type}</div>
+                  <div className="text-midgray">{calcBodyShape(b).shoulderRatio > 1 ? '肩宽型' : '梨型'}</div>
+                </div>
+                <div className="p-2 bg-paper rounded-lg">
+                  <div className="text-midgray">腿比</div>
+                  <div className="font-bold text-lg">{Math.round(b.legRatio*100)}%</div>
+                  <div className="text-midgray">{b.legRatio>0.52?'长腿':'标准'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end mt-10">
+          <button onClick={next} className="px-10 py-4 bg-ink text-white rounded-full hover:bg-klein transition">下一步：捏脸 →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, value, unit, onChange, disabled }) {
+  // 内部维护文本态：输入过程中允许清空、中间编辑，不被数字强转打断
+  const [text, setText] = useState(value === '' || value == null ? '' : String(value));
+  const [focused, setFocused] = useState(false);
+
+  // 外部值变化（如点选 S/M/L 尺码、页面初始化）时同步；正在输入时不打断
+  useEffect(() => {
+    if (!focused) setText(value === '' || value == null ? '' : String(value));
+  }, [value, focused]);
+
+  const commit = (raw) => {
+    if (raw === '' || raw === '-') { onChange(''); return; }
+    const n = Number(raw);
+    if (!isNaN(n) && n >= 0) onChange(n);
+  };
+
+  return (
+    <div className={disabled ? 'opacity-50 pointer-events-none select-none' : ''}>
+      <label className="text-sm font-medium mb-1 block text-midgray">{label}</label>
+      <div className="relative">
+        <input type="number" min="0" step="any" inputMode="decimal" value={text} disabled={disabled}
+          placeholder="—"
+          onChange={e => { setText(e.target.value); commit(e.target.value); }}
+          onFocus={() => setFocused(true)}
+          onBlur={() => {
+            setFocused(false);
+            const n = Number(text);
+            if (text === '' || isNaN(n) || n < 0) { onChange(0); setText('0'); }
+            else setText(String(n));
+          }}
+          className="w-full px-4 py-3 pr-12 border border-grayline rounded-xl focus:border-klein focus:outline-none focus:ring-2 focus:ring-klein/10 bg-white transition"/>
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-midgray pointer-events-none">{unit}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   SCREEN 3: AVATAR
+============================================================ */
+
+function AvatarScreen({ profile, update, next, back }) {
+  const a = profile.avatar;
+  const setAvatar = (k, v) => update({ avatar: { ...a, [k]: v }});
+  const setBody = (patch) => update({ body: { ...profile.body, ...patch }});
+  const [view, setView] = useState('front');
+
+  const skinTones = ['#F5D6C0','#E8C4A0','#D4A574','#B07E56','#8B5A3C','#6B4226'];
+
+  return (
+    <div>
+      <StepProgress step={2} total={6} onBack={back}/>
+      <div className="max-w-5xl mx-auto px-4 py-10">
+        <div className="mb-8 fade-up">
+          <div className="text-klein text-sm font-medium mb-2">STEP 02</div>
+          <h2 className="font-display text-4xl font-bold mb-2">捏出你的形象</h2>
+          <p className="text-midgray">调整五官发型与滑块，左侧 2D 形象实时变化；身材与上一步身体数据联动，衣服自动贴合</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-10">
+          {/* 预览 */}
+          <div className="fade-up order-2 md:order-1">
+            <div className="sticky top-24 bg-white rounded-2xl border border-grayline p-4">
+              <div className="aspect-[3/4] rounded-xl overflow-hidden">
+                <Avatar2D profile={profile} outfit={null} showClothes={false} view={view}/>
+              </div>
+              <div className="flex gap-2 mt-4 justify-center">
+                {['front','side','back'].map(v => (
+                  <button key={v} onClick={()=>setView(v)}
+                    className={`px-4 py-1.5 rounded-full text-sm transition ${view===v ? 'bg-klein text-white' : 'bg-paper text-midgray'}`}>
+                    {v==='front'?'正面':v==='side'?'侧面':'背面'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 参数化捏脸控件（实时驱动 Canvas 2D）*/}
+          <div className="space-y-6 fade-up order-1 md:order-2">
+            <ControlGroup label="脸型">
+              <div className="grid grid-cols-4 gap-2">
+                {[{id:'oval',name:'鹅蛋'},{id:'round',name:'圆脸'},{id:'square',name:'方脸'},{id:'long',name:'长脸'}].map(f=>(
+                  <button key={f.id} onClick={()=>setAvatar('faceShape', f.id)}
+                    className={`py-3 rounded-xl text-sm transition ${a.faceShape===f.id ? 'bg-klein text-white' : 'bg-paper'}`}>{f.name}</button>
+                ))}
+              </div>
+            </ControlGroup>
+
+            <ControlGroup label="发型">
+              <div className="grid grid-cols-5 gap-2">
+                {[{id:'short',name:'短发'},{id:'long',name:'长发'},{id:'bob',name:'波波'},{id:'curly',name:'卷发'},{id:'ponytail',name:'马尾'}].map(h=>(
+                  <button key={h.id} onClick={()=>setAvatar('hairStyle', h.id)}
+                    className={`py-3 rounded-xl text-xs transition ${a.hairStyle===h.id ? 'bg-klein text-white' : 'bg-paper'}`}>{h.name}</button>
+                ))}
+              </div>
+            </ControlGroup>
+
+            <ControlGroup label="发色">
+              <div className="flex flex-wrap gap-2">
+                {['#0A0A0A','#2C1810','#5C3317','#8B5A3C','#D4A574','#DAA520','#B05C9A','#7B3F3F'].map(c=>(
+                  <button key={c} onClick={()=>setAvatar('hairColor', c)}
+                    className={`w-9 h-9 rounded-full border-2 transition ${a.hairColor===c ? 'border-klein scale-110' : 'border-white shadow'}`}
+                    style={{background:c}}/>
+                ))}
+              </div>
+            </ControlGroup>
+
+            <ControlGroup label="眼型">
+              <div className="grid grid-cols-4 gap-2">
+                {[{id:'almond',name:'杏眼'},{id:'round',name:'圆眼'},{id:'wide',name:'大眼'},{id:'cat',name:'猫眼'}].map(e=>(
+                  <button key={e.id} onClick={()=>setAvatar('eyeShape', e.id)}
+                    className={`py-3 rounded-xl text-sm transition ${a.eyeShape===e.id ? 'bg-klein text-white' : 'bg-paper'}`}>{e.name}</button>
+                ))}
+              </div>
+            </ControlGroup>
+
+            <ControlGroup label="眼色">
+              <div className="flex gap-2">
+                {['#3D2314','#5C4033','#2D3748','#4A5568'].map(c=>(
+                  <button key={c} onClick={()=>setAvatar('eyeColor', c)}
+                    className={`w-9 h-9 rounded-full border-2 transition ${a.eyeColor===c ? 'border-klein scale-110' : 'border-white shadow'}`}
+                    style={{background:c}}/>
+                ))}
+              </div>
+            </ControlGroup>
+
+            <ControlGroup label="肤色">
+              <div className="flex gap-2">
+                {skinTones.map(c=>(
+                  <button key={c} onClick={()=>setBody({ skinTone: c })}
+                    className={`w-9 h-9 rounded-full border-2 transition ${profile.body.skinTone===c ? 'border-klein scale-110' : 'border-white shadow'}`}
+                    style={{background:c}}/>
+                ))}
+              </div>
+            </ControlGroup>
+
+            <div className="h-px bg-grayline"/>
+
+            <ControlGroup label="面部微调">
+              <div className="space-y-3">
+                <SliderRow label="脸型宽窄" value={a.faceWidth} min={0.8} max={1.25} step={0.01}
+                  onChange={v=>setAvatar('faceWidth', v)}/>
+                <SliderRow label="眼睛大小" value={a.eyeSize} min={0.7} max={1.5} step={0.01}
+                  onChange={v=>setAvatar('eyeSize', v)}/>
+                <SliderRow label="嘴巴宽度" value={a.mouthWidth} min={0.6} max={1.5} step={0.01}
+                  onChange={v=>setAvatar('mouthWidth', v)}/>
+              </div>
+            </ControlGroup>
+
+            <ControlGroup label="身材微调（与身体数据联动）">
+              <div className="space-y-3">
+                <SliderRow label="身高比例" value={a.heightScale} min={0.85} max={1.15} step={0.01}
+                  onChange={v=>setAvatar('heightScale', v)}/>
+                <SliderRow label="肩宽" value={a.shoulderScale} min={0.75} max={1.3} step={0.01}
+                  onChange={v=>setAvatar('shoulderScale', v)}/>
+                <SliderRow label="腰围" value={a.waistScale} min={0.7} max={1.3} step={0.01}
+                  onChange={v=>setAvatar('waistScale', v)}/>
+              </div>
+            </ControlGroup>
+          </div>
+        </div>
+
+        <div className="flex justify-between mt-10">
+          <button onClick={back} className="px-8 py-4 border border-grayline rounded-full hover:bg-paper transition">← 上一步</button>
+          <button onClick={next} className="px-10 py-4 bg-ink text-white rounded-full hover:bg-klein transition">下一步：风格偏好 →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ControlGroup({ label, children }) {
+  return (
+    <div>
+      <label className="text-sm font-medium mb-2 block">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function SliderRow({ label, value, min, max, step, onChange }) {
+  const pct = ((Number(value) - min) / (max - min)) * 100;
+  return (
+    <div>
+      <div className="flex justify-between text-xs text-midgray mb-1">
+        <span>{label}</span>
+        <span className="tabular-nums">{Number(value).toFixed(2)}×</span>
+      </div>
+      <input type="range" min={min} max={max} step={step} value={value}
+        onChange={(e)=>onChange(parseFloat(e.target.value))}
+        className="w-full"
+        style={{background:`linear-gradient(to right, #002FA7 ${pct}%, #E5E5E0 ${pct}%)`}}/>
+    </div>
+  );
+}
+
+/* ============================================================
+   SCREEN 4: STYLE PREFERENCE
+============================================================ */
+
+function StyleScreen({ profile, update, next, back }) {
+  const [phase, setPhase] = useState(0); // 0:styles 1:colors 2:techniques
+  const p = profile.preferences;
+  const setPref = (k, v) => update({ preferences: { ...p, [k]: v }});
+
+  const toggleStyle = (id, liked) => {
+    if (liked) {
+      update({ preferences: {
+        ...p,
+        likedStyles: p.likedStyles.includes(id) ? p.likedStyles.filter(s=>s!==id) : [...p.likedStyles, id],
+        dislikedStyles: p.dislikedStyles.filter(s=>s!==id),
+      }});
+    } else {
+      update({ preferences: {
+        ...p,
+        dislikedStyles: p.dislikedStyles.includes(id) ? p.dislikedStyles.filter(s=>s!==id) : [...p.dislikedStyles, id],
+        likedStyles: p.likedStyles.filter(s=>s!==id),
+      }});
+    }
+  };
+
+  const toggleColor = (c) => {
+    setPref('colors', p.colors.includes(c) ? p.colors.filter(x=>x!==c) : [...p.colors, c]);
+  };
+
+  const toggleTech = (id) => {
+    setPref('techniques', p.techniques.includes(id) ? p.techniques.filter(t=>t!==id) : [...p.techniques, id]);
+  };
+
+  const canNext = phase === 0 ? p.likedStyles.length > 0 : phase === 1 ? p.colors.length > 0 : true;
+
+  return (
+    <div>
+      <StepProgress step={3} total={6} onBack={back}/>
+      <div className="max-w-5xl mx-auto px-4 py-10">
+        <div className="mb-8 fade-up">
+          <div className="text-klein text-sm font-medium mb-2">STEP 03 · 对话 {phase+1}/3</div>
+          <h2 className="font-display text-4xl font-bold mb-2">
+            {phase===0 && '你喜欢什么风格？'}
+            {phase===1 && '偏好哪些颜色？'}
+            {phase===2 && '喜欢什么穿搭技巧？'}
+          </h2>
+          <p className="text-midgray">
+            {phase===0 && '点击喜欢或不喜欢，AI 会据此筛选适合你的单品'}
+            {phase===1 && '多选，AI 会在推荐中优先使用这些颜色'}
+            {phase===2 && '可多选，决定整体穿搭的版型与搭配逻辑'}
+          </p>
+        </div>
+
+        {/* 对话气泡 */}
+        <div className="flex gap-3 mb-8 fade-up">
+          <div className="w-10 h-10 rounded-full bg-klein flex items-center justify-center text-white text-sm shrink-0">AI</div>
+          <div className="bg-kleinsoft rounded-2xl rounded-tl-sm px-5 py-3 max-w-md">
+            {phase===0 && `先选选风格吧～我准备了 ${STYLES.length} 种主流风格，点 ❤️ 喜欢或 ✕ 不喜欢`}
+            {phase===1 && `好的！你喜欢「${p.likedStyles.map(id=>STYLES.find(s=>s.id===id)?.name).join('、')}」。再挑挑颜色？`}
+            {phase===2 && `颜色记下了。最后，你平时偏爱哪种穿法？`}
+          </div>
+        </div>
+
+        <div className="fade-up">
+          {phase === 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {STYLES.map(s => {
+                const liked = p.likedStyles.includes(s.id);
+                const disliked = p.dislikedStyles.includes(s.id);
+                return (
+                  <div key={s.id} className={`rounded-2xl border-2 p-4 transition ${liked ? 'border-klein bg-kleinsoft' : disliked ? 'border-grayline bg-grayline/30 opacity-50' : 'border-grayline bg-white hover:-translate-y-1'}`}>
+                    <div className="text-3xl mb-2">{s.icon}</div>
+                    <div className="font-bold text-sm mb-1">{s.name}</div>
+                    <div className="text-xs text-midgray mb-3">{s.desc}</div>
+                    <div className="flex gap-2">
+                      <button onClick={()=>toggleStyle(s.id, true)} className={`flex-1 py-1.5 rounded-lg text-xs transition ${liked ? 'bg-klein text-white' : 'bg-paper hover:bg-klein hover:text-white'}`}>❤️ 喜欢</button>
+                      <button onClick={()=>toggleStyle(s.id, false)} className={`flex-1 py-1.5 rounded-lg text-xs transition ${disliked ? 'bg-ink text-white' : 'bg-paper hover:bg-ink hover:text-white'}`}>✕ 不喜欢</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {phase === 1 && (
+            <div>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {COLOR_PALETTE.map(c => (
+                  <button key={c} onClick={()=>toggleColor(c)}
+                    className={`w-10 h-10 rounded-full border-2 transition ${p.colors.includes(c) ? 'border-klein scale-110 ring-2 ring-klein/30' : 'border-white shadow'}`}
+                    style={{background:c}}/>
+                ))}
+              </div>
+              {p.colors.length > 0 && (
+                <div className="p-3 bg-kleinsoft rounded-xl text-sm">
+                  已选 <span className="font-bold">{p.colors.length}</span> 种颜色
+                  <div className="flex gap-1 mt-2">
+                    {p.colors.map(c => <span key={c} className="w-5 h-5 rounded-full" style={{background:c}}/>)}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {phase === 2 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {TECHNIQUES.map(t => (
+                <button key={t.id} onClick={()=>toggleTech(t.id)}
+                  className={`text-left p-4 rounded-2xl border-2 transition ${p.techniques.includes(t.id) ? 'border-klein bg-kleinsoft' : 'border-grayline bg-white hover:border-ink/30'}`}>
+                  <div className="font-bold mb-1">{t.name}</div>
+                  <div className="text-xs text-midgray">{t.desc}</div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-between mt-10">
+          {phase > 0 ? (
+            <button onClick={()=>setPhase(phase-1)} className="px-8 py-4 border border-grayline rounded-full hover:bg-paper">← 上一题</button>
+          ) : <button onClick={back} className="px-8 py-4 border border-grayline rounded-full hover:bg-paper">← 返回</button>}
+          {phase < 2 ? (
+            <button onClick={()=>setPhase(phase+1)} disabled={!canNext}
+              className="px-10 py-4 bg-ink text-white rounded-full hover:bg-klein transition disabled:opacity-40">下一题 →</button>
+          ) : (
+            <button onClick={next} className="px-10 py-4 bg-ink text-white rounded-full hover:bg-klein transition">下一步：选择场合 →</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   SCREEN 5: OCCASION
+============================================================ */
+
+function OccasionScreen({ profile, update, next, back }) {
+  const o = profile.occasions;
+  const setOcc = (k, v) => update({ occasions: { ...o, [k]: v }});
+
+  const toggleSecondary = (id) => {
+    setOcc('secondary', o.secondary.includes(id) ? o.secondary.filter(x=>x!==id) : [...o.secondary, id]);
+  };
+
+  return (
+    <div>
+      <StepProgress step={4} total={6} onBack={back}/>
+      <div className="max-w-5xl mx-auto px-4 py-10">
+        <div className="mb-8 fade-up">
+          <div className="text-klein text-sm font-medium mb-2">STEP 04</div>
+          <h2 className="font-display text-4xl font-bold mb-2">穿着场合</h2>
+          <p className="text-midgray">选择主要场合（必选）和次要场合（可选）</p>
+        </div>
+
+        <div className="fade-up">
+          <div className="flex gap-3 mb-6">
+            <div className="w-10 h-10 rounded-full bg-klein flex items-center justify-center text-white text-sm shrink-0">AI</div>
+            <div className="bg-kleinsoft rounded-2xl rounded-tl-sm px-5 py-3 max-w-md">
+              这套穿搭主要用在什么场合呀？选一个主要的，再挑几个可能用到的～
+            </div>
+          </div>
+
+          <label className="text-sm font-medium mb-3 block">📍 主要场合</label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+            {OCCASIONS.map(oc => (
+              <button key={oc.id} onClick={()=>setOcc('primary', o.primary===oc.id ? '' : oc.id)}
+                className={`p-4 rounded-2xl border-2 transition text-left ${o.primary===oc.id ? 'border-klein bg-kleinsoft' : 'border-grayline bg-white hover:border-ink/30'}`}>
+                <div className="text-2xl mb-1">{oc.icon}</div>
+                <div className="font-bold text-sm">{oc.name}</div>
+              </button>
+            ))}
+          </div>
+
+          <label className="text-sm font-medium mb-3 block">✨ 次要场合（可多选）</label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {OCCASIONS.map(oc => (
+              <button key={oc.id} onClick={()=>toggleSecondary(oc.id)} disabled={o.primary===oc.id}
+                className={`p-3 rounded-xl border-2 transition text-sm ${o.secondary.includes(oc.id) ? 'border-klein bg-kleinsoft' : 'border-grayline bg-white hover:border-ink/30'} ${o.primary===oc.id ? 'opacity-30 cursor-not-allowed' : ''}`}>
+                {oc.icon} {oc.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-between mt-10">
+          <button onClick={back} className="px-8 py-4 border border-grayline rounded-full hover:bg-paper">← 上一步</button>
+          <button onClick={next} disabled={!o.primary}
+            className="px-10 py-4 bg-ink text-white rounded-full hover:bg-klein transition disabled:opacity-40">生成穿搭方案 →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   SCREEN 6: RESULT
+============================================================ */
+
+function ResultScreen({ profile, outfit, description, regenerate, back, restart }) {
+  const [view, setView] = useState('front');
+  const [showShop, setShowShop] = useState(false);
+  const [complain, setComplain] = useState(null);
+  const [locked, setLocked] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const handleRegenerate = () => {
+    setLoading(true);
+    setTimeout(() => {
+      const keep = {};
+      if (locked.top) keep.top = outfit.outfit.top;
+      if (locked.bottom) keep.bottom = outfit.outfit.bottom;
+      if (locked.outerwear) keep.outerwear = outfit.outfit.outerwear;
+      if (locked.shoes) keep.shoes = outfit.outfit.shoes;
+      regenerate(keep);
+      setLoading(false);
+      setComplain(null);
+      setLocked({});
+    }, 800);
+  };
+
+  const allItems = [
+    { key:'top', item: outfit.outfit.top, label:'上衣' },
+    { key:'bottom', item: outfit.outfit.bottom, label:'下装' },
+    { key:'outerwear', item: outfit.outfit.outerwear, label:'外套' },
+    { key:'shoes', item: outfit.outfit.shoes, label:'鞋履' },
+    ...outfit.outfit.accessories.map((a,i) => ({ key:`acc${i}`, item: a, label:'配饰' })),
+  ];
+
+  return (
+    <div>
+      <StepProgress step={5} total={6} onBack={back}/>
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <div className="mb-8 fade-up">
+          <div className="text-klein text-sm font-medium mb-2">STEP 05 · 你的专属穿搭</div>
+          <h2 className="font-display text-4xl font-bold mb-2">AI 为你定制的方案</h2>
+        </div>
+
+        <div className="grid lg:grid-cols-5 gap-8">
+          {/* 虚拟形象试衣 */}
+          <div className="lg:col-span-2 fade-up">
+            <div className="sticky top-24 bg-white rounded-2xl border border-grayline p-4">
+              <div className="relative aspect-[3/4] rounded-xl overflow-hidden">
+                {loading && <div className="absolute inset-0 z-10 bg-white/80 flex items-center justify-center"><div className="text-klein text-sm">AI 正在搭配...</div></div>}
+                <Avatar2D profile={profile} outfit={outfit.outfit} view={view}/>
+              </div>
+              <div className="flex gap-2 mt-4 justify-center">
+                {['front','side','back'].map(v => (
+                  <button key={v} onClick={()=>setView(v)}
+                    className={`px-4 py-1.5 rounded-full text-sm transition ${view===v ? 'bg-klein text-white' : 'bg-paper text-midgray'}`}>
+                    {v==='front'?'正面':v==='side'?'侧面':'背面'}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 穿搭介绍 */}
+          <div className="lg:col-span-3 space-y-6 fade-up">
+            {/* 设计理念 */}
+            <div className="bg-white rounded-2xl border border-grayline p-6">
+              <h3 className="font-display text-2xl font-bold mb-3">设计理念</h3>
+              <p className="text-midgray leading-relaxed">{description.concept}</p>
+            </div>
+
+            {/* 单品解析 */}
+            <div className="bg-white rounded-2xl border border-grayline p-6">
+              <h3 className="font-display text-2xl font-bold mb-4">单品清单</h3>
+              <div className="space-y-3">
+                {allItems.map(({key, item, label}) => (
+                  <div key={key} className="flex items-center gap-4 p-3 bg-paper rounded-xl">
+                    <div className="w-10 h-10 rounded-lg border-2 border-white shadow" style={{background: item.color}}/>
+                    <div className="flex-1">
+                      <div className="text-xs text-midgray">{label}</div>
+                      <div className="font-medium text-sm">{item.name}</div>
+                    </div>
+                    <label className="flex items-center gap-1 text-xs text-midgray cursor-pointer">
+                      <input type="checkbox" checked={!!locked[key]} onChange={()=>setLocked({...locked, [key]: !locked[key]})} className="accent-klein"/>
+                      保留
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 显瘦技巧 */}
+            <div className="bg-kleinsoft rounded-2xl p-6">
+              <h3 className="font-display text-xl font-bold mb-3 flex items-center gap-2">✨ 显瘦/显高技巧</h3>
+              <ul className="space-y-2">
+                {description.tips.map((t,i) => (
+                  <li key={i} className="text-sm flex gap-2"><span className="text-klein">▸</span>{t}</li>
+                ))}
+              </ul>
+            </div>
+
+            {/* 搭配逻辑 */}
+            <div className="bg-white rounded-2xl border border-grayline p-6">
+              <h3 className="font-display text-xl font-bold mb-2">搭配逻辑</h3>
+              <p className="text-midgray text-sm leading-relaxed">{description.logic}</p>
+              <div className="mt-4 pt-4 border-t border-grayline">
+                <div className="text-xs text-midgray mb-1">为什么适合你</div>
+                <p className="text-sm">{description.fitReason}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 决策区 */}
+        <div className="mt-10 bg-white rounded-2xl border border-grayline p-6 fade-up">
+          {!showShop ? (
+            <>
+              <h3 className="font-display text-2xl font-bold mb-4 text-center">这套穿搭你满意吗？</h3>
+              {complain ? (
+                <div className="mb-6">
+                  <p className="text-center text-midgray mb-4">想调整哪里？勾选要保留的单品后点击「换一身」</p>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {['颜色不对','版型不合适','某单品不喜欢','整体风格想换'].map(c => (
+                      <button key={c} onClick={()=>{}} className="px-4 py-2 rounded-full border border-grayline text-sm hover:border-klein">{c}</button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+              <div className="flex flex-wrap gap-4 justify-center">
+                <button onClick={()=>setShowShop(true)} className="px-8 py-4 bg-klein text-white rounded-full hover:opacity-90 transition">😊 满意，去看看</button>
+                <button onClick={()=>setComplain(true)} className="px-8 py-4 border border-grayline rounded-full hover:bg-paper transition">🤔 不满意，换一身</button>
+                {complain && (
+                  <button onClick={handleRegenerate} className="px-8 py-4 bg-ink text-white rounded-full hover:bg-klein transition">🔄 换一身（保留勾选）</button>
+                )}
+              </div>
+            </>
+          ) : (
+            <div>
+              <h3 className="font-display text-2xl font-bold mb-4 text-center">🛒 去哪里买</h3>
+              <div className="space-y-4">
+                {allItems.map(({key, item}) => (
+                  <div key={key} className="flex flex-col md:flex-row md:items-center gap-4 p-4 bg-paper rounded-xl">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-8 h-8 rounded" style={{background: item.color}}/>
+                      <div>
+                        <div className="font-medium text-sm">{item.name}</div>
+                        <div className="text-xs text-midgray">约 ¥{50+Math.floor(Math.random()*400)} - ¥{200+Math.floor(Math.random()*800)}</div>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 flex-wrap">
+                      {shopLinks(item.keyword).map(s => (
+                        <a key={s.name} href={s.url} target="_blank" rel="noopener"
+                          className="px-3 py-1.5 rounded-full text-xs text-white transition hover:opacity-80"
+                          style={{background: s.color}}>{s.name}</a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 p-4 bg-kleinsoft rounded-xl text-sm">
+                💡 <strong>平替提示：</strong>在淘宝搜索关键词时加上「平替」「同款」「平价」可找到更实惠的选择
+              </div>
+              <div className="flex justify-center gap-4 mt-6">
+                <button onClick={()=>setShowShop(false)} className="px-6 py-3 border border-grayline rounded-full text-sm hover:bg-paper">← 返回</button>
+                <button onClick={restart} className="px-6 py-3 bg-ink text-white rounded-full text-sm hover:bg-klein">重新开始</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   APP
+============================================================ */
+
+function App() {
+  const [step, setStep] = useState(0); // 0:home 1:body 2:avatar 3:style 4:occasion 5:result
+  const [profile, setProfile] = useState(initialProfile);
+  const [outfitResult, setOutfitResult] = useState(null);
+
+  const update = (partial) => setProfile(p => ({ ...p, ...partial }));
+
+  const goNext = () => {
+    if (step === 4) {
+      // 生成穿搭
+      const result = recommendOutfit(profile, {});
+      setOutfitResult(result);
+      setStep(5);
+    } else {
+      setStep(s => s + 1);
+    }
+  };
+
+  const regenerate = (locked) => {
+    // 传入当前穿搭作为排除集，未锁定槽位会换新单品
+    const result = recommendOutfit(profile, locked, outfitResult?.outfit);
+    setOutfitResult(result);
+  };
+
+  const restart = () => {
+    setProfile(initialProfile);
+    setOutfitResult(null);
+    setStep(0);
+  };
+
+  return (
+    <div className="min-h-screen bg-paper">
+      {step === 0 && <HomeScreen onStart={()=>setStep(1)}/>}
+      {step === 1 && <BodyDataScreen profile={profile} update={update} next={goNext} back={()=>setStep(0)}/>}
+      {step === 2 && <AvatarScreen profile={profile} update={update} next={goNext} back={()=>setStep(1)}/>}
+      {step === 3 && <StyleScreen profile={profile} update={update} next={goNext} back={()=>setStep(2)}/>}
+      {step === 4 && <OccasionScreen profile={profile} update={update} next={goNext} back={()=>setStep(3)}/>}
+      {step === 5 && outfitResult && (
+        <ResultScreen profile={profile} outfit={outfitResult} description={outfitResult.description}
+          regenerate={regenerate} back={()=>setStep(4)} restart={restart}/>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

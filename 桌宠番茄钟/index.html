@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>桌宠番茄钟 · 陪你专注</title>
+<style>
+:root{--bg:#1a1a2e;--panel:#16213e;--accent:#e94560;--accent2:#0f3460;--text:#eaeaea;--muted:#7a7a9e;--good:#4ecca3;--warn:#f9a825;--bad:#e94560}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow-x:hidden}
+.header{width:100%;max-width:520px;padding:20px;text-align:center}
+.header h1{font-size:28px;letter-spacing:2px}
+.header p{color:var(--muted);font-size:13px;margin-top:6px}
+/* 桌宠区域 */
+.pet-zone{width:100%;max-width:520px;padding:0 20px;display:flex;justify-content:center;margin-bottom:20px}
+.pet{width:140px;height:140px;position:relative;cursor:pointer;transition:transform .3s}
+.pet:hover{transform:scale(1.05)}
+.pet-body{width:120px;height:120px;margin:0 auto;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:50% 50% 45% 45%;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(102,126,234,.35)}
+.pet-face{position:absolute;bottom:25px;left:50%;transform:translateX(-50%);width:70px;height:50px}
+.eye{width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:8px;transition:height .2s}
+.eye::after{content:'';width:6px;height:6px;background:#1a1a2e;border-radius:50%;position:absolute;top:4px;left:4px}
+.eye.l{left:8px}.eye.r{right:8px}
+.mouth{width:20px;height:10px;border:3px solid #fff;border-top:none;border-radius:0 0 20px 20px;position:absolute;bottom:5px;left:50%;transform:translateX(-50%);transition:all .3s}
+.blush{width:12px;height:6px;background:rgba(233,69,96,.5);border-radius:50%;position:absolute;top:22px}
+.blush.l{left:0}.blush.r{right:0}
+.pet-message{position:absolute;top:-30px;left:50%;transform:translateX(-50%);background:#fff;color:#1a1a2e;padding:6px 14px;border-radius:16px;font-size:12px;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
+.pet-message::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#fff;border-bottom:none}
+.pet.show-msg .pet-message{opacity:1}
+/* 计时器 */
+.timer-card{width:100%;max-width:520px;background:var(--panel);border-radius:24px;padding:30px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.mode-tabs{display:flex;gap:10px;justify-content:center;margin-bottom:24px}
+.mode-btn{padding:10px 24px;border-radius:20px;border:2px solid var(--accent2);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;transition:.3s;font-family:inherit}
+.mode-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.time-display{font-size:72px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:4px;margin:10px 0;text-shadow:0 4px 20px rgba(233,69,96,.3)}
+.time-label{color:var(--muted);font-size:14px;margin-bottom:20px}
+.controls{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{padding:14px 32px;border-radius:16px;border:none;font-size:16px;font-weight:600;cursor:pointer;transition:.3s;font-family:inherit}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(233,69,96,.4)}
+.btn-secondary{background:var(--accent2);color:var(--text)}
+.btn-secondary:hover{background:#1a4a7a}
+/* 统计 */
+.stats{width:100%;max-width:520px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px}
+.stat-card{background:var(--panel);border-radius:16px;padding:16px;text-align:center}
+.stat-num{font-size:28px;font-weight:700;color:var(--accent)}
+.stat-label{font-size:12px;color:var(--muted);margin-top:4px}
+/* 设置 */
+.settings{width:100%;max-width:520px;padding:0 20px 30px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--accent2)}
+.setting-row label{font-size:14px;color:var(--muted)}
+.setting-row input{width:60px;padding:8px;border-radius:10px;border:2px solid var(--accent2);background:var(--bg);color:var(--text);text-align:center;font-size:14px}
+/* 完成弹窗 */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-bg.show{opacity:1;pointer-events:auto}
+.modal{background:var(--panel);border-radius:24px;padding:40px;text-align:center;max-width:360px;transform:scale(.9);transition:transform .3s}
+.modal-bg.show .modal{transform:scale(1)}
+.modal h2{font-size:24px;margin-bottom:10px}
+.modal p{color:var(--muted);margin-bottom:20px}
+/* 动画 */
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes sleep{0%,100%{opacity:1}50%{opacity:.6}}
+@keyframes blink{0%,90%,100%{height:14px}95%{height:2px}}
+.pet.working .pet-body{animation:bounce 1.5s infinite}
+.pet.resting .eye{animation:sleep 2s infinite}
+.pet .eye{animation:blink 4s infinite}
+.confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:99;animation:fall 3s linear forwards}
+@keyframes fall{to{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@media(max-width:480px){.time-display{font-size:56px}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="header"><h1>🐱 桌宠番茄钟</h1><p>一只小宠物陪你专注，完成番茄钟它会开心哦</p></div>
+
+<div class="pet-zone">
+  <div class="pet" id="pet" onclick="petClick()">
+    <div class="pet-message" id="petMsg">点击我打招呼~</div>
+    <div class="pet-body">
+      <div class="pet-face">
+        <div class="eye l"></div><div class="eye r"></div>
+        <div class="blush l"></div><div class="blush r"></div>
+        <div class="mouth" id="mouth"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="timer-card">
+  <div class="mode-tabs">
+    <button class="mode-btn active" data-mode="work" onclick="setMode('work')">🍅 专注 25min</button>
+    <button class="mode-btn" data-mode="short" onclick="setMode('short')">☕ 短休 5min</button>
+    <button class="mode-btn" data-mode="long" onclick="setMode('long')">🌙 长休 15min</button>
+  </div>
+  <div class="time-display" id="timeDisplay">25:00</div>
+  <div class="time-label" id="timeLabel">准备开始专注</div>
+  <div class="controls">
+    <button class="btn btn-primary" id="startBtn" onclick="toggleTimer()">开始</button>
+    <button class="btn btn-secondary" onclick="resetTimer()">重置</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-card"><div class="stat-num" id="todayCount">0</div><div class="stat-label">今日番茄</div></div>
+  <div class="stat-card"><div class="stat-num" id="totalCount">0</div><div class="stat-label">累计番茄</div></div>
+  <div class="stat-card"><div class="stat-num" id="focusMinutes">0</div><div class="stat-label">专注分钟</div></div>
+</div>
+
+<div class="settings">
+  <div class="setting-row"><label>专注时长（分钟）</label><input type="number" id="workTime" value="25" min="1" max="120" onchange="updateSettings()"></div>
+  <div class="setting-row"><label>短休时长（分钟）</label><input type="number" id="shortTime" value="5" min="1" max="30" onchange="updateSettings()"></div>
+  <div class="setting-row"><label>长休时长（分钟）</label><input type="number" id="longTime" value="15" min="1" max="60" onchange="updateSettings()"></div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 id="modalTitle">🎉 太棒了！</h2>
+    <p id="modalText">你完成了一个番茄钟！</p>
+    <button class="btn btn-primary" onclick="closeModal()">继续加油</button>
+  </div>
+</div>
+
+<script>
+let mode='work',timeLeft=25*60,timer=null,isRunning=false;
+let settings={work:25,short:5,long:15};
+let stats={today:0,total:0,minutes:0};
+const petMsgs={idle:['点击我打招呼~','今天也要加油哦！','想开始专注了吗？'],working:['专注中...','别分心哦！','我陪你一起努力！','加油加油！'],resting:['休息一下吧~','喝口水吧','眼睛休息一下~'],done:['太棒了！','又完成一个番茄钟！','你真厉害！']};
+function init(){loadStats();updateDisplay();setInterval(petRandomMsg,8000);}
+function loadStats(){const s=localStorage.getItem('pomodoroStats');if(s)stats=JSON.parse(s);const today=new Date().toDateString();if(stats.lastDate!==today){stats.today=0;stats.lastDate=today;}updateStats();}
+function saveStats(){localStorage.setItem('pomodoroStats',JSON.stringify(stats));}
+function updateStats(){document.getElementById('todayCount').textContent=stats.today;document.getElementById('totalCount').textContent=stats.total;document.getElementById('focusMinutes').textContent=stats.minutes;}
+function setMode(m){if(isRunning)return;mode=m;document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));timeLeft=settings[m]*60;updateDisplay();updateLabel();updatePetState();}
+function updateDisplay(){const m=Math.floor(timeLeft/60),s=timeLeft%60;document.getElementById('timeDisplay').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
+function updateLabel(){const labels={work:'专注时间',short:'短休息时间',long:'长休息时间'};document.getElementById('timeLabel').textContent=isRunning?labels[mode]:'准备开始'+(mode==='work'?'专注':'休息');}
+function updatePetState(){const pet=document.getElementById('pet');pet.className='pet '+(isRunning?(mode==='work'?'working':'resting'):'');const mouth=document.getElementById('mouth');if(isRunning&&mode==='work'){mouth.style.borderRadius='0 0 20px 20px';mouth.style.height='10px';}else if(isRunning){mouth.style.borderRadius='50%';mouth.style.height='6px';}else{mouth.style.borderRadius='0 0 20px 20px';mouth.style.height='10px';}}
+function toggleTimer(){if(isRunning){clearInterval(timer);isRunning=false;document.getElementById('startBtn').textContent='继续';}else{timer=setInterval(tick,1000);isRunning=true;document.getElementById('startBtn').textContent='暂停';showPetMsg(mode==='work'?'开始专注啦！':'好好休息~');}updateLabel();updatePetState();}
+function tick(){timeLeft--;updateDisplay();if(timeLeft<=0){clearInterval(timer);isRunning=false;onComplete();}}
+function onComplete(){const pet=document.getElementById('pet');pet.className='pet';showModal();spawnConfetti();if(mode==='work'){stats.today++;stats.total++;stats.minutes+=settings.work;saveStats();updateStats();showPetMsg(petMsgs.done[Math.floor(Math.random()*petMsgs.done.length)]);setTimeout(()=>setMode('short'),2000);}else{showPetMsg('休息好了，继续加油！');setTimeout(()=>setMode('work'),2000);}document.getElementById('startBtn').textContent='开始';updateLabel();updatePetState();}
+function resetTimer(){clearInterval(timer);isRunning=false;timeLeft=settings[mode]*60;updateDisplay();updateLabel();updatePetState();document.getElementById('startBtn').textContent='开始';}
+function updateSettings(){settings.work=parseInt(document.getElementById('workTime').value)||25;settings.short=parseInt(document.getElementById('shortTime').value)||5;settings.long=parseInt(document.getElementById('longTime').value)||15;if(!isRunning)resetTimer();}
+function petClick(){const msgs=isRunning?(mode==='work'?petMsgs.working:petMsgs.resting):petMsgs.idle;showPetMsg(msgs[Math.floor(Math.random()*msgs.length)]);}
+function petRandomMsg(){if(Math.random()<.3)petClick();}
+function showPetMsg(text){const pet=document.getElementById('pet'),msg=document.getElementById('petMsg');msg.textContent=text;pet.classList.add('show-msg');setTimeout(()=>pet.classList.remove('show-msg'),2500);}
+function showModal(){document.getElementById('modalTitle').textContent=mode==='work'?'🎉 专注完成！':'✨ 休息结束！';document.getElementById('modalText').textContent=mode==='work'?'你完成了一个番茄钟，小宠物为你开心！':'休息好了，准备下一个番茄钟吧！';document.getElementById('modalBg').classList.add('show');}
+function closeModal(){document.getElementById('modalBg').classList.remove('show');}
+function spawnConfetti(){const colors=['#e94560','#4ecca3','#f9a825','#667eea','#764ba2'];for(let i=0;i<50;i++){const c=document.createElement('div');c.className='confetti';c.style.left=Math.random()*100+'vw';c.style.top='-10px';c.style.background=colors[Math.floor(Math.random()*colors.length)];c.style.borderRadius=Math.random()>.5?'50%':'0';c.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(c);setTimeout(()=>c.remove(),3500);}}
+document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();toggleTimer();}});
+init();
+</script>
+</body>
+</html>
