@@ -593,18 +593,60 @@
     cursor: pointer; transition: .25s; white-space: nowrap;
   }
   .board-input button:hover { background: var(--pin); transform: rotate(-1.5deg); }
-  #msgList { margin-top: 22px; display: flex; flex-direction: column; gap: 12px; max-height: 320px; overflow-y: auto; padding-right: 4px; }
+  .board-input + .board-input { margin-top: 12px; }
+  .msg-tip { min-height: 18px; margin-top: 10px; font-size: 13px; font-family: var(--f-cn); color: var(--ink-soft); }
+  .msg-tip.ok { color: #3f7d4f; }
+  .msg-tip.err { color: var(--pin); }
+  #msgList { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; max-height: 460px; overflow-y: auto; padding-right: 4px; }
   .msg {
-    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    display: flex; flex-direction: column; align-items: stretch; gap: 5px;
     background: var(--paper-2); border: 1px solid #b39d72;
-    padding: 11px 16px; font-size: 14px; color: var(--ink);
+    padding: 11px 16px; color: var(--ink);
     animation: pop .35s ease; box-shadow: 0 4px 10px rgba(0,0,0,.25);
   }
   .msg:nth-child(2n) { transform: rotate(-.4deg); background: #eadfbF; }
   .msg:nth-child(2n+1) { transform: rotate(.35deg); }
   @keyframes pop { from { transform: scale(.92) rotate(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .msg .del { border: none; background: none; cursor: pointer; font-size: 15px; opacity: .45; color: var(--ink); transition: .2s; }
-  .msg .del:hover { opacity: 1; color: var(--pin); transform: scale(1.25); }
+  .msg-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+  .msg-who { font-family: var(--f-type); font-size: 12.5px; letter-spacing: .5px; color: #7a6647; }
+  .msg-time { font-size: 11.5px; color: #9a8764; white-space: nowrap; }
+  .msg-txt { font-size: 14px; line-height: 1.65; word-break: break-word; white-space: pre-wrap; }
+  .msg-more {
+    display: block; width: 100%; margin-top: 14px; padding: 10px;
+    border: 1px dashed #b39d72; background: transparent; color: var(--ink-soft);
+    font-family: var(--f-cn); font-size: 13.5px; cursor: pointer; transition: .25s;
+  }
+  .msg-more:hover { border-color: var(--pin); color: var(--pin); }
+  .msg-more:disabled { opacity: .55; cursor: default; }
+  .msg-foot { display: flex; align-items: center; gap: 16px; margin-top: 7px; padding-top: 7px; border-top: 1px dashed #c9b68f; }
+  .msg-act {
+    border: none; background: none; cursor: pointer; padding: 0;
+    font-family: var(--f-cn); font-size: 13px; color: #8a7657;
+    display: inline-flex; align-items: center; gap: 4px; transition: .2s;
+  }
+  .msg-act:hover { color: var(--pin); }
+  .msg-act.on-like { color: #c47c1a; font-weight: 700; }
+  .msg-act.on-dislike { color: #4a4034; font-weight: 700; }
+  .msg-act.cmt { margin-left: auto; }
+  .cmt-box { margin-top: 8px; padding: 8px 10px; background: rgba(0,0,0,.04); border-left: 2px solid #c9b68f; }
+  .cmt-item { padding: 5px 0; border-bottom: 1px dashed rgba(0,0,0,.09); }
+  .cmt-item:last-child { border-bottom: none; }
+  .cmt-head { display: flex; justify-content: space-between; gap: 8px; font-size: 11.5px; color: #8a7657; margin-bottom: 2px; }
+  .cmt-text { font-size: 13px; line-height: 1.55; word-break: break-word; white-space: pre-wrap; color: var(--ink); }
+  .cmt-empty { font-size: 12.5px; color: var(--ink-soft); padding: 3px 0; }
+  .cmt-form { display: flex; gap: 8px; margin-top: 8px; }
+  .cmt-form input {
+    flex: 1; min-width: 0; padding: 7px 12px;
+    border: 1px solid #b39d72; background: var(--paper-3); color: var(--ink);
+    font-family: var(--f-cn); font-size: 13px; outline: none;
+  }
+  .cmt-form input:focus { border-color: var(--pin); }
+  .cmt-form button {
+    border: 1px solid #000; background: #100d09; color: var(--paper);
+    padding: 7px 14px; font-family: var(--f-cn); font-size: 13px; cursor: pointer; transition: .2s;
+  }
+  .cmt-form button:hover { background: var(--pin); }
+  .cmt-form button:disabled { opacity: .55; cursor: default; }
   .empty-tip { text-align: center; color: var(--ink-soft); font-size: 14px; padding: 18px 0; }
 
   /* ===== 页脚 & 返回顶部 ===== */
@@ -1697,24 +1739,29 @@
         <span class="badge">④ 安全：无密钥 / 密码 / 隐私泄露</span>
       </div>
       <p><b>真实性声明：</b>本作品集所展示的《梦梦消消乐》《心光谱 · 性向温柔测试与科普小屋》《跃动 · 运动技能自学计划》《AI 穿搭推荐 · 虚拟形象试衣》《桌宠番茄钟 · 陪你专注》《Markdown 笔记 · 极简写作》《待办事项 · 任务管理》《天气查询 · 实时气象》及本网站，均为本人在课程期间真实提出需求、参与设计决策并验收完成的项目。开发过程中使用了 TRAE AI 编程助手辅助生成与调试代码、整理资料；卡通头像与封面示意图由 AI 文生图生成（图中已标注），文案取舍、功能定义与最终判断均由本人完成；未使用付费模板，未把他人作品冒充为自己的成果。</p>
-      <p><b>安全声明：</b>本网站为纯静态页面，不包含服务器密码、数据库主密钥（service_role）或他人隐私信息；游戏排行榜使用 Supabase 提供的<b>可公开 publishable 客户端密钥</b>（该密钥设计上可暴露在前端），写入只能通过数据库函数完成，数据库主密钥仅保存在云服务端、从不下发；游戏账号数据保存在玩家自己浏览器的 localStorage 中。</p>
+      <p><b>安全声明：</b>本网站为纯静态页面，不包含服务器密码、数据库主密钥（service_role）或他人隐私信息；游戏排行榜与留言板使用 Supabase 提供的<b>可公开匿名客户端密钥</b>（该密钥设计上可暴露在前端），留言板数据库仅开放<b>读取与新增</b>权限（不开放修改、删除），数据库主密钥仅保存在云服务端、从不下发；游戏账号数据保存在玩家自己浏览器的 localStorage 中。</p>
     </div>
   </div>
 </section>
 
-<!-- ================= 留言板 ================= -->
+<!-- ================= 留言板（接入「匿名树洞」云数据库） ================= -->
 <section class="section" id="guestbook" style="padding-top:0;">
   <div class="container">
     <div class="sec-head reveal">
       <h2 class="sec-title">留言<span>板</span></h2>
-      <p class="sec-sub">老师/同学如果有建议，欢迎留在这里 💜（仅保存在本机浏览器）</p>
+      <p class="sec-sub">与《匿名树洞》实时同步 · 留言保存在云端，所有人都能看到 🌿</p>
     </div>
     <div class="board reveal">
       <div class="board-input">
-        <input id="msgInput" type="text" maxlength="60" placeholder="留下你的建议吧～（最多60字）" onkeydown="if(event.key==='Enter')addMsg()">
-        <button onclick="addMsg()">发送 💌</button>
+        <input id="msgName" type="text" maxlength="20" placeholder="你的代号（留空 = 匿名）">
       </div>
-      <div id="msgList"></div>
+      <div class="board-input">
+        <input id="msgInput" type="text" maxlength="500" placeholder="留下你的建议或悄悄话～（最多 500 字）" onkeydown="if(event.key==='Enter')addMsg()">
+        <button id="msgSend" onclick="addMsg()">发送 💌</button>
+      </div>
+      <div id="msgTip" class="msg-tip"></div>
+      <div id="msgList"><div class="empty-tip">正在连接匿名树洞…</div></div>
+      <button id="msgMore" class="msg-more" style="display:none;">加载更早的留言 ▾</button>
     </div>
   </div>
 </section>
@@ -1782,40 +1829,272 @@ avatar.addEventListener('click', () => {
 
 /* ===== 滚动浮现 + 技能条：已迁移到 gsap-anim.js（GSAP ScrollTrigger） ===== */
 
-/* ===== 留言板 ===== */
-const KEY = 'wyx-guestbook';
+/* ===== 留言板：接入《匿名树洞》Supabase 云数据库 ===== */
+const SB_URL = 'https://ddcabyilmoixvuiawmnn.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkY2FieWlsbW9peHZ1aWF3bW5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MTc4OTAsImV4cCI6MjEwNzQ5Mzg5MH0.PtlMG6A1J6Fwv50VN_fQKoxGnwzbeOPnFSEWEYUzycg';
+const SB_HEADERS = { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' };
+const MSG_PAGE = 20, MSG_MAX = 500, NAME_MAX = 20, CMT_MAX = 200;
+const BAD_WORDS = ['赌博','诈骗','毒品','枪支','色情','代开发票','法轮功','暴力恐怖','洗钱','走私'];
+
 const msgList = document.getElementById('msgList');
-const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-function getMsgs() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
-function render() {
-  const msgs = getMsgs();
-  if (!msgs.length) {
+const msgMore = document.getElementById('msgMore');
+const msgTipEl = document.getElementById('msgTip');
+const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+let cloudMsgs = [], cloudTotal = 0, sending = false;
+let cmtCounts = {}, cmtCache = {}, expandedCmt = new Set();
+// 本机投票记录与树洞共用同一个 key，两处点赞状态保持一致
+let myVotes = {};
+try { myVotes = JSON.parse(localStorage.getItem('treehole_votes')) || {}; } catch { myVotes = {}; }
+
+function filterBad(text) {
+  let out = text, hits = 0;
+  for (const w of BAD_WORDS) {
+    if (out.includes(w)) { hits++; out = out.split(w).join('*'.repeat(w.length)); }
+  }
+  return { text: out, hits };
+}
+function fmtTime(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return '';
+  const p = n => String(n).padStart(2, '0');
+  return `${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function showTip(text, ok) {
+  msgTipEl.textContent = text;
+  msgTipEl.className = 'msg-tip ' + (ok ? 'ok' : 'err');
+  if (text) setTimeout(() => { if (msgTipEl.textContent === text) msgTipEl.textContent = ''; }, 4000);
+}
+function msgCardHTML(m) {
+  const v = myVotes[m.id];
+  const voteCls = (on, tone) => on ? `msg-act on-${tone}` : 'msg-act';
+  return `
+    <div class="msg">
+      <div class="msg-head"><span class="msg-who">${esc(m.name || '匿名')}</span><span class="msg-time">${fmtTime(m.created_at)}</span></div>
+      <div class="msg-txt">${esc(m.content)}</div>
+      <div class="msg-foot">
+        <button id="like-btn-${m.id}" class="${voteCls(v === 'like', 'like')}" onclick="toggleLike(${m.id})">👍 <span id="like-c-${m.id}">${m.likes ?? 0}</span></button>
+        <button id="dislike-btn-${m.id}" class="${voteCls(v === 'dislike', 'dislike')}" onclick="toggleDislike(${m.id})">👎 <span id="dislike-c-${m.id}">${m.dislikes ?? 0}</span></button>
+        <button class="msg-act cmt" onclick="toggleComments(${m.id})">💬 <span id="comment-c-${m.id}">${cmtCounts[m.id] || 0}</span></button>
+      </div>
+      <div id="comment-section-${m.id}" class="cmt-box" style="display:${expandedCmt.has(m.id) ? 'block' : 'none'};"></div>
+    </div>`;
+}
+function renderMsgs() {
+  if (!cloudMsgs.length) {
     msgList.innerHTML = '<div class="empty-tip">还没有留言，来做第一个留言的人吧～ 🐣</div>';
+    msgMore.style.display = 'none';
     return;
   }
-  msgList.innerHTML = msgs.map((m, i) =>
-    `<div class="msg"><span>💬 ${esc(m)}</span><button class="del" data-i="${i}" title="删除">✖</button></div>`
-  ).join('');
+  msgList.innerHTML = cloudMsgs.map(msgCardHTML).join('');
+  for (const id of expandedCmt) renderComments(id);
+  msgMore.style.display = cloudMsgs.length < cloudTotal ? 'block' : 'none';
+  msgMore.disabled = false;
+  msgMore.textContent = `加载更早的留言 ▾（已显示 ${cloudMsgs.length}/${cloudTotal}）`;
 }
-function addMsg() {
+async function loadMsgs() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/messages?select=*&order=created_at.desc&limit=${MSG_PAGE}`, { headers: { ...SB_HEADERS, Prefer: 'count=exact' } });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.message || '加载失败');
+    const cr = r.headers.get('content-range');
+    cloudTotal = cr ? parseInt(cr.split('/')[1], 10) || data.length : data.length;
+    cloudMsgs = Array.isArray(data) ? data : [];
+    renderMsgs();
+  } catch (e) {
+    msgList.innerHTML = '<div class="empty-tip">暂时连不上匿名树洞，请稍后再试</div>';
+  }
+}
+async function loadMoreMsgs() {
+  if (msgMore.disabled) return;
+  msgMore.disabled = true;
+  msgMore.textContent = '加载中…';
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/messages?select=*&order=created_at.desc&limit=${MSG_PAGE}&offset=${cloudMsgs.length}`, { headers: SB_HEADERS });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.message || '加载失败');
+    cloudMsgs = cloudMsgs.concat(data);
+    renderMsgs();
+    if (window.gsap) gsap.from('#msgList .msg:nth-last-child(-n+3)', { y: 14, opacity: 0, duration: 0.4, stagger: 0.06 });
+  } catch (e) {
+    showTip('网络异常，请稍后再试', false);
+    msgMore.disabled = false;
+    msgMore.textContent = '加载更早的留言 ▾';
+  }
+}
+async function addMsg() {
   const input = document.getElementById('msgInput');
-  const v = input.value.trim();
-  if (!v) return;
-  const msgs = getMsgs();
-  msgs.unshift(v);
-  localStorage.setItem(KEY, JSON.stringify(msgs));
-  input.value = '';
-  render();
-  if (window.gsap) gsap.from('#msgList .msg:first-child', { y: -16, opacity: 0, rotation: 2, duration: 0.45, ease: 'back.out(1.7)' });
+  const nameEl = document.getElementById('msgName');
+  const raw = input.value.trim();
+  if (!raw) { showTip('先写点什么再投递吧', false); return; }
+  if (raw.length > MSG_MAX) { showTip(`留言太长啦（${MSG_MAX} 字以内）`, false); return; }
+  if (sending) return;
+  sending = true;
+  const btn = document.getElementById('msgSend');
+  btn.disabled = true;
+  btn.textContent = '投递中…';
+  const { text: content, hits } = filterBad(raw);
+  const name = filterBad(String(nameEl.value || '').trim()).text.slice(0, NAME_MAX) || '匿名';
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/messages`, {
+      method: 'POST',
+      headers: { ...SB_HEADERS, Prefer: 'return=representation' },
+      body: JSON.stringify({ name, content })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.message || '投递失败');
+    cloudMsgs.unshift(Array.isArray(data) ? data[0] : data);
+    cloudTotal++;
+    input.value = '';
+    renderMsgs();
+    showTip(hits > 0 ? '已投递，部分敏感词已自动屏蔽 🌿' : '已投递进匿名树洞 🌿', true);
+    if (window.gsap) gsap.from('#msgList .msg:first-child', { y: -16, opacity: 0, rotation: 2, duration: 0.45, ease: 'back.out(1.7)' });
+  } catch (e) {
+    showTip('投递失败，请稍后再试', false);
+  } finally {
+    sending = false;
+    btn.disabled = false;
+    btn.textContent = '发送 💌';
+  }
 }
-msgList.addEventListener('click', e => {
-  if (!e.target.classList.contains('del')) return;
-  const msgs = getMsgs();
-  msgs.splice(+e.target.dataset.i, 1);
-  localStorage.setItem(KEY, JSON.stringify(msgs));
-  render();
-});
-render();
+/* ===== 点赞 / 踩：走数据库 RPC 原子更新 ===== */
+async function callVote(id, likeDelta, dislikeDelta) {
+  const r = await fetch(`${SB_URL}/rest/v1/rpc/vote_message`, {
+    method: 'POST',
+    headers: SB_HEADERS,
+    body: JSON.stringify({ p_id: id, p_like_delta: likeDelta, p_dislike_delta: dislikeDelta })
+  });
+  const data = await r.json();
+  if (!r.ok) throw new Error('vote failed');
+  return Array.isArray(data) ? data[0] : data;
+}
+async function toggleLike(id) {
+  const cur = myVotes[id];
+  if (cur === 'like') await applyVote(id, -1, 0, null);
+  else if (cur === 'dislike') await applyVote(id, 1, -1, 'like');
+  else await applyVote(id, 1, 0, 'like');
+}
+async function toggleDislike(id) {
+  const cur = myVotes[id];
+  if (cur === 'dislike') await applyVote(id, 0, -1, null);
+  else if (cur === 'like') await applyVote(id, -1, 1, 'dislike');
+  else await applyVote(id, 0, 1, 'dislike');
+}
+async function applyVote(id, likeDelta, dislikeDelta, next) {
+  try {
+    const res = await callVote(id, likeDelta, dislikeDelta);
+    const m = cloudMsgs.find(x => x.id === id);
+    if (m) { m.likes = res.likes; m.dislikes = res.dislikes; }
+    if (next) myVotes[id] = next; else delete myVotes[id];
+    localStorage.setItem('treehole_votes', JSON.stringify(myVotes));
+    updateVoteUI(id);
+  } catch (e) {
+    showTip('点赞操作失败，请稍后再试', false);
+  }
+}
+function updateVoteUI(id) {
+  const m = cloudMsgs.find(x => x.id === id);
+  if (!m) return;
+  const likeBtn = document.getElementById(`like-btn-${id}`);
+  const dislikeBtn = document.getElementById(`dislike-btn-${id}`);
+  const likeNum = document.getElementById(`like-c-${id}`);
+  const dislikeNum = document.getElementById(`dislike-c-${id}`);
+  if (likeNum) likeNum.textContent = m.likes ?? 0;
+  if (dislikeNum) dislikeNum.textContent = m.dislikes ?? 0;
+  if (likeBtn) likeBtn.className = myVotes[id] === 'like' ? 'msg-act on-like' : 'msg-act';
+  if (dislikeBtn) dislikeBtn.className = myVotes[id] === 'dislike' ? 'msg-act on-dislike' : 'msg-act';
+}
+
+/* ===== 评论 ===== */
+async function loadCmtCounts() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/comments?select=message_id`, { headers: SB_HEADERS });
+    const rows = await r.json();
+    if (!r.ok || !Array.isArray(rows)) return;
+    cmtCounts = {};
+    for (const row of rows) cmtCounts[row.message_id] = (cmtCounts[row.message_id] || 0) + 1;
+  } catch (e) { /* 评论数加载失败不影响主流程 */ }
+}
+async function toggleComments(id) {
+  const box = document.getElementById(`comment-section-${id}`);
+  if (!box) return;
+  if (expandedCmt.has(id)) {
+    expandedCmt.delete(id);
+    box.style.display = 'none';
+    return;
+  }
+  expandedCmt.add(id);
+  box.style.display = 'block';
+  if (!(id in cmtCache)) {
+    box.innerHTML = '<p class="cmt-empty">评论加载中…</p>';
+    await loadComments(id);
+  }
+  renderComments(id);
+}
+async function loadComments(id) {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/comments?select=*&message_id=eq.${id}&order=created_at.asc`, { headers: SB_HEADERS });
+    const data = await r.json();
+    if (!r.ok) { showTip('评论加载失败，请稍后再试', false); return; }
+    cmtCache[id] = data;
+    cmtCounts[id] = data.length;
+    const span = document.getElementById(`comment-c-${id}`);
+    if (span) span.textContent = data.length;
+  } catch (e) {
+    showTip('网络异常，请稍后再试', false);
+  }
+}
+async function submitComment(id) {
+  const input = document.getElementById(`comment-input-${id}`);
+  const raw = (input?.value || '').trim();
+  if (!raw) { showTip('评论内容不能为空', false); return; }
+  if (raw.length > CMT_MAX) { showTip(`评论太长啦（${CMT_MAX} 字以内）`, false); return; }
+  const { text: content } = filterBad(raw);
+  const name = filterBad(String(document.getElementById('msgName').value || '').trim()).text.slice(0, NAME_MAX) || '匿名';
+  const btn = document.getElementById(`cmt-send-${id}`);
+  if (btn) { btn.disabled = true; btn.textContent = '发送中…'; }
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/comments`, {
+      method: 'POST',
+      headers: { ...SB_HEADERS, Prefer: 'return=representation' },
+      body: JSON.stringify({ message_id: id, name, content })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.message || '评论失败');
+    (cmtCache[id] = cmtCache[id] || []).push(Array.isArray(data) ? data[0] : data);
+    cmtCounts[id] = (cmtCounts[id] || 0) + 1;
+    const span = document.getElementById(`comment-c-${id}`);
+    if (span) span.textContent = cmtCounts[id];
+    renderComments(id);
+    showTip('评论已发送 💬', true);
+  } catch (e) {
+    showTip('评论失败，请稍后再试', false);
+    if (btn) { btn.disabled = false; btn.textContent = '发送'; }
+  }
+}
+function renderComments(id) {
+  const box = document.getElementById(`comment-section-${id}`);
+  if (!box) return;
+  const list = cmtCache[id] || [];
+  const listHTML = list.length
+    ? list.map(c => `
+        <div class="cmt-item">
+          <div class="cmt-head"><span>${esc(c.name || '匿名')}</span><span>${fmtTime(c.created_at)}</span></div>
+          <div class="cmt-text">${esc(c.content)}</div>
+        </div>`).join('')
+    : '<p class="cmt-empty">还没有评论，来说两句吧 🍃</p>';
+  box.innerHTML = `
+    <div style="max-height:220px;overflow-y:auto;">${listHTML}</div>
+    <div class="cmt-form">
+      <input id="comment-input-${id}" maxlength="${CMT_MAX}" placeholder="写下你的评论…" onkeydown="if(event.key==='Enter')submitComment(${id})">
+      <button id="cmt-send-${id}" onclick="submitComment(${id})">发送</button>
+    </div>`;
+}
+
+msgMore.addEventListener('click', loadMoreMsgs);
+(async () => {
+  await loadCmtCounts();
+  await loadMsgs();
+})();
 
 /* ===== 返回顶部 ===== */
 const topBtn = document.getElementById('topBtn');
@@ -1935,7 +2214,7 @@ topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoo
 <!-- GSAP 动效（本地库：E:\github\GSAP dist） -->
 <script src="gsap/gsap.min.js?v=1"></script>
 <script src="gsap/ScrollTrigger.min.js?v=1"></script>
-<script src="gsap-anim.js?v=2"></script>
+<script src="gsap-anim.js?v=3"></script>
 <!-- 背景飘浮微粒（黑板白尘） -->
 <script src="particles-bg.js?v=1"></script>
 <!-- 橡皮筋弹性分段导航 -->

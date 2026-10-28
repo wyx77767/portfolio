@@ -25,7 +25,7 @@
           return;
         }
         gsap.fromTo(f, { width: '0%' },
-          { width: w, duration: 1.1, delay: 0.15 + i * 0.09, ease: 'power2.out' });
+          { width: w, duration: 1.1, delay: 0.15 + i * 0.09, ease: 'power2.out', overwrite: true });
       });
     });
   }
@@ -111,25 +111,38 @@
     playIntroOnce();
   }
 
-  /* ---------- 滚动批次浮现 + 技能条 ---------- */
+  /* ---------- 滚动批次浮现 + 技能条（每次划过都重播） ---------- */
+  function playReveal(batch) {
+    batch.forEach(function (el) { el.classList.add('visible'); });
+    gsap.to(batch, {
+      opacity: 1, y: 0, duration: 0.75,
+      stagger: 0.09, ease: 'power3.out', overwrite: true,
+    });
+    batch.forEach(function (el) { fillBars(el, true); });
+  }
+  function hideReveal(batch) {
+    batch.forEach(function (el) { el.classList.remove('visible'); });
+    gsap.to(batch, {
+      opacity: 0, y: 28, duration: 0.35,
+      stagger: 0.04, ease: 'power2.in', overwrite: true,
+    });
+  }
   ScrollTrigger.batch('.reveal', {
     start: 'top 88%',
-    once: true,
-    onEnter: function (batch) {
-      gsap.to(batch, {
-        opacity: 1, y: 0, duration: 0.75,
-        stagger: 0.09, ease: 'power3.out', overwrite: true,
-        onComplete: function () { batch.forEach(function (el) { el.classList.add('visible'); }); },
-      });
-      batch.forEach(function (el) { fillBars(el, true); });
-    },
+    onEnter: playReveal,
+    onEnterBack: playReveal,
+    onLeave: hideReveal,
+    onLeaveBack: hideReveal,
   });
 
-  /* ---------- 章节编号徽章弹出 ---------- */
+  /* ---------- 章节编号徽章弹出（每次划过都重播） ---------- */
   gsap.utils.toArray('.num-badge').forEach(function (badge) {
     gsap.from(badge, {
       scale: 0.4, opacity: 0, rotation: -16, duration: 0.6, ease: 'back.out(2)',
-      scrollTrigger: { trigger: badge, start: 'top 88%', once: true },
+      scrollTrigger: {
+        trigger: badge, start: 'top 88%',
+        toggleActions: 'restart none none reverse',
+      },
     });
   });
 
