@@ -32,6 +32,16 @@
   var hovered = false;
   var lastTime = 0;
 
+  /* 拖拽状态 */
+  var dragging = false;
+  var dragStartX = 0;
+  var dragStartAngle = 0;
+  var prevX = 0;
+  var prevTime = 0;
+  var lastVx = 0;          // px / ms
+  var inertia = 0;         // 松手后的惯性角速度（度/秒）
+  var SENSITIVITY = 0.32;  // 每像素拖动对应的旋转角度
+
   var rise = document.createElement('div');
   rise.className = 'hc-rise pre';
 
@@ -83,7 +93,17 @@
     if (!lastTime) lastTime = now;
     var dt = Math.min(0.05, (now - lastTime) / 1000);
     lastTime = now;
-    if (!hovered) angle -= SPEED * dt;
+
+    if (dragging) {
+      /* 拖拽中由 pointermove 直接改写 angle */
+    } else if (inertia) {
+      angle += inertia * dt;
+      inertia *= Math.pow(0.9, dt * 60);
+      if (Math.abs(inertia) < 6) inertia = 0;
+    } else if (!hovered) {
+      angle -= SPEED * dt;
+    }
+
     paint();
     requestAnimationFrame(loop);
   }
@@ -109,6 +129,46 @@
   root.addEventListener('mouseenter', function () { hovered = true; });
   root.addEventListener('mouseleave', function () { hovered = false; });
   window.addEventListener('resize', fit);
+
+  /* ---------- 鼠标 / 触屏拖拽旋转 ---------- */
+  function onPointerDown(e) {
+    if (e.button !== undefined && e.button !== 0) return;
+    dragging = true;
+    dragStartX = e.clientX;
+    dragStartAngle = angle;
+    prevX = e.clientX;
+    prevTime = e.timeStamp;
+    lastVx = 0;
+    inertia = 0;
+    root.style.cursor = 'grabbing';
+    start();
+    try { root.setPointerCapture(e.pointerId); } catch (err) { /* 忽略不支持捕获的环境 */ }
+  }
+
+  function onPointerMove(e) {
+    if (!dragging) return;
+    angle = dragStartAngle + (e.clientX - dragStartX) * SENSITIVITY;
+    var span = e.timeStamp - prevTime;
+    if (span > 0) lastVx = (e.clientX - prevX) / span;
+    prevX = e.clientX;
+    prevTime = e.timeStamp;
+    paint();
+  }
+
+  function onPointerUp(e) {
+    if (!dragging) return;
+    dragging = false;
+    root.style.cursor = 'grab';
+    /* px/ms → 度/秒，作为松手后的惯性 */
+    inertia = lastVx * SENSITIVITY * 1000;
+    if (Math.abs(inertia) < 8) inertia = 0;
+    try { root.releasePointerCapture(e.pointerId); } catch (err) { /* 忽略 */ }
+  }
+
+  root.addEventListener('pointerdown', onPointerDown);
+  root.addEventListener('pointermove', onPointerMove);
+  root.addEventListener('pointerup', onPointerUp);
+  root.addEventListener('pointercancel', onPointerUp);
 
   fit();
   paint();

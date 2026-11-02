@@ -571,7 +571,9 @@
   .hobby .t { font-family: var(--f-type); font-weight: 400; margin-top: 9px; font-size: 15px; letter-spacing: 1.5px; color: #000; }
 
   /* ===== 课外也喜欢：3D 圆柱轮播 ===== */
-  .hobby-carousel { position: relative; height: 560px; margin-top: 16px; overflow: hidden; }
+  .hobby-carousel { position: relative; height: 560px; margin-top: 16px; overflow: hidden;
+    cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .hobby-carousel:active { cursor: grabbing; }
   .hobby-carousel::before {
     content: ''; position: absolute; left: 50%; top: 50%;
     width: 760px; height: 760px; transform: translate(-50%, -50%);
@@ -2260,7 +2262,7 @@ topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoo
 <!-- 背景飘浮微粒（黑板白尘） -->
 <script src="particles-bg.js?v=1"></script>
 <!-- 课外也喜欢：3D 圆柱轮播 -->
-<script src="hobby-carousel.js?v=1"></script>
+<script src="hobby-carousel.js?v=2"></script>
 <!-- 橡皮筋弹性分段导航 -->
 <script src="rubber-segment.js?v=2"></script>
 <script>
