@@ -29,7 +29,6 @@
   var angle = 0;
   var cards = [];
   var running = false;
-  var hovered = false;
   var lastTime = 0;
 
   /* 拖拽状态 */
@@ -40,6 +39,8 @@
   var prevTime = 0;
   var lastVx = 0;          // px / ms
   var inertia = 0;         // 松手后的惯性角速度（度/秒）
+  var dragMoved = 0;       // 本次拖拽的位移量，用于区分点击
+  var downCard = null;     // 按下时命中的卡片
   var SENSITIVITY = 0.32;  // 每像素拖动对应的旋转角度
 
   var rise = document.createElement('div');
@@ -55,6 +56,7 @@
     var item = ITEMS[i];
     var card = document.createElement('div');
     card.className = 'hc-card';
+    card.setAttribute('data-title', item.title);
     card.style.transform = 'rotateY(' + (i * STEP) + 'deg) translateZ(' + RADIUS + 'px)';
     card.innerHTML =
       '<div class="hc-inner">' +
@@ -100,7 +102,7 @@
       angle += inertia * dt;
       inertia *= Math.pow(0.9, dt * 60);
       if (Math.abs(inertia) < 6) inertia = 0;
-    } else if (!hovered) {
+    } else {
       angle -= SPEED * dt;
     }
 
@@ -126,8 +128,6 @@
     viewport.style.transform = s < 0.99 ? 'scale(' + s.toFixed(3) + ')' : 'none';
   }
 
-  root.addEventListener('mouseenter', function () { hovered = true; });
-  root.addEventListener('mouseleave', function () { hovered = false; });
   window.addEventListener('resize', fit);
 
   /* ---------- 鼠标 / 触屏拖拽旋转 ---------- */
@@ -140,6 +140,8 @@
     prevTime = e.timeStamp;
     lastVx = 0;
     inertia = 0;
+    dragMoved = 0;
+    downCard = e.target && e.target.closest ? e.target.closest('.hc-card') : null;
     root.style.cursor = 'grabbing';
     start();
     try { root.setPointerCapture(e.pointerId); } catch (err) { /* 忽略不支持捕获的环境 */ }
@@ -147,7 +149,9 @@
 
   function onPointerMove(e) {
     if (!dragging) return;
-    angle = dragStartAngle + (e.clientX - dragStartX) * SENSITIVITY;
+    var dx = e.clientX - dragStartX;
+    dragMoved = Math.abs(dx);
+    angle = dragStartAngle + dx * SENSITIVITY;
     var span = e.timeStamp - prevTime;
     if (span > 0) lastVx = (e.clientX - prevX) / span;
     prevX = e.clientX;
@@ -162,6 +166,12 @@
     /* px/ms → 度/秒，作为松手后的惯性 */
     inertia = lastVx * SENSITIVITY * 1000;
     if (Math.abs(inertia) < 8) inertia = 0;
+    /* 未拖动则视为点击：点「阅读」卡片跳到下方书廊 */
+    if (dragMoved < 6 && downCard && downCard.getAttribute('data-title') === '阅读') {
+      var gallery = document.getElementById('bookGallery');
+      if (gallery) gallery.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    downCard = null;
     try { root.releasePointerCapture(e.pointerId); } catch (err) { /* 忽略 */ }
   }
 
