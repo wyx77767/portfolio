@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>极简商城 · MUSE 美妆商店</title>
+<style>
+  :root{
+    --cream:#faf8f4; --ink:#1b1b1b; --muted:#7d7973; --line:#e6e1d8;
+    --sand:#d8cfc0; --accent:#2b2b2b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--cream);color:var(--ink);line-height:1.8;
+    padding:56px 24px 80px;
+  }
+  .wrap{max-width:960px;margin:0 auto}
+  .brand{font-size:11px;letter-spacing:6px;color:var(--muted);text-transform:uppercase}
+  h1{font-size:38px;font-weight:300;letter-spacing:2px;margin:14px 0 10px}
+  h1 b{font-weight:600}
+  .lead{max-width:700px;font-size:14px;color:#4c4842;letter-spacing:.4px}
+  .rule{height:1px;background:var(--line);margin:32px 0}
+  .stats{display:flex;gap:56px;flex-wrap:wrap}
+  .stat .n{font-size:26px;font-weight:300;letter-spacing:1px}
+  .stat .l{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:2px}
+  .sec{margin-top:44px}
+  .sec h2{font-size:13px;letter-spacing:4px;text-transform:uppercase;color:#3a3733;
+    padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:20px}
+  .cols{display:grid;grid-template-columns:repeat(2,1fr);gap:32px}
+  ul{list-style:none}
+  ul li{font-size:13.5px;color:#3d3a35;padding:5px 0 5px 16px;position:relative}
+  ul li::before{content:"";position:absolute;left:0;top:12px;width:5px;height:1px;background:var(--sand)}
+  .kv{display:flex;gap:12px;font-size:13px;padding:6px 0;border-bottom:1px dashed rgba(0,0,0,.06)}
+  .kv b{flex:0 0 92px;font-weight:500;color:var(--muted)}
+  .routes{display:flex;flex-wrap:wrap;gap:8px}
+  .route{font-family:ui-monospace,Consolas,monospace;font-size:12px;padding:4px 10px;
+    border:1px solid var(--line);background:#fff;letter-spacing:.3px}
+  .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:6px}
+  .step{border:1px solid var(--line);background:#fff;padding:14px 12px;font-size:12px;text-align:center}
+  .step .k{display:block;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:6px}
+  pre{background:#fff;border:1px solid var(--line);padding:18px 20px;overflow-x:auto;
+    font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.9;color:#33302c}
+  pre .c{color:#a09a91}
+  .note{font-size:12.5px;color:var(--muted);margin-top:14px}
+  .back{display:inline-block;margin-top:40px;font-size:12px;letter-spacing:2px;
+    color:#2b2b2b;text-decoration:none;border-bottom:1px solid #2b2b2b;padding-bottom:3px}
+  @media (max-width:760px){
+    .cols{grid-template-columns:1fr}
+    .flow{grid-template-columns:repeat(2,1fr)}
+    body{padding:32px 16px 56px}
+    h1{font-size:28px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">MUSE · Minimal Store</div>
+  <h1>极简商城 · <b>素白美妆商店</b></h1>
+  <p class="lead">
+    18 件单品、5 个分类的极简美妆商城。界面克制留白，重点放在「浏览 → 加购 → 结算 → 订单」
+    这条完整交易链路上，并在后端处理库存并发、订单快照与状态流转。
+  </p>
+
+  <div class="rule"></div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">18</div><div class="l">单品</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">分类</div></div>
+    <div class="stat"><div class="n">10</div><div class="l">页面</div></div>
+    <div class="stat"><div class="n">6</div><div class="l">数据表</div></div>
+    <div class="stat"><div class="n">5</div><div class="l">订单状态</div></div>
+  </div>
+
+  <section class="sec">
+    <h2>交易流程</h2>
+    <div class="flow">
+      <div class="step"><span class="k">STEP 01</span>浏览 / 筛选</div>
+      <div class="step"><span class="k">STEP 02</span>加入购物车</div>
+      <div class="step"><span class="k">STEP 03</span>选择地址</div>
+      <div class="step"><span class="k">STEP 04</span>提交订单</div>
+      <div class="step"><span class="k">STEP 05</span>查看物流</div>
+    </div>
+  </section>
+
+  <div class="cols sec" style="margin-top:36px">
+    <section>
+      <h2>核心功能</h2>
+      <ul>
+        <li>分类、品牌、价格区间三个维度的组合筛选</li>
+        <li>关键词搜索 + 4 种排序（默认 / 价格升降 / 上新）</li>
+        <li>折扣专栏按原价与原价差自动计算折扣力度</li>
+        <li>购物车同一商品合并累加，数量与库存联动</li>
+        <li>收货地址支持默认地址互斥切换</li>
+        <li>下单在事务中条件扣减库存，避免超卖</li>
+        <li>订单号由「M + 时间戳 + 4 位随机数」生成，冲突自动重试</li>
+        <li>订单内保存商品名、图、单价快照，历史订单不受改价影响</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>页面结构</h2>
+      <div class="routes">
+        <span class="route">/</span>
+        <span class="route">/sale</span>
+        <span class="route">/product/:id</span>
+        <span class="route">/cart</span>
+        <span class="route">/checkout</span>
+        <span class="route">/orders</span>
+        <span class="route">/orders/:id</span>
+        <span class="route">/addresses</span>
+        <span class="route">/login</span>
+        <span class="route">/register</span>
+      </div>
+
+      <h2 style="margin-top:26px">数据表</h2>
+      <div class="kv"><b>products</b><span>名称、分类、品牌、价格、原价、库存</span></div>
+      <div class="kv"><b>cart_items</b><span>用户购物车条目</span></div>
+      <div class="kv"><b>addresses</b><span>收货地址，默认地址唯一</span></div>
+      <div class="kv"><b>orders / order_items</b><span>订单主表与商品快照</span></div>
+      <div class="kv"><b>users</b><span>账号与加密密码</span></div>
+    </section>
+  </div>
+
+  <div class="cols sec" style="margin-top:36px">
+    <section>
+      <h2>技术栈</h2>
+      <ul>
+        <li>前端 React 19 + TypeScript 5.7 + Vite 6，纯 CSS 手写，无 UI 框架</li>
+        <li>三个 Context：Auth 鉴权、Cart 购物车、Toast 轻提示</li>
+        <li>后端 Express 4 + knex，默认 SQLite（内置 muse.db），可切 MySQL</li>
+        <li>参数校验用 zod，密码 bcrypt，登录态 JWT</li>
+        <li>服务启动自动建表并写入 18 件商品与演示账号</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>本地二次开发（可选）</h2>
+      <pre><span class="c"># 后端（默认 SQLite，开箱即用）</span>
+cd server
+npm install
+npm run dev    <span class="c"># http://localhost:3101</span>
+
+<span class="c"># 前端</span>
+cd client
+npm install
+npm run dev    <span class="c"># 演示账号 demo / demo1234</span></pre>
+      <p class="note">
+        项目已部署在线上演示环境，演示账号 <code>demo / demo1234</code>；
+        上方命令仅用于本地二次开发，源码位于 <code>E:\plant\在线商城</code>。
+      </p>
+    </section>
+  </div>
+
+  <a class="back" href="../index.html#work-card-shop">← 返回作品集</a>
+</div>
+</body>
+</html>

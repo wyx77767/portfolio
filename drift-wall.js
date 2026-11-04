@@ -103,9 +103,9 @@
     this._stage = stage;
     viewport.appendChild(stage);
 
-    // 每列需要的瓦片数（覆盖 600px 高度 + 余量）
+    // 每列完整放置全部项目（列间相位错开），保证每个项目出现频率一致
     var step = o.tileHeight + o.gap;
-    var perSet = Math.ceil(640 / step);
+    var perSet = Math.max(1, o.items.length);
     var setH = perSet * step;
 
     for (var c = 0; c < o.columns; c++) {

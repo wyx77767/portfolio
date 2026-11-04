@@ -149,8 +149,56 @@
   modal.addEventListener('click', function (e) {
     if (e.target === modal || e.target.classList.contains('bm-close')) closeBook();
   });
+
+  /* ---------- 阅读覆盖层：由「课外也喜欢」的阅读卡片唤起 ---------- */
+  /* 覆盖层 DOM 在本脚本之后，故延迟获取，避免初始化时为 null */
+  var overlay = null;
+
+  function getOverlay() {
+    if (!overlay) overlay = document.getElementById('readingOverlay');
+    return overlay;
+  }
+
+  function openGallery() {
+    var el = getOverlay();
+    if (!el) return;
+    target = 0;
+    current = 0;
+    layout();
+    el.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeGallery() {
+    var el = getOverlay();
+    if (!el) return;
+    closeBook();
+    el.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  window.openReadingGallery = openGallery;
+
+  function bindOverlay() {
+    var el = getOverlay();
+    if (!el || el.getAttribute('data-bound') === '1') return;
+    el.setAttribute('data-bound', '1');
+    el.addEventListener('click', function (e) {
+      if (e.target === el) closeGallery();
+    });
+    var closeBtn = document.getElementById('readingClose');
+    if (closeBtn) closeBtn.addEventListener('click', closeGallery);
+  }
+
+  bindOverlay();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindOverlay);
+  }
+
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeBook();
+    if (e.key !== 'Escape') return;
+    if (modal.classList.contains('open')) closeBook();
+    else if (getOverlay() && getOverlay().classList.contains('open')) closeGallery();
   });
 
   /* ---------- 拖拽 ---------- */

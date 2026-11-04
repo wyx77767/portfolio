@@ -166,10 +166,9 @@
     /* px/ms → 度/秒，作为松手后的惯性 */
     inertia = lastVx * SENSITIVITY * 1000;
     if (Math.abs(inertia) < 8) inertia = 0;
-    /* 未拖动则视为点击：点「阅读」卡片跳到下方书廊 */
+    /* 未拖动则视为点击：点「阅读」卡片打开书籍书廊 */
     if (dragMoved < 6 && downCard && downCard.getAttribute('data-title') === '阅读') {
-      var gallery = document.getElementById('bookGallery');
-      if (gallery) gallery.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (typeof window.openReadingGallery === 'function') window.openReadingGallery();
     }
     downCard = null;
     try { root.releasePointerCapture(e.pointerId); } catch (err) { /* 忽略 */ }

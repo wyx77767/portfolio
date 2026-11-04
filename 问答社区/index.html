@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>问答社区 · 雾问 mist-ask</title>
+<style>
+  :root{
+    --blue:#6f8fd6; --violet:#8b7fd0; --ink:#22283a; --muted:#6b7390;
+    --card:rgba(255,255,255,.72); --line:rgba(34,40,58,.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    color:var(--ink);line-height:1.8;min-height:100vh;padding:52px 22px 76px;
+    background:
+      radial-gradient(760px 520px at 18% 6%, rgba(139,127,208,.30), transparent 62%),
+      radial-gradient(820px 600px at 84% 96%, rgba(111,143,214,.30), transparent 64%),
+      linear-gradient(150deg,#f3f6fc 0%, #f7f4fb 55%, #eef2fa 100%);
+    background-attachment:fixed;
+  }
+  .wrap{max-width:980px;margin:0 auto}
+  .hero{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    padding:34px 34px 30px;box-shadow:0 20px 50px rgba(60,80,140,.12);
+  }
+  .eyebrow{font-size:11.5px;letter-spacing:3px;color:var(--violet);font-weight:600}
+  h1{font-size:32px;letter-spacing:1.5px;margin:10px 0 8px;font-weight:600}
+  h1 em{font-style:normal;color:var(--blue)}
+  .lead{font-size:14.5px;color:#4c5470;max-width:700px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+  .chip{font-size:11.5px;padding:5px 12px;border-radius:999px;background:rgba(111,143,214,.13);
+    color:#4a5f9e;border:1px solid rgba(111,143,214,.24);letter-spacing:.6px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    padding:24px;box-shadow:0 14px 34px rgba(60,80,140,.09)}
+  .card h2{font-size:14.5px;letter-spacing:1px;margin-bottom:14px;color:#3a4670;display:flex;gap:8px;align-items:center}
+  .card h2::before{content:"";width:18px;height:18px;border-radius:50%;
+    background:linear-gradient(135deg,var(--blue),var(--violet));opacity:.85}
+  ul{list-style:none}
+  ul li{font-size:13.5px;padding:5px 0 5px 20px;position:relative;color:#404a6b}
+  ul li::before{content:"↑";position:absolute;left:2px;top:5px;color:var(--blue);font-size:12px}
+  .rules{display:flex;flex-direction:column;gap:8px}
+  .rule{display:flex;align-items:center;gap:12px;font-size:13px;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:10px 14px}
+  .rule .pts{flex:0 0 62px;text-align:center;font-weight:600;color:var(--blue);font-size:13px}
+  .rule .pts.neg{color:#c2688c}
+  .routes{display:flex;flex-wrap:wrap;gap:8px}
+  .route{font-family:ui-monospace,Consolas,monospace;font-size:12px;padding:4px 10px;
+    background:#fff;border:1px solid var(--line);border-radius:8px;color:#39456e}
+  .kv{display:flex;gap:12px;font-size:13px;padding:5px 0;color:#404a6b}
+  .kv b{flex:0 0 96px;color:var(--muted);font-weight:500}
+  pre{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+    font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.9;overflow-x:auto;color:#38405e}
+  pre .c{color:#98a2c0}
+  .note{font-size:12.5px;color:var(--muted);margin-top:12px}
+  .back{display:inline-block;margin-top:28px;font-size:13px;letter-spacing:1.5px;color:#4a5f9e;
+    text-decoration:none;border-bottom:1px solid rgba(111,143,214,.55);padding-bottom:2px}
+  @media (max-width:760px){
+    .grid{grid-template-columns:1fr}
+    body{padding:28px 14px 52px}
+    .hero{padding:26px 22px}
+    h1{font-size:25px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">MIST-ASK · Q&amp;A COMMUNITY</div>
+    <h1>问答社区 · <em>雾问</em></h1>
+    <p class="lead">
+      一个积分驱动的问答社区：提问消耗积分、回答与采纳获得积分，点赞有正负反馈。
+      重点不在「能发帖」，而在积分规则、事务一致性与防重复操作这些容易被忽略的细节。
+    </p>
+    <div class="chips">
+      <span class="chip">React 19</span>
+      <span class="chip">Vite 7</span>
+      <span class="chip">Express</span>
+      <span class="chip">SQLite</span>
+      <span class="chip">JWT</span>
+      <span class="chip">Markdown GFM</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <h2>核心功能</h2>
+      <ul>
+        <li>最新 / 热门 / 未解决三种列表视图</li>
+        <li>标签筛选 + 关键词搜索 + 分页（每页 8 条）</li>
+        <li>提问支持 Markdown（GFM）书写，详情页渲染</li>
+        <li>回答可被提问者采纳，采纳后标记已解决</li>
+        <li>点赞与点踩，禁止给自己投票</li>
+        <li>积分榜 TOP 用户排名</li>
+        <li>个人主页展示提问、回答与积分变化</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>积分规则</h2>
+      <div class="rules">
+        <div class="rule"><span class="pts">+20</span><span>注册即得初始积分</span></div>
+        <div class="rule"><span class="pts neg">−5</span><span>发布提问</span></div>
+        <div class="rule"><span class="pts">+10</span><span>提交回答</span></div>
+        <div class="rule"><span class="pts">+30</span><span>回答被采纳</span></div>
+        <div class="rule"><span class="pts">±5</span><span>被点赞 / 被点踩</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>数据与一致性</h2>
+      <div class="kv"><b>users</b><span>账号、积分余额、加密密码</span></div>
+      <div class="kv"><b>questions</b><span>标题、正文、标签、状态、浏览量</span></div>
+      <div class="kv"><b>answers</b><span>回答内容、是否被采纳</span></div>
+      <div class="kv"><b>votes</b><span>投票记录，唯一索引防重复</span></div>
+      <h2 style="margin-top:20px">关键处理</h2>
+      <ul>
+        <li>采纳与积分变更放在同一事务里，避免只改一半</li>
+        <li>votes 表 (user_id, target, target_id) 加唯一索引，重复点赞直接被数据库拒绝</li>
+        <li>点赞数等冗余计数随事务同步更新</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>页面结构</h2>
+      <div class="routes">
+        <span class="route">/</span>
+        <span class="route">/questions/:id</span>
+        <span class="route">/ask</span>
+        <span class="route">/login</span>
+        <span class="route">/register</span>
+        <span class="route">/users/:id</span>
+      </div>
+      <h2 style="margin-top:22px">本地二次开发（可选）</h2>
+      <pre><span class="c"># 后端（SQLite，自动种子数据）</span>
+cd server
+npm install
+npm run dev    <span class="c"># http://localhost:4000</span>
+
+<span class="c"># 前端</span>
+cd client
+npm install
+npm run dev    <span class="c"># demo / 123456</span></pre>
+      <p class="note">
+        项目已部署在线上演示环境，演示账号 <code>demo / 123456</code>；
+        上方命令仅用于本地二次开发，源码位于 <code>E:\plant\问答社区</code>。
+      </p>
+    </section>
+  </div>
+
+  <a class="back" href="../index.html#work-card-qa">← 返回作品集</a>
+</div>
+</body>
+</html>

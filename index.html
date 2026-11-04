@@ -615,6 +615,8 @@
   .hc-title { font-family: var(--f-type); font-size: 20px; letter-spacing: 3px; color: #000; }
   .hc-sub { font-family: var(--f-type); font-size: 11px; letter-spacing: 4px;
     text-transform: uppercase; color: #8a7657; }
+  .hc-hint { text-align: center; margin: 6px 0 0; font-family: var(--f-type);
+    font-size: 11.5px; letter-spacing: 2px; color: rgba(239,229,205,.42); }
   @media (max-width: 760px) {
     .hobby-carousel { height: 420px; }
     .hobby-carousel::before { width: 520px; height: 520px; }
@@ -626,6 +628,23 @@
     perspective: 1200px; cursor: grab; touch-action: pan-y;
     user-select: none; -webkit-user-select: none; }
   .book-gallery:active { cursor: grabbing; }
+
+  /* 阅读覆盖层 */
+  .reading-overlay { position: fixed; inset: 0; z-index: 99998; display: flex;
+    flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    background: rgba(6,5,4,.93); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px);
+    opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+  .reading-overlay.open { opacity: 1; pointer-events: auto; }
+  .reading-overlay .book-gallery { width: min(940px, 92vw); height: 460px; margin-top: 0; }
+  .ro-head { display: flex; align-items: center; gap: 22px; }
+  .ro-title { font-family: var(--f-type); font-size: 22px; letter-spacing: 4px; color: var(--paper);
+    text-shadow: 0 2px 12px rgba(0,0,0,.8); }
+  .ro-close { font-family: var(--f-type); font-size: 12px; letter-spacing: 2px;
+    padding: 7px 18px; background: transparent; color: var(--paper);
+    border: 1px solid rgba(239,229,205,.5); cursor: pointer; transition: .25s; }
+  .ro-close:hover { background: var(--paper); color: #1a130a; }
+  .ro-tip { font-family: var(--f-type); font-size: 11px; letter-spacing: 2px;
+    color: rgba(239,229,205,.34); pointer-events: none; }
   .bg-track { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; }
   .bg-card { position: absolute; left: 0; top: 0; width: 170px; height: 236px;
     margin: -118px 0 0 -85px; transform-style: preserve-3d;
@@ -642,7 +661,7 @@
     font-family: var(--f-type); font-size: 11px; letter-spacing: 2px;
     color: rgba(239,229,205,.34); pointer-events: none; }
 
-  .book-modal { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center;
+  .book-modal { position: fixed; inset: 0; z-index: 100001; display: flex; align-items: center;
     justify-content: center; padding: 24px; background: rgba(6,5,4,.76);
     backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
     opacity: 0; pointer-events: none; transition: opacity .3s ease; }
@@ -666,6 +685,8 @@
   .bm-close:hover { background: #cf202c; }
   @media (max-width: 760px) {
     .book-gallery { height: 340px; }
+    .reading-overlay .book-gallery { width: 96vw; height: 330px; }
+    .ro-title { font-size: 18px; }
     .bg-card { width: 132px; height: 184px; margin: -92px 0 0 -66px; }
     .bg-caption { bottom: 30px; }
     .bm-card { flex-direction: column; gap: 16px; padding: 20px; }
@@ -942,7 +963,7 @@
         <p class="muted small">我是 wyx，一名正在学习数智编程的学生。我喜欢把想法亲手做成可以玩、可以用的东西：从一行行代码写出消除小游戏，到做一个温柔的科普网页，再到搭建你正在看的这个作品集。</p>
         <div class="info-list" style="margin-top:14px;">
           <div class="info-item"><span class="k">🎈 昵称</span><span class="v">wyx</span></div>
-          <div class="info-item"><span class="k">🎒 身份</span><span class="v">学生</span></div>
+          <div class="info-item"><span class="k">🎒 身份</span><span class="v">武汉理工大学 · 数字经济专业 本科生</span></div>
           <div class="info-item"><span class="k">🧭 方向</span><span class="v">游戏 / 网页 / 互动小工具</span></div>
           <div class="info-item"><span class="k">🌟 座右铭</span><span class="v">把喜欢的事做到底</span></div>
         </div>
@@ -965,10 +986,22 @@
       </div>
     </div>
 
+    <div class="card reveal" style="margin-top:22px;">
+      <h3 class="block-h">🎓 教育背景</h3>
+      <div class="info-list" style="margin-top:14px;">
+        <div class="info-item"><span class="k">🏫 学校专业</span><span class="v">武汉理工大学 · 数字经济专业 · 本科</span></div>
+        <div class="info-item"><span class="k">📅 就读时间</span><span class="v">2025.09 – 至今</span></div>
+        <div class="info-item"><span class="k">🏅 学业成绩</span><span class="v">必修绩点 4.27 · 专业排名 4/72（年级前 5%）</span></div>
+        <div class="info-item"><span class="k">🎖 荣誉奖项</span><span class="v">校级三好学生 · 校级二等奖学金</span></div>
+      </div>
+      <p class="muted small" style="margin-top:14px;"><b>📚 主修课程：</b>数据库原理、程序设计 Python、应用统计学、数字经济学、信息安全、Web 开发基础</p>
+      <p class="muted small" style="margin-top:8px;"><b>🛠 能力积累：</b>熟练使用 SQL Server 完成数据库建模、范式分析与 E-R 图设计；掌握基础数据分析与可视化；熟悉 Vibe Coding 人机协作开发流程，可独立完成简单静态网站开发。</p>
+      <p class="muted small" style="margin-top:8px;"><b>🏁 竞赛与实践：</b>备战商业经营挑战赛、iCAN、三创赛、正大杯等学科创新竞赛；在校内社团负责学术分享与活动策划，组织经济学外刊共读、调研研讨活动；参加南洋理工大学研学项目。</p>
+    </div>
+
     <h3 class="block-h" style="text-align:center; margin-top:34px;">⭐ 课外也喜欢</h3>
     <div class="hobby-carousel" id="hobbyCarousel"></div>
-    <h3 class="block-h" style="text-align:center; margin-top:22px; font-size:20px;">📖 最近在读</h3>
-    <div class="book-gallery" id="bookGallery"></div>
+    <p class="hc-hint">点击「📖 阅读」卡片查看我喜欢的书单</p>
   </div>
 </section>
 
@@ -1036,12 +1069,30 @@
           </tr>
           <tr>
             <td>⑨</td>
+            <td>综合项目作业（前后端）</td>
+            <td><a href="blog/index.html" target="_blank">📝 博客系统 · Markdown 多用户博客</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>⑩</td>
+            <td>综合项目作业（前后端）</td>
+            <td><a href="在线商城/index.html" target="_blank">🛍️ 极简商城 · MUSE 美妆商店</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>⑪</td>
+            <td>综合项目作业（前后端）</td>
+            <td><a href="问答社区/index.html" target="_blank">💬 问答社区 · 雾问 mist-ask</a></td>
+            <td>✅ 已完成</td>
+          </tr>
+          <tr>
+            <td>⑫</td>
             <td>期末作品集（本站）</td>
             <td><a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">🌸 wyx 个人作品集</a></td>
             <td>🔄 持续迭代中</td>
           </tr>
           <tr>
-            <td>⑩</td>
+            <td>⑬</td>
             <td>【其他阶段作业】</td>
             <td class="muted">待按课程顺序补充链接</td>
             <td>⏳ 待补充</td>
@@ -1061,7 +1112,7 @@
     <div class="sec-head reveal">
       <span class="num-badge"><img src="collage/num-0-gold.png" alt="0"><img src="collage/num-3.png" alt="3"></span>
       <h2 class="sec-title">项目<span>成果</span></h2>
-      <p class="sec-sub">功能 · 入口 · 关键页 · 技术说明（八件作品完全对应）</p>
+      <p class="sec-sub">功能 · 入口 · 关键页 · 技术说明（十一件作品完全对应）</p>
     </div>
 
     <!-- ===== 作品漂流墙：进入板块先浏览三件作品（悬停抬升 / 点击进入项目） ===== -->
@@ -1224,6 +1275,66 @@
           <a class="link" href="#feature-weather">查看本项目的专题复盘 →</a>
         </div>
       </div>
+      <!-- 项目 9：博客系统 -->
+      <div class="work reveal" id="work-card-blog">
+        <div class="pic"><img class="no-vintage" src="covers/blog.jpg" alt="博客系统封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>📝 博客系统 · Markdown 多用户博客</h3>
+          <ul class="feat-list">
+            <li>JWT 登录（7 天有效期）+ bcrypt 密码加密，支持注册 / 退出</li>
+            <li>文章列表分页（每页 10 条），支持分类筛选与标题/正文关键词搜索</li>
+            <li>Markdown 写作与 GFM 渲染，详情页自动累加浏览数</li>
+            <li>作者权限隔离：文章仅创建者可编辑、删除</li>
+            <li>封面图上传（multer 限制 5MB 与图片类型），个人中心可改邮箱头像</li>
+            <li>分类接口返回各分类文章数，前端用毛玻璃视觉呈现</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="blog/index.html" target="_blank">打开项目 →</a></p>
+          <p class="kv"><b>🧩 关键页：</b>文章列表 → 文章详情 → 写作/编辑 → 个人中心</p>
+          <p class="kv"><b>🛠 技术：</b>React 19 + TypeScript + Vite + Express 4 + MySQL + JWT</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">TypeScript</span><span class="tag">Express</span><span class="tag">MySQL</span></div>
+          <a class="link" href="#feature-blog">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 10：极简商城 -->
+      <div class="work reveal" id="work-card-shop">
+        <div class="pic"><img class="no-vintage" src="covers/shop.jpg" alt="极简商城封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>🛍️ 极简商城 · MUSE 美妆商店</h3>
+          <ul class="feat-list">
+            <li>18 件单品、5 个分类，支持分类/品牌/价格区间三维组合筛选</li>
+            <li>关键词搜索 + 4 种排序，折扣专栏按原价自动计算折扣力度</li>
+            <li>购物车同商品合并累加，数量与库存联动</li>
+            <li>下单在数据库事务内条件扣减库存（行锁），防止超卖</li>
+            <li>订单号「M + 时间戳 + 4 位随机数」生成，冲突自动重试 5 次</li>
+            <li>订单内保存商品名/图/单价快照，5 种订单状态流转</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="在线商城/index.html" target="_blank">打开项目 →</a></p>
+          <p class="kv"><b>🧩 关键页：</b>首页 → 商品详情 → 购物车 → 结算 → 订单列表</p>
+          <p class="kv"><b>🛠 技术：</b>React 19 + TypeScript + Vite 6 + Express + knex + SQLite/MySQL</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">电商交易</span><span class="tag">事务与库存</span><span class="tag">响应式</span></div>
+          <a class="link" href="#feature-shop">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
+      <!-- 项目 11：问答社区 -->
+      <div class="work reveal" id="work-card-qa">
+        <div class="pic"><img class="no-vintage" src="covers/qa.jpg" alt="问答社区封面图（AI 生成示意图）"></div>
+        <div class="body">
+          <h3>💬 问答社区 · 雾问 mist-ask</h3>
+          <ul class="feat-list">
+            <li>最新 / 热门 / 未解决三种列表视图，标签筛选 + 关键词搜索</li>
+            <li>分页每页 8 条，提问与回答均支持 Markdown（GFM）渲染</li>
+            <li>积分体系：注册 +20、提问 −5、回答 +10、被采纳 +30、点赞 ±5</li>
+            <li>采纳回答与积分变更放在同一事务，避免只改一半</li>
+            <li>votes 表唯一索引防重复点赞，并禁止给自己投票</li>
+            <li>积分榜 TOP 排名与个人主页积分变化记录</li>
+          </ul>
+          <p class="kv"><b>🔗 项目入口：</b><a href="问答社区/index.html" target="_blank">打开项目 →</a></p>
+          <p class="kv"><b>🧩 关键页：</b>问题列表 → 问题详情/回答 → 提问 → 个人主页</p>
+          <p class="kv"><b>🛠 技术：</b>React 19 + Vite 7 + Express + node:sqlite + JWT + scrypt</p>
+          <div class="tags"><span class="tag">React</span><span class="tag">社区积分</span><span class="tag">数据一致性</span><span class="tag">Markdown</span></div>
+          <a class="link" href="#feature-qa">查看本项目的专题复盘 →</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1283,6 +1394,7 @@
           <li><b>v1.7 · 2026-09-18</b>：消消乐排行榜升级——接入 Supabase 云端 PostgreSQL，跨网络共享并三级降级</li>
           <li><b>v1.8 · 2026-10-12</b>：接入第四个项目《AI 穿搭推荐 · 虚拟形象试衣》：新增同构项目卡与专题复盘，阶段作业表增加对应行</li>
           <li><b>v1.9 · 2026-10-26</b>：接入四个新工具项目（桌宠番茄钟/Markdown 笔记/待办事项/天气查询）：各含同构项目卡与专题复盘，阶段作业表扩展至 10 行</li>
+          <li><b>v1.10 · 2026-11-03</b>：接入三个前后端综合项目（博客系统/极简商城/问答社区）：新增同构项目卡、专题复盘与项目说明页，阶段作业表扩展至 13 行</li>
         </ul>
       </div>
       <div class="ev reveal" style="grid-column: 1 / -1;">
@@ -1385,7 +1497,14 @@
             <td>补真实截图与作业周次；考虑添加项目分类筛选</td>
           </tr>
           <tr>
-            <td colspan="5" class="muted small">游戏本体的迭代（步数用尽改安慰页、移动端触摸适配、云端排行榜升级等）见上方八件作品的专题复盘卡片。</td>
+            <td>11-03<br>v1.10</td>
+            <td>接入三个前后端综合项目：博客系统（JWT 鉴权 + Markdown 写作 + 作者权限）、极简商城（三维筛选 + 购物车 + 事务扣库存 + 订单快照）、问答社区（积分体系 + 采纳事务 + 唯一索引防重复点赞）；各含同构项目卡、专题复盘与静态说明页</td>
+            <td>前 8 件都是单文件前端作品，缺少「前端 + 接口 + 数据库」的完整闭环证明</td>
+            <td>作品从 8 件扩展到 11 件，首次覆盖全栈链路；说明页可在线打开，源码与运行步骤写清楚</td>
+            <td>补真实运行截图；条件允许时把后端部署到可访问的服务器</td>
+          </tr>
+          <tr>
+            <td colspan="5" class="muted small">游戏本体的迭代（步数用尽改安慰页、移动端触摸适配、云端排行榜升级等）见上方十一件作品的专题复盘卡片。</td>
           </tr>
         </tbody>
       </table>
@@ -1399,7 +1518,7 @@
     <div class="sec-head reveal">
       <span class="num-badge"><img src="collage/num-0-gold.png" alt="0"><img src="collage/num-6.png" alt="6"></span>
       <h2 class="sec-title">标志性成果<span>专题</span></h2>
-      <p class="sec-sub">八件作品：问题 · 用户 · 方案 · 复盘</p>
+      <p class="sec-sub">十一件作品：问题 · 用户 · 方案 · 复盘</p>
     </div>
     <div class="feature-hero reveal" id="feature-game">
       <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=adorable%20kawaii%20match-3%20game%20screenshot%20style%20illustration%2C%207%20by%207%20grid%20of%20cute%20animal%20faces%2C%20pink%20purple%20candy%20UI%2C%20sparkles%2C%20mobile%20game%20art&image_size=landscape_16_9" alt="梦梦消消乐专题横幅（AI 生成示意图）">
@@ -1777,6 +1896,151 @@
       </div>
     </div>
   </div>
+
+  <!-- 专题 9：博客系统 -->
+  <div class="feature-hero reveal" id="feature-blog" style="margin-top:56px;">
+    <img src="covers/blog.jpg" alt="博客系统专题横幅（AI 生成示意图）">
+    <div class="cap">
+      <h3>📝 博客系统 · Markdown 多用户博客</h3>
+      <p>鉴权 · 作者权限 · 分类搜索，一条完整的全栈内容链路</p>
+    </div>
+  </div>
+  <div class="f5">
+    <div class="card reveal">
+      <h4>❗ 问题</h4>
+      <ul>
+        <li>课程笔记和随笔散落在多个文档里，想有一个自己的写作空间</li>
+        <li>只做过纯前端页面，想完整走一遍「前端 → 接口 → 数据库」的闭环</li>
+        <li>想弄明白登录态、作者权限、分页搜索这些真实项目里绕不开的东西</li>
+      </ul>
+    </div>
+    <div class="card reveal">
+      <h4>👥 用户</h4>
+      <ul>
+        <li>有持续写作习惯、需要分类整理文章的同学</li>
+        <li>只想读文章、不想被复杂后台打扰的普通访客</li>
+        <li>我自己：一边写课程笔记，一边练全栈</li>
+      </ul>
+    </div>
+    <div class="card reveal">
+      <h4>💡 方案</h4>
+      <ul>
+        <li>JWT 登录（7 天有效期）+ bcrypt 加密存储，注册即生成账号</li>
+        <li>数据表三张：users / categories / posts，posts 用外键关联作者与分类</li>
+        <li>列表分页每页 10 条，分类筛选与标题/正文关键词搜索组合使用</li>
+        <li>作者权限在路由层统一校验：非本人只能读，不能改删</li>
+        <li>封面图走 multer 上传，限制 5MB 且只接受图片类型</li>
+        <li>正文用 Markdown 存储，前端 react-markdown + remark-gfm 渲染</li>
+      </ul>
+    </div>
+    <div class="card reveal">
+      <h4>🪞 复盘</h4>
+      <ul>
+        <li><b style="color:var(--text)">做对的：</b>先把三张表的关系画清楚，再写接口，返工很少</li>
+        <li><b style="color:var(--text)">做对的：</b>权限写成统一中间件，而不是每个接口各写一遍</li>
+        <li><b style="color:var(--text)">学到的：</b>分页与搜索要同时考虑 SQL 条件和前端状态，不然会出现页码错乱</li>
+        <li><b style="color:var(--text)">学到的：</b>文件上传必须做类型和体积双重校验，只信前端是不够的</li>
+        <li><b style="color:var(--text)">下一步：</b>图片压缩、草稿箱、文章评论与点赞</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 专题 10：极简商城 -->
+  <div class="feature-hero reveal" id="feature-shop" style="margin-top:56px;">
+    <img src="covers/shop.jpg" alt="极简商城专题横幅（AI 生成示意图）">
+    <div class="cap">
+      <h3>🛍️ 极简商城 · MUSE 美妆商店</h3>
+      <p>浏览 · 加购 · 结算 · 订单，一条能被并发考验的交易链路</p>
+    </div>
+  </div>
+  <div class="f5">
+    <div class="card reveal">
+      <h4>❗ 问题</h4>
+      <ul>
+        <li>想弄懂电商里「购物车 → 下单 → 扣库存」到底怎么串起来</li>
+        <li>美妆单品的价格、分类、折扣信息分散，挑东西要来回翻</li>
+        <li>见过库存被买成负数的案例，想知道怎么避免超卖</li>
+      </ul>
+    </div>
+    <div class="card reveal">
+      <h4>👥 用户</h4>
+      <ul>
+        <li>想按预算和分类快速挑单品的同学</li>
+        <li>喜欢干净留白界面、不想被弹窗打扰的购物者</li>
+        <li>我自己：练习交易型项目的完整实现</li>
+      </ul>
+    </div>
+    <div class="card reveal">
+      <h4>💡 方案</h4>
+      <ul>
+        <li>18 件单品、5 个分类，分类 / 品牌 / 价格区间三维组合筛选</li>
+        <li>关键词搜索 + 4 种排序；折扣专栏用原价与现价差自动算折扣</li>
+        <li>购物车同商品合并累加，数量上限跟库存联动</li>
+        <li>下单在事务里条件扣库存（带行锁），库存不足直接回滚</li>
+        <li>订单号「M + 时间戳 + 4 位随机数」，唯一冲突自动重试最多 5 次</li>
+        <li>订单商品保存名称、图片、单价快照，之后改价不影响历史订单</li>
+      </ul>
+    </div>
+    <div class="card reveal">
+      <h4>🪞 复盘</h4>
+      <ul>
+        <li><b style="color:var(--text)">做对的：</b>库存扣减放进事务并加条件判断，而不是「先查再改」</li>
+        <li><b style="color:var(--text)">做对的：</b>订单快照让历史订单不会因为商品改价而变形</li>
+        <li><b style="color:var(--text)">学到的：</b>并发下「读到有库存」不等于「下单时还有库存」，必须用数据库保证</li>
+        <li><b style="color:var(--text)">学到的：</b>订单号既要人能读，也要能防冲突，两者要一起设计</li>
+        <li><b style="color:var(--text)">下一步：</b>支付回调、优惠券、后台商品管理</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 专题 11：问答社区 -->
+  <div class="feature-hero reveal" id="feature-qa" style="margin-top:56px;">
+    <img src="covers/qa.jpg" alt="问答社区专题横幅（AI 生成示意图）">
+    <div class="cap">
+      <h3>💬 问答社区 · 雾问 mist-ask</h3>
+      <p>积分驱动的问答：让认真回答的人被看见</p>
+    </div>
+  </div>
+  <div class="f5">
+    <div class="card reveal">
+      <h4>❗ 问题</h4>
+      <ul>
+        <li>课程群里的提问很快被刷走，好答案无法沉淀下来</li>
+        <li>回答的人得不到反馈，久了就没人愿意认真答</li>
+        <li>想练习「积分、事务、防重复」这类社区系统的核心逻辑</li>
+      </ul>
+    </div>
+    <div class="card reveal">
+      <h4>👥 用户</h4>
+      <ul>
+        <li>在课程群里提问、希望得到具体解答的同学</li>
+        <li>愿意回答并积累信誉与积分的活跃用户</li>
+        <li>我自己：想做一个能长期用下去的小社区</li>
+      </ul>
+    </div>
+    <div class="card reveal">
+      <h4>💡 方案</h4>
+      <ul>
+        <li>积分规则：注册 +20、提问 −5、回答 +10、被采纳 +30、点赞 ±5</li>
+        <li>采纳回答与积分变更放在同一事务，避免只改一半</li>
+        <li>votes 表对 (用户, 目标, 目标 ID) 建唯一索引，从数据库层防重复点赞</li>
+        <li>禁止给自己投票，点赞与点踩互斥</li>
+        <li>最新 / 热门 / 未解决三种视图 + 标签筛选 + 分页每页 8 条</li>
+        <li>提问与回答均支持 Markdown（GFM），前端统一渲染</li>
+      </ul>
+    </div>
+    <div class="card reveal">
+      <h4>🪞 复盘</h4>
+      <ul>
+        <li><b style="color:var(--text)">做对的：</b>用唯一索引在数据库层防重复，而不是只靠按钮禁用</li>
+        <li><b style="color:var(--text)">做对的：</b>把积分当「钱」对待，任何变更都放进事务</li>
+        <li><b style="color:var(--text)">学到的：</b>冗余计数（点赞数、回答数）必须与主数据同步更新，否则会越用越歪</li>
+        <li><b style="color:var(--text)">学到的：</b>列表的「热门」不是简单按点赞排序，要结合时间衰减</li>
+        <li><b style="color:var(--text)">下一步：</b>消息通知、举报机制、回答排序权重</li>
+      </ul>
+    </div>
+  </div>
+  </div>
 </section>
 
 <!-- ================= 07 最终学习复盘 ================= -->
@@ -1836,7 +2100,7 @@
         <span class="badge">③ 真实：如实说明 AI 协作</span>
         <span class="badge">④ 安全：无密钥 / 密码 / 隐私泄露</span>
       </div>
-      <p><b>真实性声明：</b>本作品集所展示的《梦梦消消乐》《心光谱 · 性向温柔测试与科普小屋》《跃动 · 运动技能自学计划》《AI 穿搭推荐 · 虚拟形象试衣》《桌宠番茄钟 · 陪你专注》《Markdown 笔记 · 极简写作》《待办事项 · 任务管理》《天气查询 · 实时气象》及本网站，均为本人在课程期间真实提出需求、参与设计决策并验收完成的项目。开发过程中使用了 TRAE AI 编程助手辅助生成与调试代码、整理资料；卡通头像与封面示意图由 AI 文生图生成（图中已标注），文案取舍、功能定义与最终判断均由本人完成；未使用付费模板，未把他人作品冒充为自己的成果。</p>
+      <p><b>真实性声明：</b>本作品集所展示的《梦梦消消乐》《心光谱 · 性向温柔测试与科普小屋》《跃动 · 运动技能自学计划》《AI 穿搭推荐 · 虚拟形象试衣》《桌宠番茄钟 · 陪你专注》《Markdown 笔记 · 极简写作》《待办事项 · 任务管理》《天气查询 · 实时气象》《博客系统 · Markdown 多用户博客》《极简商城 · MUSE 美妆商店》《问答社区 · 雾问 mist-ask》及本网站，均为本人在课程期间真实提出需求、参与设计决策并验收完成的项目。开发过程中使用了 TRAE AI 编程助手辅助生成与调试代码、整理资料；卡通头像与封面示意图由 AI 文生图生成（图中已标注），文案取舍、功能定义与最终判断均由本人完成；未使用付费模板，未把他人作品冒充为自己的成果。</p>
       <p><b>安全声明：</b>本网站为纯静态页面，不包含服务器密码、数据库主密钥（service_role）或他人隐私信息；游戏排行榜与留言板使用 Supabase 提供的<b>可公开匿名客户端密钥</b>（该密钥设计上可暴露在前端），留言板数据库仅开放<b>读取与新增</b>权限（不开放修改、删除），数据库主密钥仅保存在云服务端、从不下发；游戏账号数据保存在玩家自己浏览器的 localStorage 中。</p>
     </div>
   </div>
@@ -2227,7 +2491,7 @@ topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoo
 </script>
 
 <!-- ===== 作品漂流墙 DriftWall：3D 漂浮照片墙，项目封面 + 名称 ===== -->
-<script src="drift-wall.js?v=1"></script>
+<script src="drift-wall.js?v=2"></script>
 <script>
 (function () {
   function initDriftWall() {
@@ -2280,6 +2544,24 @@ topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoo
         href: '#work-card-weather',
         noVintage: true,
       },
+      {
+        title: '博客系统',
+        image: 'covers/blog.jpg',
+        href: '#work-card-blog',
+        noVintage: true,
+      },
+      {
+        title: '极简商城',
+        image: 'covers/shop.jpg',
+        href: '#work-card-shop',
+        noVintage: true,
+      },
+      {
+        title: '问答社区',
+        image: 'covers/qa.jpg',
+        href: '#work-card-qa',
+        noVintage: true,
+      },
     ];
     window.__driftWall = new DriftWall(host, {
       items: items,
@@ -2316,9 +2598,7 @@ topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoo
 <!-- 背景飘浮微粒（黑板白尘） -->
 <script src="particles-bg.js?v=1"></script>
 <!-- 课外也喜欢：3D 圆柱轮播 -->
-<script src="hobby-carousel.js?v=3"></script>
-<!-- 最近在读：CircularGallery 弧形书廊 -->
-<script src="book-gallery.js?v=1"></script>
+<script src="hobby-carousel.js?v=4"></script>
 <!-- 橡皮筋弹性分段导航 -->
 <script src="rubber-segment.js?v=2"></script>
 <script>
@@ -2357,5 +2637,17 @@ topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoo
   }
 })();
 </script>
+
+<!-- ===== 阅读：书籍弧形书廊（由「课外也喜欢」的阅读卡片打开） ===== -->
+<div class="reading-overlay" id="readingOverlay">
+  <div class="ro-head">
+    <span class="ro-title">📖 我喜欢读</span>
+    <button class="ro-close" type="button" id="readingClose">返回</button>
+  </div>
+  <div class="book-gallery" id="bookGallery"></div>
+  <div class="ro-tip">拖动切换 · 点击书封面查看简介</div>
+</div>
+<!-- 书廊脚本需在覆盖层 DOM 之后加载 -->
+<script src="book-gallery.js?v=3"></script>
 </body>
 </html>

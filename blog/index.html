@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>博客系统 · Markdown 多用户博客</title>
+<style>
+  :root{
+    --teal:#3f8f86; --teal-d:#2f6f68; --cream:#f4efe4; --ink:#1d2b29;
+    --glass:rgba(255,255,255,.62); --line:rgba(29,43,41,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+    color:var(--ink); line-height:1.75; min-height:100vh;
+    background:
+      radial-gradient(900px 600px at 12% 8%, #cfe6e0 0%, transparent 60%),
+      radial-gradient(800px 520px at 88% 92%, #dfe9d9 0%, transparent 62%),
+      linear-gradient(160deg,#eef4f1 0%, #f4efe4 100%);
+    background-attachment:fixed;
+    padding:48px 20px 72px;
+  }
+  .wrap{max-width:980px;margin:0 auto}
+  .hero{
+    background:var(--glass); border:1px solid var(--line); border-radius:18px;
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    padding:34px 34px 30px; box-shadow:0 18px 44px rgba(29,43,41,.10);
+  }
+  .eyebrow{font-size:12px;letter-spacing:3px;color:var(--teal);font-weight:600}
+  h1{font-size:30px;letter-spacing:1px;margin:10px 0 8px}
+  h1 span{color:var(--teal)}
+  .lead{font-size:14.5px;color:#4a5b58;max-width:720px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .tag{font-size:11.5px;letter-spacing:1px;padding:5px 12px;border-radius:999px;
+    background:rgba(63,143,134,.10);color:var(--teal-d);border:1px solid rgba(63,143,134,.22)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:22px}
+  .card{
+    background:var(--glass);border:1px solid var(--line);border-radius:16px;
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    padding:24px 24px 20px;box-shadow:0 12px 30px rgba(29,43,41,.07);
+  }
+  .card h2{font-size:15px;letter-spacing:1px;color:var(--teal-d);margin-bottom:12px;display:flex;gap:8px;align-items:center}
+  .card h2::before{content:"";width:5px;height:16px;border-radius:3px;background:var(--teal)}
+  ul{list-style:none}
+  ul li{font-size:13.5px;padding:4px 0 4px 18px;position:relative;color:#33423f}
+  ul li::before{content:"✔";position:absolute;left:0;color:var(--teal);font-size:11px;top:6px}
+  .kv{display:flex;gap:10px;font-size:13px;padding:5px 0;color:#33423f}
+  .kv b{flex:0 0 74px;color:#6c7a77;font-weight:500}
+  .routes{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .route{font-family:ui-monospace,Consolas,monospace;font-size:12px;padding:4px 9px;
+    background:#fff;border:1px solid var(--line);border-radius:6px;color:#2b3a37}
+  pre{
+    background:#15302c;color:#d9ece8;border-radius:12px;padding:16px 18px;
+    font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.85;overflow-x:auto;
+  }
+  pre .c{color:#7fa79f}
+  .note{font-size:12.5px;color:#6a7875;margin-top:12px}
+  .back{display:inline-block;margin-top:26px;font-size:13px;letter-spacing:1px;
+    color:var(--teal-d);text-decoration:none;border-bottom:1px solid rgba(63,143,134,.5);padding-bottom:2px}
+  @media (max-width:760px){
+    .grid{grid-template-columns:1fr}
+    body{padding:24px 14px 48px}
+    .hero{padding:26px 22px}
+    h1{font-size:24px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="eyebrow">PROJECT · 03</div>
+    <h1>博客系统 · <span>Markdown 多用户博客</span></h1>
+    <p class="lead">
+      一个完整的前后端分离博客：注册登录、Markdown 写作、分类与搜索、作者权限隔离。
+      前端负责内容呈现与写作体验，后端用 Express 提供 REST 接口，数据落在 MySQL。
+    </p>
+    <div class="meta">
+      <span class="tag">React 19</span>
+      <span class="tag">TypeScript</span>
+      <span class="tag">Vite</span>
+      <span class="tag">Tailwind 4</span>
+      <span class="tag">Express</span>
+      <span class="tag">MySQL</span>
+      <span class="tag">JWT</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card">
+      <h2>核心功能</h2>
+      <ul>
+        <li>JWT 登录（有效期 7 天）+ bcrypt 加密存储密码，支持注册 / 退出</li>
+        <li>文章列表分页，每页 10 条，支持分类筛选</li>
+        <li>按标题与正文关键词搜索</li>
+        <li>详情页自动累加浏览数</li>
+        <li>写作页支持新建 / 编辑，仅作者本人可改可删</li>
+        <li>封面图通过 multer 上传，限制 5MB 且仅图片类型</li>
+        <li>个人中心可修改邮箱与头像</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>页面结构</h2>
+      <div class="routes">
+        <span class="route">/</span>
+        <span class="route">/post/:id</span>
+        <span class="route">/write</span>
+        <span class="route">/write/:id</span>
+        <span class="route">/profile</span>
+        <span class="route">/login</span>
+        <span class="route">/register</span>
+      </div>
+      <h2 style="margin-top:20px">数据表</h2>
+      <div class="kv"><b>users</b><span>账号、密码哈希、邮箱、头像</span></div>
+      <div class="kv"><b>categories</b><span>分类名称，接口返回各分类文章数</span></div>
+      <div class="kv"><b>posts</b><span>标题、正文、封面、标签（JSON）、作者外键</span></div>
+    </section>
+
+    <section class="card">
+      <h2>技术实现</h2>
+      <ul>
+        <li>前端 React 19 + TypeScript + Vite，路由用 react-router</li>
+        <li>Markdown 渲染：react-markdown + remark-gfm（支持表格、任务列表）</li>
+        <li>接口统一走 <code>/api</code>，开发环境由 Vite 代理到 3001 端口</li>
+        <li>后端 Express 4 + mysql2，鉴权中间件校验 JWT 后注入当前用户</li>
+        <li>上传接口用 multer 做类型与体积双重校验</li>
+        <li>文章标签以 JSON 字段存储，配合索引加速分类查询</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>本地二次开发（可选）</h2>
+      <pre><span class="c"># 1. 准备 MySQL 并建库，写入 .env</span>
+<span class="c"># 2. 后端</span>
+cd server
+npm install
+npm run seed   <span class="c"># 写入演示账号 demo / 123456</span>
+npm run dev    <span class="c"># http://localhost:3001</span>
+
+<span class="c"># 3. 前端</span>
+cd client
+npm install
+npm run dev    <span class="c"># http://localhost:5173</span></pre>
+      <p class="note">
+        项目已部署在线上演示环境，演示账号 <code>demo / 123456</code>；
+        上方命令仅用于本地二次开发，源码位于 <code>E:\plant\blog</code>。
+      </p>
+    </section>
+  </div>
+
+  <a class="back" href="../index.html#work-card-blog">← 返回作品集</a>
+</div>
+</body>
+</html>
