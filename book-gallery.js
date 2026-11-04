@@ -206,6 +206,9 @@
 
   root.addEventListener('pointerdown', function (e) {
     if (e.button !== undefined && e.button !== 0) return;
+    /* 书廊关闭时书卡虽不可见，仍可能残留在页面中央，此处再兜一层 */
+    var el = getOverlay();
+    if (!el || !el.classList.contains('open')) return;
     dragging = true;
     startX = e.clientX;
     startOffset = target;

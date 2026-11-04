@@ -635,6 +635,11 @@
     background: rgba(6,5,4,.93); backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px);
     opacity: 0; pointer-events: none; transition: opacity .35s ease; }
   .reading-overlay.open { opacity: 1; pointer-events: auto; }
+  /* 关闭态：覆盖层/弹窗内所有元素一律不可点。
+     书卡在 JS 里会被写成 pointer-events:auto，会穿透父级的 none，
+     导致看不见的书卡在页面中央拦截点击并弹出书籍简介，故在此强制关闭。 */
+  .reading-overlay:not(.open) *,
+  .book-modal:not(.open) * { pointer-events: none !important; }
   .reading-overlay .book-gallery { width: min(940px, 92vw); height: 460px; margin-top: 0; }
   .ro-head { display: flex; align-items: center; gap: 22px; }
   .ro-title { font-family: var(--f-type); font-size: 22px; letter-spacing: 4px; color: var(--paper);
@@ -2648,6 +2653,6 @@ topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoo
   <div class="ro-tip">拖动切换 · 点击书封面查看简介</div>
 </div>
 <!-- 书廊脚本需在覆盖层 DOM 之后加载 -->
-<script src="book-gallery.js?v=3"></script>
+<script src="book-gallery.js?v=4"></script>
 </body>
 </html>
