@@ -41,6 +41,7 @@
   var inertia = 0;         // 松手后的惯性角速度（度/秒）
   var dragMoved = 0;       // 本次拖拽的位移量，用于区分点击
   var downCard = null;     // 按下时命中的卡片
+  var downFacing = 180;    // 按下时该卡片与正面的夹角（度）
   var SENSITIVITY = 0.32;  // 每像素拖动对应的旋转角度
 
   var rise = document.createElement('div');
@@ -79,6 +80,8 @@
       var a = (((angle + i * STEP) % 360) + 360) % 360;
       var d = a > 180 ? 360 - a : a;
       var t = d / 180;
+      /* 只有朝向正面的卡片可点击：避免背向卡片与卡片间的空白区域误触 */
+      cards[i].style.pointerEvents = d < 90 ? 'auto' : 'none';
       if (t > 0.42) {
         var k = (t - 0.42) / 0.58;          // 0 边缘 → 1 正背面
         cards[i].style.filter = 'brightness(' + (1 - k * 0.55).toFixed(2) + ') blur(' + (k * 1.4).toFixed(2) + 'px)';
@@ -130,6 +133,12 @@
 
   window.addEventListener('resize', fit);
 
+  /* 卡片与正面的夹角（0 = 正对屏幕，180 = 完全背向） */
+  function facingOf(i) {
+    var a = (((angle + i * STEP) % 360) + 360) % 360;
+    return a > 180 ? 360 - a : a;
+  }
+
   /* ---------- 鼠标 / 触屏拖拽旋转 ---------- */
   function onPointerDown(e) {
     if (e.button !== undefined && e.button !== 0) return;
@@ -142,6 +151,7 @@
     inertia = 0;
     dragMoved = 0;
     downCard = e.target && e.target.closest ? e.target.closest('.hc-card') : null;
+    downFacing = downCard ? facingOf(cards.indexOf(downCard)) : 180;
     root.style.cursor = 'grabbing';
     start();
     try { root.setPointerCapture(e.pointerId); } catch (err) { /* 忽略不支持捕获的环境 */ }
@@ -166,10 +176,21 @@
     /* px/ms → 度/秒，作为松手后的惯性 */
     inertia = lastVx * SENSITIVITY * 1000;
     if (Math.abs(inertia) < 8) inertia = 0;
-    /* 未拖动则视为点击：点「阅读」卡片打开书籍书廊 */
-    if (dragMoved < 6 && downCard && downCard.getAttribute('data-title') === '阅读') {
+    /* 未拖动、且点中的是正朝向的「阅读」卡片，才视为点击 */
+    if (dragMoved < 6 && downCard && downFacing < 90 &&
+        downCard.getAttribute('data-title') === '阅读') {
       if (typeof window.openReadingGallery === 'function') window.openReadingGallery();
     }
+    downCard = null;
+    try { root.releasePointerCapture(e.pointerId); } catch (err) { /* 忽略 */ }
+  }
+
+  /* 触屏滚动等导致的取消手势，不应当成点击 */
+  function onPointerCancel(e) {
+    if (!dragging) return;
+    dragging = false;
+    root.style.cursor = 'grab';
+    inertia = 0;
     downCard = null;
     try { root.releasePointerCapture(e.pointerId); } catch (err) { /* 忽略 */ }
   }
@@ -177,7 +198,7 @@
   root.addEventListener('pointerdown', onPointerDown);
   root.addEventListener('pointermove', onPointerMove);
   root.addEventListener('pointerup', onPointerUp);
-  root.addEventListener('pointercancel', onPointerUp);
+  root.addEventListener('pointercancel', onPointerCancel);
 
   fit();
   paint();
