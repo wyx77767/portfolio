@@ -68,7 +68,7 @@
   body::before {
     /* 黑色颗粒照片纹理（PPT 每一页的黑板底） */
     content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
-    background: #070605 url("collage/bg-grain.png") center/cover no-repeat;
+    background: #070605 url("collage/bg-grain.webp") center/cover no-repeat;
     opacity: .92;
     mix-blend-mode: screen;
   }
@@ -81,7 +81,7 @@
       radial-gradient(ellipse 45% 35% at 12% 90%, rgba(192,143,36,.06), transparent 70%);
   }
   html[data-theme="light"] body::before {
-    background: #e4d8ba url("collage/bg-grain.png") center/cover no-repeat;
+    background: #e4d8ba url("collage/bg-grain.webp") center/cover no-repeat;
     mix-blend-mode: multiply; opacity: .2;
   }
   html[data-theme="light"] body::after {
@@ -194,7 +194,7 @@
   .avatar-ring::before {
     content: ""; position: absolute; top: -15px; left: 50%; transform: translateX(-50%) rotate(-6deg);
     width: 120px; height: 32px;
-    background: url("collage/tape-green.png") center/100% 100% no-repeat;
+    background: url("collage/tape-green.webp") center/100% 100% no-repeat;
   }
   .avatar-ring::after {
     content: "wyx · 2026"; position: absolute; bottom: 12px; left: 0; right: 0; text-align: center;
@@ -257,7 +257,7 @@
   .sec-title {
     position: relative; display: inline-block;
     min-width: 280px;
-    background: url("collage/strip-a.png") center/100% 100% no-repeat;
+    background: url("collage/strip-a.webp") center/100% 100% no-repeat;
     padding: 17px 64px 21px;
     font-family: var(--f-type); font-weight: 400;
     font-size: clamp(25px, 3.4vw, 37px); letter-spacing: 5px;
@@ -267,14 +267,14 @@
   .sec-title::before {
     content: ""; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
     width: 30px; height: 44px;
-    background: url("collage/pin.png") center/contain no-repeat;
+    background: url("collage/pin.webp") center/contain no-repeat;
     filter: drop-shadow(0 3px 3px rgba(0,0,0,.5));
   }
   .sec-title span { color: var(--pin-deep); }
-  section:nth-of-type(2n)   .sec-title { background-image: url("collage/strip-b.png"); transform: rotate(.8deg); }
-  section:nth-of-type(3n)   .sec-title { background-image: url("collage/strip-c.png"); }
-  section:nth-of-type(4n)   .sec-title { background-image: url("collage/strip-d.png"); }
-  section:nth-of-type(5n)   .sec-title { background-image: url("collage/strip-e.png"); }
+  section:nth-of-type(2n)   .sec-title { background-image: url("collage/strip-b.webp"); transform: rotate(.8deg); }
+  section:nth-of-type(3n)   .sec-title { background-image: url("collage/strip-c.webp"); }
+  section:nth-of-type(4n)   .sec-title { background-image: url("collage/strip-d.webp"); }
+  section:nth-of-type(5n)   .sec-title { background-image: url("collage/strip-e.webp"); }
   .sec-sub {
     text-align: center; color: var(--cream-dim);
     font-family: var(--f-mono); font-size: 14px; letter-spacing: 2px;
@@ -295,7 +295,7 @@
   .card::after, .ev::after, .work::after, .review-card::after, .board::after, .declare::after {
     /* 纸张颗粒脏点 */
     content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
-    background: url("collage/bg-grain.png") center/cover;
+    background: url("collage/bg-grain.webp") center/cover;
     opacity: .07; mix-blend-mode: multiply;
   }
   .card {
@@ -305,9 +305,9 @@
   .card::before, .ev::before {
     content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(-4deg);
     width: 118px; height: 32px;
-    background: url("collage/tape-green.png") center/100% 100% no-repeat; opacity: .92;
+    background: url("collage/tape-green.webp") center/100% 100% no-repeat; opacity: .92;
   }
-  .grid-2 > .card:nth-child(2)::before { background-image: url("collage/tape-floral.png"); }
+  .grid-2 > .card:nth-child(2)::before { background-image: url("collage/tape-floral.webp"); }
   .card h3, .card .muted, .card .small, .card p, .card li { color: var(--ink); }
   .card .muted, .muted { color: var(--ink-soft); }
   .card h3.block-h, h3.block-h {
@@ -454,10 +454,10 @@
   .ev-grid .ev:nth-child(3n) { transform: rotate(.3deg); }
   .ev::before {
     width: 84px; top: -13px; left: 26px; transform: rotate(-8deg);
-    background-image: url("collage/tape-orange.png");
+    background-image: url("collage/tape-orange.webp");
   }
-  .ev:nth-child(2n)::before { background-image: url("collage/tape-lily.png"); left: auto; right: 26px; transform: rotate(7deg); }
-  .ev:nth-child(3n)::before { background-image: url("collage/tape-red.png"); }
+  .ev:nth-child(2n)::before { background-image: url("collage/tape-lily.webp"); left: auto; right: 26px; transform: rotate(7deg); }
+  .ev:nth-child(3n)::before { background-image: url("collage/tape-red.webp"); }
   .ev .ev-ic { font-size: 30px; }
   .ev h4 {
     font-family: var(--f-type); font-weight: 400; font-size: 18.5px;
@@ -485,10 +485,10 @@
   .feature-hero:nth-of-type(2n) { transform: rotate(.5deg); }
   .feature-hero::before, .feature-hero::after {
     content: ""; position: absolute; top: -14px; width: 120px; height: 32px; z-index: 3;
-    background: url("collage/tape-floral.png") center/100% 100% no-repeat;
+    background: url("collage/tape-floral.webp") center/100% 100% no-repeat;
   }
   .feature-hero::before { left: 30px; transform: rotate(-7deg); }
-  .feature-hero::after { right: 30px; transform: rotate(8deg); background-image: url("collage/tape-orange.png"); }
+  .feature-hero::after { right: 30px; transform: rotate(8deg); background-image: url("collage/tape-orange.webp"); }
   .feature-hero img {
     width: 100%; height: 100%; object-fit: cover;
     filter: sepia(.3) saturate(.82) contrast(.94);
@@ -540,7 +540,7 @@
   .declare::before {
     width: 130px; left: auto; right: 40px; top: -15px;
     transform: translateX(0) rotate(6deg);
-    background-image: url("collage/tape-red.png");
+    background-image: url("collage/tape-red.webp");
   }
   .declare .badge-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
   .badge {
@@ -704,7 +704,7 @@
   .board::before {
     content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%) rotate(-3deg);
     width: 140px; height: 34px;
-    background: url("collage/tape-lily.png") center/100% 100% no-repeat;
+    background: url("collage/tape-lily.webp") center/100% 100% no-repeat;
   }
   .board-input { display: flex; gap: 12px; }
   .board-input input {
@@ -908,29 +908,29 @@
 
 <!-- 全局边角拼贴装饰（不拦截点击） -->
 <div class="deco-fixed" aria-hidden="true">
-  <img class="df-moth"   src="collage/moth-brown.png"      alt="">
-  <img class="df-flower" src="collage/flower-poppy.png"    alt="">
-  <img class="df-butter" src="collage/butterfly-peacock.png" alt="">
+  <img class="df-moth"   src="collage/moth-brown.webp"      alt="">
+  <img class="df-flower" src="collage/flower-poppy.webp"    alt="">
+  <img class="df-butter" src="collage/butterfly-peacock.webp" alt="">
 </div>
 
 <!-- ================= 首屏（黑胶带标题 + 拍立得 + 拼贴） ================= -->
 <header class="hero" id="top">
   <div class="hero-collage" aria-hidden="true">
-    <img class="hc hc-book"    src="collage/book.png"        alt="">
-    <img class="hc hc-moon"    src="collage/moon.png"        alt="">
-    <img class="hc hc-statue"  src="collage/statue.png"      alt="">
-    <img class="hc hc-balloon" src="collage/balloon.png"     alt="">
-    <img class="hc hc-zeppelin" src="collage/zeppelin.png"   alt="">
-    <img class="hc hc-mirror"  src="collage/mirror.png"      alt="">
-    <img class="hc hc-lips"    src="collage/lips.png"        alt="">
-    <img class="hc hc-typewriter" src="collage/typewriter.png" alt="">
-    <img class="hc hc-letter"  src="collage/letter-scrap.png" alt="">
-    <img class="hc hc-writer"  src="collage/writer.png"      alt="">
-    <img class="hc hc-fwhite"  src="collage/flower-white.png" alt="">
-    <img class="hc hc-fyellow" src="collage/flower-yellow.png" alt="">
-    <div class="hc hc-polar hc-p1"><img src="collage/polaroid-1.jpg" alt=""></div>
-    <div class="hc hc-polar hc-p2"><img src="collage/polaroid-3.jpg" alt=""></div>
-    <div class="hc hc-polar hc-p3"><img src="collage/polaroid-5.jpg" alt=""></div>
+    <img class="hc hc-book"    src="collage/book.webp"        alt="">
+    <img class="hc hc-moon"    src="collage/moon.webp"        alt="">
+    <img class="hc hc-statue"  src="collage/statue.webp"      alt="">
+    <img class="hc hc-balloon" src="collage/balloon.webp"     alt="">
+    <img class="hc hc-zeppelin" src="collage/zeppelin.webp"   alt="">
+    <img class="hc hc-mirror"  src="collage/mirror.webp"      alt="">
+    <img class="hc hc-lips"    src="collage/lips.webp"        alt="">
+    <img class="hc hc-typewriter" src="collage/typewriter.webp" alt="">
+    <img class="hc hc-letter"  src="collage/letter-scrap.webp" alt="">
+    <img class="hc hc-writer"  src="collage/writer.webp"      alt="">
+    <img class="hc hc-fwhite"  src="collage/flower-white.webp" alt="">
+    <img class="hc hc-fyellow" src="collage/flower-yellow.webp" alt="">
+    <div class="hc hc-polar hc-p1"><img src="collage/polaroid-1.webp" alt=""></div>
+    <div class="hc hc-polar hc-p2"><img src="collage/polaroid-3.webp" alt=""></div>
+    <div class="hc hc-polar hc-p3"><img src="collage/polaroid-5.webp" alt=""></div>
   </div>
   <div class="container hero-inner">
     <div class="hero-text">
@@ -958,7 +958,7 @@
 <section class="section" id="about">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="num-badge"><img src="collage/num-0-teal.png" alt="0"><img src="collage/num-1.png" alt="1"></span>
+      <span class="num-badge"><img src="collage/num-0-teal.webp" alt="0"><img src="collage/num-1.webp" alt="1"></span>
       <h2 class="sec-title">个人简介与<span>能力说明</span></h2>
       <p class="sec-sub">方向 · 工具 · 技能</p>
     </div>
@@ -1014,7 +1014,7 @@
 <section class="section" id="coursework" style="padding-top:0;">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="num-badge"><img src="collage/num-0-pink.png" alt="0"><img src="collage/num-2.png" alt="2"></span>
+      <span class="num-badge"><img src="collage/num-0-pink.webp" alt="0"><img src="collage/num-2.webp" alt="2"></span>
       <h2 class="sec-title">阶段<span>作业</span></h2>
       <p class="sec-sub">按课程学习顺序展示，每一项都附可打开的成果，而不只是截图</p>
     </div>
@@ -1115,7 +1115,7 @@
 <section class="section" id="works" style="padding-top:0;">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="num-badge"><img src="collage/num-0-gold.png" alt="0"><img src="collage/num-3.png" alt="3"></span>
+      <span class="num-badge"><img src="collage/num-0-gold.webp" alt="0"><img src="collage/num-3.webp" alt="3"></span>
       <h2 class="sec-title">项目<span>成果</span></h2>
       <p class="sec-sub">功能 · 入口 · 关键页 · 技术说明（十一件作品完全对应）</p>
     </div>
@@ -1206,7 +1206,7 @@
       </div>
       <!-- 项目 5：桌宠番茄钟 -->
       <div class="work reveal" id="work-card-pomodoro">
-        <div class="pic"><img class="no-vintage" src="covers/pomodoro.jpg" alt="桌宠番茄钟封面图（AI 生成示意图）"></div>
+        <div class="pic"><img class="no-vintage" src="covers/pomodoro.webp" alt="桌宠番茄钟封面图（AI 生成示意图）"></div>
         <div class="body">
           <h3>🐱 桌宠番茄钟 · 陪你专注</h3>
           <ul class="feat-list">
@@ -1225,7 +1225,7 @@
       </div>
       <!-- 项目 6：Markdown 笔记 -->
       <div class="work reveal" id="work-card-markdown">
-        <div class="pic"><img class="no-vintage" src="covers/markdown.jpg" alt="Markdown 笔记封面图（AI 生成示意图）"></div>
+        <div class="pic"><img class="no-vintage" src="covers/markdown.webp" alt="Markdown 笔记封面图（AI 生成示意图）"></div>
         <div class="body">
           <h3>📝 Markdown 笔记 · 极简写作</h3>
           <ul class="feat-list">
@@ -1244,7 +1244,7 @@
       </div>
       <!-- 项目 7：待办事项 -->
       <div class="work reveal" id="work-card-todo">
-        <div class="pic"><img class="no-vintage" src="covers/todo.jpg" alt="待办事项封面图（AI 生成示意图）"></div>
+        <div class="pic"><img class="no-vintage" src="covers/todo.webp" alt="待办事项封面图（AI 生成示意图）"></div>
         <div class="body">
           <h3>✅ 待办事项 · 任务管理</h3>
           <ul class="feat-list">
@@ -1263,7 +1263,7 @@
       </div>
       <!-- 项目 8：天气查询 -->
       <div class="work reveal" id="work-card-weather">
-        <div class="pic"><img class="no-vintage" src="covers/weather.jpg" alt="天气查询封面图（AI 生成示意图）"></div>
+        <div class="pic"><img class="no-vintage" src="covers/weather.webp" alt="天气查询封面图（AI 生成示意图）"></div>
         <div class="body">
           <h3>🌤️ 天气查询 · 实时气象</h3>
           <ul class="feat-list">
@@ -1282,7 +1282,7 @@
       </div>
       <!-- 项目 9：博客系统 -->
       <div class="work reveal" id="work-card-blog">
-        <div class="pic"><img class="no-vintage" src="covers/blog.jpg" alt="博客系统封面图（AI 生成示意图）"></div>
+        <div class="pic"><img class="no-vintage" src="covers/blog.webp" alt="博客系统封面图（AI 生成示意图）"></div>
         <div class="body">
           <h3>📝 博客系统 · Markdown 多用户博客</h3>
           <ul class="feat-list">
@@ -1302,7 +1302,7 @@
       </div>
       <!-- 项目 10：极简商城 -->
       <div class="work reveal" id="work-card-shop">
-        <div class="pic"><img class="no-vintage" src="covers/shop.jpg" alt="极简商城封面图（AI 生成示意图）"></div>
+        <div class="pic"><img class="no-vintage" src="covers/shop.webp" alt="极简商城封面图（AI 生成示意图）"></div>
         <div class="body">
           <h3>🛍️ 极简商城 · MUSE 美妆商店</h3>
           <ul class="feat-list">
@@ -1322,7 +1322,7 @@
       </div>
       <!-- 项目 11：问答社区 -->
       <div class="work reveal" id="work-card-qa">
-        <div class="pic"><img class="no-vintage" src="covers/qa.jpg" alt="问答社区封面图（AI 生成示意图）"></div>
+        <div class="pic"><img class="no-vintage" src="covers/qa.webp" alt="问答社区封面图（AI 生成示意图）"></div>
         <div class="body">
           <h3>💬 问答社区 · 雾问 mist-ask</h3>
           <ul class="feat-list">
@@ -1348,7 +1348,7 @@
 <section class="section" id="process" style="padding-top:0;">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="num-badge"><img src="collage/num-0-teal.png" alt="0"><img src="collage/num-4.png" alt="4"></span>
+      <span class="num-badge"><img src="collage/num-0-teal.webp" alt="0"><img src="collage/num-4.webp" alt="4"></span>
       <h2 class="sec-title">过程<span>证据</span></h2>
       <p class="sec-sub">需求 · 原型 · 与 AI 交互关键步骤 · 版本 · 问题解决</p>
     </div>
@@ -1421,7 +1421,7 @@
 <section class="section" id="iterations" style="padding-top:0;">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="num-badge"><img src="collage/num-0-pink.png" alt="0"><img src="collage/num-5.png" alt="5"></span>
+      <span class="num-badge"><img src="collage/num-0-pink.webp" alt="0"><img src="collage/num-5.webp" alt="5"></span>
       <h2 class="sec-title">迭代<span>记录</span></h2>
       <p class="sec-sub">改了什么 · 为什么 · 效果 · 下一步</p>
     </div>
@@ -1521,7 +1521,7 @@
 <section class="section" id="feature" style="padding-top:0;">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="num-badge"><img src="collage/num-0-gold.png" alt="0"><img src="collage/num-6.png" alt="6"></span>
+      <span class="num-badge"><img src="collage/num-0-gold.webp" alt="0"><img src="collage/num-6.webp" alt="6"></span>
       <h2 class="sec-title">标志性成果<span>专题</span></h2>
       <p class="sec-sub">十一件作品：问题 · 用户 · 方案 · 复盘</p>
     </div>
@@ -1904,7 +1904,7 @@
 
   <!-- 专题 9：博客系统 -->
   <div class="feature-hero reveal" id="feature-blog" style="margin-top:56px;">
-    <img src="covers/blog.jpg" alt="博客系统专题横幅（AI 生成示意图）">
+    <img src="covers/blog.webp" alt="博客系统专题横幅（AI 生成示意图）">
     <div class="cap">
       <h3>📝 博客系统 · Markdown 多用户博客</h3>
       <p>鉴权 · 作者权限 · 分类搜索，一条完整的全栈内容链路</p>
@@ -1952,7 +1952,7 @@
 
   <!-- 专题 10：极简商城 -->
   <div class="feature-hero reveal" id="feature-shop" style="margin-top:56px;">
-    <img src="covers/shop.jpg" alt="极简商城专题横幅（AI 生成示意图）">
+    <img src="covers/shop.webp" alt="极简商城专题横幅（AI 生成示意图）">
     <div class="cap">
       <h3>🛍️ 极简商城 · MUSE 美妆商店</h3>
       <p>浏览 · 加购 · 结算 · 订单，一条能被并发考验的交易链路</p>
@@ -2000,7 +2000,7 @@
 
   <!-- 专题 11：问答社区 -->
   <div class="feature-hero reveal" id="feature-qa" style="margin-top:56px;">
-    <img src="covers/qa.jpg" alt="问答社区专题横幅（AI 生成示意图）">
+    <img src="covers/qa.webp" alt="问答社区专题横幅（AI 生成示意图）">
     <div class="cap">
       <h3>💬 问答社区 · 雾问 mist-ask</h3>
       <p>积分驱动的问答：让认真回答的人被看见</p>
@@ -2052,7 +2052,7 @@
 <section class="section" id="review" style="padding-top:0;">
   <div class="container">
     <div class="sec-head reveal">
-      <span class="num-badge"><img src="collage/num-0-teal.png" alt="0"><img src="collage/num-7.png" alt="7"></span>
+      <span class="num-badge"><img src="collage/num-0-teal.webp" alt="0"><img src="collage/num-7.webp" alt="7"></span>
       <h2 class="sec-title">最终学习<span>复盘</span></h2>
       <p class="sec-sub">能力变化 · 方法 · 失败 · 计划</p>
     </div>
@@ -2527,43 +2527,43 @@ topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoo
       },
       {
         title: '桌宠番茄钟',
-        image: 'covers/pomodoro.jpg',
+        image: 'covers/pomodoro.webp',
         href: '#work-card-pomodoro',
         noVintage: true,
       },
       {
         title: 'Markdown笔记',
-        image: 'covers/markdown.jpg',
+        image: 'covers/markdown.webp',
         href: '#work-card-markdown',
         noVintage: true,
       },
       {
         title: '待办事项',
-        image: 'covers/todo.jpg',
+        image: 'covers/todo.webp',
         href: '#work-card-todo',
         noVintage: true,
       },
       {
         title: '天气查询',
-        image: 'covers/weather.jpg',
+        image: 'covers/weather.webp',
         href: '#work-card-weather',
         noVintage: true,
       },
       {
         title: '博客系统',
-        image: 'covers/blog.jpg',
+        image: 'covers/blog.webp',
         href: '#work-card-blog',
         noVintage: true,
       },
       {
         title: '极简商城',
-        image: 'covers/shop.jpg',
+        image: 'covers/shop.webp',
         href: '#work-card-shop',
         noVintage: true,
       },
       {
         title: '问答社区',
-        image: 'covers/qa.jpg',
+        image: 'covers/qa.webp',
         href: '#work-card-qa',
         noVintage: true,
       },
@@ -2654,5 +2654,7 @@ topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoo
 </div>
 <!-- 书廊脚本需在覆盖层 DOM 之后加载 -->
 <script src="book-gallery.js?v=4"></script>
+<!-- 文字管理后台（管理员 wyx） -->
+<script src="admin.js?v=1"></script>
 </body>
 </html>
