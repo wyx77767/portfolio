@@ -6,8 +6,11 @@
 (function () {
   'use strict';
 
-  var NAMESPACE = 'wyx_fandom_dc';
-  if (window[NAMESPACE]) return; // 幂等
+  var NAME = 'wyx_fandom_dc';
+  // 即使之前已挂载，也要确保 window.openFandomGallery 是 function
+  // （某些浏览器/扩展/旧缓存可能把它污染成 boolean）
+  var already = typeof window.openFandomGallery === 'function' && window[NAME];
+  if (already) return;
 
   var css = [
     '.fans-overlay{position:fixed;inset:0;z-index:9999;display:none;',
@@ -274,5 +277,5 @@
   // 导出
   window.openFandomGallery = open;
   window.closeFandomGallery = close;
-  window[NAMESPACE] = { open: open, close: close };
+  window[NAME] = { open: open, close: close };
 })();
