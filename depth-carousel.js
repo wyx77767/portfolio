@@ -92,8 +92,8 @@
     autoEvery: 3400
   };
 
-  // 16 张粉丝照片（从 fans/star_01.webp 到 star_16.webp）
-  var N = 16;
+  // 13 张粉丝照片（fans/star_01.webp ~ star_13.webp）
+  var N = 13;
   var frames = [];
   for (var i = 1; i <= N; i++) {
     var card = document.createElement('div');
