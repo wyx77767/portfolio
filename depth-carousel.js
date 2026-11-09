@@ -25,7 +25,7 @@
     '.fans-close:hover{background:#cf202c;border-color:#cf202c;color:#fff;transform:rotate(90deg)}',
     '.dc-wrap{perspective:1400px;perspective-origin:50% 48%;width:min(92vw,920px);',
     'height:min(62vh,540px);position:relative;margin-top:4px}',
-    '.dc-stage{position:absolute;inset:0;transform-style:preserve-3d}',
+    '.dc-stage{position:absolute;inset:0;transform-style:preserve-3d;z-index:1}',
     '.dc-card{position:absolute;left:50%;top:50%;transform-origin:center center;',
     'backface-visibility:hidden;will-change:transform,opacity,filter;pointer-events:auto}',
     '.dc-card img{display:block;border-radius:4px;box-shadow:0 16px 40px rgba(0,0,0,.65);',
@@ -35,7 +35,7 @@
     'color:rgba(236,225,198,.5);font-family:"Anonymous Pro",monospace;font-size:10px;',
     'letter-spacing:2px;opacity:0;transition:opacity .3s}',
     '.dc-dots{position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);',
-    'display:flex;gap:7px}',
+    'display:flex;gap:7px;z-index:10}',
     '.dc-dots span{width:8px;height:8px;border-radius:50%;background:rgba(236,225,198,.28);transition:.2s;cursor:pointer}',
     '.dc-dots span.on{background:#cf202c;transform:scale(1.25)}',
     '.dc-hint{color:rgba(236,225,198,.55);font-family:"Anonymous Pro",monospace;',
@@ -250,6 +250,8 @@
   // 触摸/鼠标拖拽
   var dragging = false, lastX = 0;
   wrap.addEventListener('pointerdown', function (e) {
+    // 按钮 / 圆点自身要能正常收到 click，不能被拖拽捕获抢走
+    if (e.target && e.target.closest && e.target.closest('button, .dc-dots')) return;
     dragging = true;
     lastX = e.clientX;
     try { wrap.setPointerCapture(e.pointerId); } catch (_) {}
