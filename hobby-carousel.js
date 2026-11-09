@@ -176,10 +176,14 @@
     /* px/ms → 度/秒，作为松手后的惯性 */
     inertia = lastVx * SENSITIVITY * 1000;
     if (Math.abs(inertia) < 8) inertia = 0;
-    /* 未拖动、且点中的是正朝向的「阅读」卡片，才视为点击 */
-    if (dragMoved < 6 && downCard && downFacing < 90 &&
-        downCard.getAttribute('data-title') === '阅读') {
-      if (typeof window.openReadingGallery === 'function') window.openReadingGallery();
+    /* 未拖动、且点中的是正朝向的某张卡片，才视为点击 */
+    if (dragMoved < 6 && downCard && downFacing < 90) {
+      var title = downCard.getAttribute('data-title');
+      if (title === '阅读' && typeof window.openReadingGallery === 'function') {
+        window.openReadingGallery();
+      } else if (title === '追星' && typeof window.openFandomGallery === 'function') {
+        window.openFandomGallery();
+      }
     }
     downCard = null;
     try { root.releasePointerCapture(e.pointerId); } catch (err) { /* 忽略 */ }
