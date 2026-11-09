@@ -122,7 +122,7 @@
   var hover = false;
   var autoTimer = null;
   var rafId = null;
-  var open = false;
+  var opened = false;
 
   // 渲染
   function render() {
@@ -167,7 +167,7 @@
 
   // 动画帧
   function animate() {
-    if (!open) { rafId = null; return; }
+    if (!opened) { rafId = null; return; }
     var d = target - current;
     if (Math.abs(d) < 0.001) {
       current = target;
@@ -180,9 +180,9 @@
 
   function startAuto() {
     stopAuto();
-    if (!conf.autoplay || hover || !open) return;
+    if (!conf.autoplay || hover || !opened) return;
     autoTimer = setInterval(function () {
-      if (!hover && open) {
+      if (!hover && opened) {
         target += 1;
       }
     }, conf.autoEvery);
@@ -191,13 +191,13 @@
     if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
   }
 
-  function next() { target += 1; if (open) startAuto(); }
-  function prev() { target -= 1; if (open) startAuto(); }
+  function next() { target += 1; if (opened) startAuto(); }
+  function prev() { target -= 1; if (opened) startAuto(); }
 
   // 打开遮罩
   function open() {
     target = 0; current = 0; hover = false;
-    open = true;
+    opened = true;
     overlay.classList.add('show');
     overlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
@@ -209,7 +209,7 @@
 
   // 关闭遮罩
   function close() {
-    open = false;
+    opened = false;
     stopAuto();
     cancelAnimationFrame(rafId); rafId = null;
     overlay.classList.remove('show');
@@ -237,7 +237,7 @@
 
   // 键盘
   document.addEventListener('keydown', function (e) {
-    if (!open) return;
+    if (!opened) return;
     if (e.key === 'ArrowRight') { next(); }
     else if (e.key === 'ArrowLeft') { prev(); }
     else if (e.key === 'Escape') { close(); }
