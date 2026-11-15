@@ -1,8 +1,7 @@
 /* ============================================================
  * FuzzyText — 模糊失真文字启动页
  * 文字 "Welcome to my world" 两个词一组蹦出，每组配：
- *   1) Web Audio 合成的机械音效（咔哒+嗡鸣）
- *   2) Web Speech API 朗读该组词
+ *   Web Audio 合成的机械音效（咔哒+嗡鸣）
  * 文字带持续模糊失真（baseIntensity），鼠标悬停增强（hoverIntensity）。
  * ============================================================ */
 (function (global) {
@@ -29,12 +28,9 @@
       this._mouse = { x: -9999, y: -9999, active: false };
       this._revealedGroups = 0;  // 已显示的词组数
       this._intensity = this.opts.baseIntensity;
-      this._voices = [];         // 缓存语音列表
-      this._voicesReady = false;
 
       this._buildCanvas();
       this._bindEvents();
-      this._preloadVoices();
       this._startLoop();
       // 开始逐组蹦出文字
       this._startReveal();
@@ -99,20 +95,7 @@
       this._groups = groups;
       this._revealedGroups = 0;
 
-      // 等语音列表就绪后再开始（确保第一组也能朗读），最多等 1.5s
-      const start = () => this._revealNext();
-      if (this._voicesReady) {
-        start();
-      } else {
-        let waited = 0;
-        const wait = setInterval(() => {
-          waited += 100;
-          if (this._voicesReady || waited > 1500) {
-            clearInterval(wait);
-            start();
-          }
-        }, 100);
-      }
+      this._revealNext();
     }
 
     _revealNext() {
@@ -130,36 +113,11 @@
       // 播放机械音效
       this._playMechanicalSound();
 
-      // 只在第一组显示时，把所有单词一次性排队朗读（避免多组 speakNext 交错）
-      if (this._revealedGroups === 1) {
-        const allWords = this.opts.text.split(/\s+/);
-        this._speakWords(allWords);
-      }
-
       // 下一组
       if (this._revealedGroups < this._groups.length) {
         setTimeout(() => this._revealNext(), this.opts.groupDelay);
       }
       // 最后一组不设自动淡出，等用户点击
-    }
-
-    /* ---------- 预加载语音列表（解决 getVoices 异步加载问题） ---------- */
-    _preloadVoices() {
-      try {
-        if (!global.speechSynthesis) return;
-        const load = () => {
-          this._voices = global.speechSynthesis.getVoices();
-          if (this._voices.length) this._voicesReady = true;
-        };
-        load();
-        global.speechSynthesis.onvoiceschanged = load;
-        // 兜底：某些浏览器 voiceschanged 不触发，定时重试
-        let tries = 0;
-        const retry = setInterval(() => {
-          load();
-          if (this._voicesReady || tries++ > 10) clearInterval(retry);
-        }, 200);
-      } catch (e) { /* 静默 */ }
     }
 
     /* ---------- 机械音效（Web Audio 合成） ---------- */
@@ -206,43 +164,6 @@
         osc2.stop(now + 0.06);
 
         setTimeout(() => ctx.close(), 400);
-      } catch (e) { /* 静默 */ }
-    }
-
-    /* ---------- 逐个朗读单词（Web Speech API，顺序衔接） ---------- */
-    _speakWords(words) {
-      this._doSpeakWords(words);
-    }
-
-    _doSpeakWords(words) {
-      try {
-        if (!global.speechSynthesis) return;
-        // 不调用 cancel，让多组单词自然排队（Welcome→to→my→world 顺序朗读）
-
-        const voices = this._voices.length ? this._voices : global.speechSynthesis.getVoices();
-        const enVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) || voices.find(v => v.lang.startsWith('en'));
-
-        let idx = 0;
-        const speakNext = () => {
-          if (idx >= words.length) return;
-          const word = words[idx++];
-          const u = new SpeechSynthesisUtterance(word);
-          u.lang = 'en-US';
-          u.rate = 1.3;
-          u.pitch = 1.1;
-          u.volume = 0.85;
-          if (enVoice) u.voice = enVoice;
-          u.onend = () => {
-            // 单词之间短暂停顿，再读下一个
-            setTimeout(speakNext, 10);
-          };
-          u.onerror = () => {
-            // 出错也继续下一个，避免卡死
-            setTimeout(speakNext, 25);
-          };
-          global.speechSynthesis.speak(u);
-        };
-        speakNext();
       } catch (e) { /* 静默 */ }
     }
 
@@ -350,7 +271,6 @@
     _finish() {
       if (this._finished) return;
       this._finished = true;
-      if (global.speechSynthesis) global.speechSynthesis.cancel();
       this.canvas.style.transition = 'opacity 0.6s ease-out';
       this.canvas.style.opacity = '0';
       setTimeout(() => {
